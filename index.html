@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kabwe Central SDA Church Choir - Member System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 800px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #667eea;
+        }
+        
+        .church-name {
+            color: #2c3e50;
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        
+        .choir-title {
+            color: #667eea;
+            font-size: 1.2rem;
+            font-weight: 500;
+        }
+        
+        .section {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+        }
+        
+        .section-title {
+            color: #2c3e50;
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #2c3e50;
+            font-weight: 500;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
+        }
+        
+        .member-list {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #e1e8ed;
+            border-radius: 8px;
+            padding: 1rem;
+        }
+        
+        .member-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem;
+            margin-bottom: 0.5rem;
+            background: rgba(102, 126, 234, 0.05);
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .member-info {
+            flex-grow: 1;
+        }
+        
+        .member-name {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .member-details {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+        
+        .attendance-record {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+            border: 1px solid #e1e8ed;
+        }
+        
+        .attendance-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #f1f3f4;
+        }
+        
+        .attendance-item:last-child {
+            border-bottom: none;
+        }
+        
+        .status-present {
+            color: #27ae60;
+            font-weight: bold;
+        }
+        
+        .status-absent {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .message {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+        
+        .success {
+            background: rgba(39, 174, 96, 0.1);
+            color: #27ae60;
+            border: 1px solid rgba(39, 174, 96, 0.3);
+        }
+        
+        .error {
+            background: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+            border: 1px solid rgba(231, 76, 60, 0.3);
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #e1e8ed;
+        }
+        
+        .tab {
+            padding: 0.8rem 1.5rem;
+            background: none;
+            border: none;
+            color: #7f8c8d;
+            font-weight: 500;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+        
+        .login-form {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                width: 95%;
+                padding: 1rem;
+            }
+            
+            .church-name {
+                font-size: 1.4rem;
+            }
+            
+            .member-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="church-name">Kabwe Central Seventh-day Adventist Church</div>
+            <div class="choir-title">Choir Management System</div>
+        </div>
+        
+        <!-- Login Section -->
+        <div id="loginSection" class="section">
+            <h2 class="section-title">🎵 Member Login</h2>
+            <div class="login-form">
+                <div class="form-group">
+                    <label for="loginName">Full Name:</label>
+                    <input type="text" id="loginName" placeholder="Enter your full name">
+                </div>
+                <div class="form-group">
+                    <label for="loginPhone">Phone Number:</label>
+                    <input type="tel" id="loginPhone" placeholder="Enter your phone number">
+                </div>
+                <button onclick="loginMember()">Login</button>
+                <button onclick="showRegisterForm()" class="btn-secondary">New Member? Register</button>
+            </div>
+        </div>
+        
+        <!-- Registration Section -->
+        <div id="registrationSection" class="section hidden">
+            <h2 class="section-title">📝 New Member Registration</h2>
+            <div class="form-group">
+                <label for="memberName">Full Name:</label>
+                <input type="text" id="memberName" placeholder="Enter full name">
+            </div>
+            <div class="form-group">
+                <label for="memberPhone">Phone Number:</label>
+                <input type="tel" id="memberPhone" placeholder="Enter phone number">
+            </div>
+            <div class="form-group">
+                <label for="voicePart">Voice Part:</label>
+                <select id="voicePart">
+                    <option value="">Select voice part</option>
+                    <option value="Soprano">Soprano</option>
+                    <option value="Alto">Alto</option>
+                    <option value="Tenor">Tenor</option>
+                    <option value="Bass">Bass</option>
+                </select>
+            </div>
+            <button onclick="registerMember()">Register Member</button>
+            <button onclick="showLoginForm()" class="btn-secondary">Back to Login</button>
+        </div>
+        
+        <!-- Main Dashboard -->
+        <div id="dashboard" class="hidden">
+            <div class="tabs">
+                <button class="tab active" onclick="showTab('attendance')">📋 Attendance</button>
+                <button class="tab" onclick="showTab('members')">👥 Members</button>
+                <button class="tab" onclick="showTab('records')">📊 Records</button>
+            </div>
+            
+            <!-- Attendance Tab -->
+            <div id="attendanceTab" class="section">
+                <h2 class="section-title">📋 Mark Attendance</h2>
+                <div class="form-group">
+                    <label for="attendanceDate">Date:</label>
+                    <input type="date" id="attendanceDate">
+                </div>
+                <div class="form-group">
+                    <label for="attendanceType">Service Type:</label>
+                    <select id="attendanceType">
+                        <option value="Sabbath Morning">Sabbath Morning Service</option>
+                        <option value="Choir Practice">Choir Practice</option>
+                        <option value="Special Event">Special Event</option>
+                        <option value="Wedding">Wedding</option>
+                        <option value="Funeral">Funeral</option>
+                    </select>
+                </div>
+                <button onclick="markAttendance()">Mark My Attendance</button>
+                <button onclick="logout()" class="btn-secondary">Logout</button>
+            </div>
+            
+            <!-- Members Tab -->
+            <div id="membersTab" class="section hidden">
+                <h2 class="section-title">👥 Choir Members</h2>
+                <div id="membersList" class="member-list"></div>
+            </div>
+            
+            <!-- Records Tab -->
+            <div id="recordsTab" class="section hidden">
+                <h2 class="section-title">📊 My Attendance Records</h2>
+                <div id="attendanceRecords" class="attendance-record"></div>
+            </div>
+        </div>
+        
+        <div id="messageArea"></div>
+    </div>
+    
+    <script>
+        // In-memory storage (Note: data will be lost on page refresh)
+        let members = [
+            {
+                id: 1,
+                name: "Grace Mwansa",
+                phone: "0977123456",
+                voicePart: "Soprano",
+                registeredDate: "2024-01-15"
+            },
+            {
+                id: 2,
+                name: "John Phiri",
+                phone: "0966789012",
+                voicePart: "Tenor",
+                registeredDate: "2024-01-20"
+            },
+            {
+                id: 3,
+                name: "Mary Banda",
+                phone: "0955456789",
+                voicePart: "Alto",
+                registeredDate: "2024-02-05"
+            }
+        ];
+        
+        let attendance = [];
+        let currentUser = null;
+        let nextMemberId = 4;
+        
+        // Initialize the system
+        document.getElementById('attendanceDate').valueAsDate = new Date();
+        
+        function showMessage(message, type = 'success') {
+            const messageArea = document.getElementById('messageArea');
+            messageArea.innerHTML = `<div class="message ${type}">${message}</div>`;
+            setTimeout(() => {
+                messageArea.innerHTML = '';
+            }, 3000);
+        }
+        
+        function loginMember() {
+            const name = document.getElementById('loginName').value.trim();
+            const phone = document.getElementById('loginPhone').value.trim();
+            
+            if (!name || !phone) {
+                showMessage('Please enter both name and phone number.', 'error');
+                return;
+            }
+            
+            const member = members.find(m => 
+                m.name.toLowerCase() === name.toLowerCase() && m.phone === phone
+            );
+            
+            if (member) {
+                currentUser = member;
+                document.getElementById('loginSection').classList.add('hidden');
+                document.getElementById('registrationSection').classList.add('hidden');
+                document.getElementById('dashboard').classList.remove('hidden');
+                updateMembersList();
+                updateAttendanceRecords();
+                showMessage(`Welcome back, ${member.name}! 🎵`);
+            } else {
+                showMessage('Member not found. Please check your details or register as a new member.', 'error');
+            }
+        }
+        
+        function showRegisterForm() {
+            document.getElementById('loginSection').classList.add('hidden');
+            document.getElementById('registrationSection').classList.remove('hidden');
+        }
+        
+        function showLoginForm() {
+            document.getElementById('registrationSection').classList.add('hidden');
+            document.getElementById('loginSection').classList.remove('hidden');
+        }
+        
+        function registerMember() {
+            const name = document.getElementById('memberName').value.trim();
+            const phone = document.getElementById('memberPhone').value.trim();
+            const voicePart = document.getElementById('voicePart').value;
+            
+            if (!name || !phone || !voicePart) {
+                showMessage('Please fill in all fields.', 'error');
+                return;
+            }
+            
+            // Check if member already exists
+            const existingMember = members.find(m => 
+                m.name.toLowerCase() === name.toLowerCase() || m.phone === phone
+            );
+            
+            if (existingMember) {
+                showMessage('A member with this name or phone number already exists.', 'error');
+                return;
+            }
+            
+            const newMember = {
+                id: nextMemberId++,
+                name: name,
+                phone: phone,
+                voicePart: voicePart,
+                registeredDate: new Date().toISOString().split('T')[0]
+            };
+            
+            members.push(newMember);
+            showMessage(`Registration successful! Welcome to the choir, ${name}! 🎉`);
+            
+            // Clear form
+            document.getElementById('memberName').value = '';
+            document.getElementById('memberPhone').value = '';
+            document.getElementById('voicePart').value = '';
+            
+            // Switch to login
+            showLoginForm();
+        }
+        
+        function markAttendance() {
+            if (!currentUser) return;
+            
+            const date = document.getElementById('attendanceDate').value;
+            const serviceType = document.getElementById('attendanceType').value;
+            
+            if (!date) {
+                showMessage('Please select a date.', 'error');
+                return;
+            }
+            
+            // Check if already marked attendance for this date and service
+            const existingRecord = attendance.find(a => 
+                a.memberId === currentUser.id && 
+                a.date === date && 
+                a.serviceType === serviceType
+            );
+            
+            if (existingRecord) {
+                showMessage('You have already marked attendance for this date and service type.', 'error');
+                return;
+            }
+            
+            const attendanceRecord = {
+                id: attendance.length + 1,
+                memberId: currentUser.id,
+                memberName: currentUser.name,
+                date: date,
+                serviceType: serviceType,
+                status: 'Present',
+                timestamp: new Date().toISOString()
+            };
+            
+            attendance.push(attendanceRecord);
+            updateAttendanceRecords();
+            showMessage(`Attendance marked successfully for ${serviceType} on ${date}! ✅`);
+        }
+        
+        function showTab(tabName) {
+            // Hide all tabs
+            document.getElementById('attendanceTab').classList.add('hidden');
+            document.getElementById('membersTab').classList.add('hidden');
+            document.getElementById('recordsTab').classList.add('hidden');
+            
+            // Remove active class from all tab buttons
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            
+            // Show selected tab
+            document.getElementById(tabName + 'Tab').classList.remove('hidden');
+            event.target.classList.add('active');
+            
+            if (tabName === 'members') {
+                updateMembersList();
+            } else if (tabName === 'records') {
+                updateAttendanceRecords();
+            }
+        }
+        
+        function updateMembersList() {
+            const membersList = document.getElementById('membersList');
+            if (members.length === 0) {
+                membersList.innerHTML = '<p>No members registered yet.</p>';
+                return;
+            }
+            
+            membersList.innerHTML = members.map(member => `
+                <div class="member-item">
+                    <div class="member-info">
+                        <div class="member-name">${member.name}</div>
+                        <div class="member-details">${member.voicePart} • Joined: ${member.registeredDate}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function updateAttendanceRecords() {
+            const recordsDiv = document.getElementById('attendanceRecords');
+            if (!currentUser) return;
+            
+            const userAttendance = attendance.filter(a => a.memberId === currentUser.id)
+                                            .sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            if (userAttendance.length === 0) {
+                recordsDiv.innerHTML = '<p>No attendance records found.</p>';
+                return;
+            }
+            
+            const totalServices = userAttendance.length;
+            const presentCount = userAttendance.filter(a => a.status === 'Present').length;
+            const attendanceRate = ((presentCount / totalServices) * 100).toFixed(1);
+            
+            recordsDiv.innerHTML = `
+                <div style="margin-bottom: 1rem; padding: 1rem; background: rgba(102, 126, 234, 0.1); border-radius: 8px;">
+                    <strong>Attendance Summary:</strong> ${presentCount} out of ${totalServices} services attended (${attendanceRate}% attendance rate)
+                </div>
+                ${userAttendance.map(record => `
+                    <div class="attendance-item">
+                        <div>
+                            <strong>${record.date}</strong><br>
+                            <small>${record.serviceType}</small>
+                        </div>
+                        <div class="status-${record.status.toLowerCase()}">${record.status}</div>
+                    </div>
+                `).join('')}
+            `;
+        }
+        
+        function logout() {
+            currentUser = null;
+            document.getElementById('dashboard').classList.add('hidden');
+            document.getElementById('loginSection').classList.remove('hidden');
+            document.getElementById('loginName').value = '';
+            document.getElementById('loginPhone').value = '';
+            showMessage('You have been logged out successfully.');
+        }
+        
+        // Initialize with sample data
+        updateMembersList();
+    </script>
+</body>
+</html>
