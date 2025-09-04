@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kabwe Central SDA Church Choir - Member System</title>
+    <title>Kabwe Central SDA Church Choir - Management System</title>
     <style>
         * {
             margin: 0;
@@ -26,7 +26,7 @@
             border-radius: 20px;
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
             width: 90%;
-            max-width: 800px;
+            max-width: 1000px;
             backdrop-filter: blur(10px);
         }
         
@@ -79,7 +79,7 @@
             font-weight: 500;
         }
         
-        input, select {
+        input, select, textarea {
             width: 100%;
             padding: 0.8rem;
             border: 2px solid #e1e8ed;
@@ -88,7 +88,7 @@
             transition: all 0.3s ease;
         }
         
-        input:focus, select:focus {
+        input:focus, select:focus, textarea:focus {
             outline: none;
             border-color: #667eea;
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
@@ -117,67 +117,94 @@
             background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
         }
         
-        .member-list {
-            max-height: 300px;
-            overflow-y: auto;
-            border: 1px solid #e1e8ed;
-            border-radius: 8px;
-            padding: 1rem;
+        .btn-danger {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
         }
         
-        .member-item {
+        .btn-success {
+            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+        }
+        
+        .tabs {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.8rem;
-            margin-bottom: 0.5rem;
-            background: rgba(102, 126, 234, 0.05);
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #e1e8ed;
+            flex-wrap: wrap;
+        }
+        
+        .tab {
+            padding: 0.8rem 1.5rem;
+            background: none;
+            border: none;
+            color: #7f8c8d;
+            font-weight: 500;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            margin-bottom: 0;
+        }
+        
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            background: white;
             border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .data-table th {
+            background: #667eea;
+            color: white;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        .data-table td {
+            padding: 0.8rem 1rem;
+            border-bottom: 1px solid #e1e8ed;
+        }
+        
+        .data-table tr:hover {
+            background: #f8fafc;
+        }
+        
+        .member-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             border-left: 4px solid #667eea;
         }
         
-        .member-info {
-            flex-grow: 1;
-        }
-        
-        .member-name {
+        .stat-number {
+            font-size: 2rem;
             font-weight: bold;
             color: #2c3e50;
+            margin-bottom: 0.5rem;
         }
         
-        .member-details {
-            font-size: 0.9rem;
+        .stat-label {
             color: #7f8c8d;
-        }
-        
-        .attendance-record {
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 8px;
-            padding: 1rem;
-            margin-top: 1rem;
-            border: 1px solid #e1e8ed;
-        }
-        
-        .attendance-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.5rem 0;
-            border-bottom: 1px solid #f1f3f4;
-        }
-        
-        .attendance-item:last-child {
-            border-bottom: none;
-        }
-        
-        .status-present {
-            color: #27ae60;
-            font-weight: bold;
-        }
-        
-        .status-absent {
-            color: #e74c3c;
-            font-weight: bold;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
         
         .hidden {
@@ -202,27 +229,10 @@
             border: 1px solid rgba(231, 76, 60, 0.3);
         }
         
-        .tabs {
-            display: flex;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
-            border-bottom: 2px solid #e1e8ed;
-        }
-        
-        .tab {
-            padding: 0.8rem 1.5rem;
-            background: none;
-            border: none;
-            color: #7f8c8d;
-            font-weight: 500;
-            cursor: pointer;
-            border-bottom: 3px solid transparent;
-            transition: all 0.3s ease;
-        }
-        
-        .tab.active {
-            color: #667eea;
-            border-bottom-color: #667eea;
+        .warning {
+            background: rgba(243, 156, 18, 0.1);
+            color: #f39c12;
+            border: 1px solid rgba(243, 156, 18, 0.3);
         }
         
         .login-form {
@@ -236,13 +246,13 @@
                 padding: 1rem;
             }
             
-            .church-name {
-                font-size: 1.4rem;
+            .tabs {
+                justify-content: center;
             }
             
-            .member-item {
-                flex-direction: column;
-                align-items: flex-start;
+            .tab {
+                font-size: 0.9rem;
+                padding: 0.6rem 1rem;
             }
         }
     </style>
@@ -251,12 +261,12 @@
     <div class="container">
         <div class="header">
             <div class="church-name">Kabwe Central Seventh-day Adventist Church</div>
-            <div class="choir-title">Choir Management System</div>
+            <div class="choir-title">Enhanced Choir Management System</div>
         </div>
         
         <!-- Login Section -->
         <div id="loginSection" class="section">
-            <h2 class="section-title">🎵 Member Login</h2>
+            <h2 class="section-title">🎵 System Access</h2>
             <div class="login-form">
                 <div class="form-group">
                     <label for="loginName">Full Name:</label>
@@ -266,7 +276,11 @@
                     <label for="loginPhone">Phone Number:</label>
                     <input type="tel" id="loginPhone" placeholder="Enter your phone number">
                 </div>
-                <button onclick="loginMember()">Login</button>
+                <div class="form-group">
+                    <label for="loginPassword">Password (Admin Only):</label>
+                    <input type="password" id="loginPassword" placeholder="Leave blank for member access">
+                </div>
+                <button onclick="loginUser()">Login</button>
                 <button onclick="showRegisterForm()" class="btn-secondary">New Member? Register</button>
             </div>
         </div>
@@ -292,21 +306,24 @@
                     <option value="Bass">Bass</option>
                 </select>
             </div>
+            <div class="form-group">
+                <label for="memberEmail">Email (Optional):</label>
+                <input type="email" id="memberEmail" placeholder="Enter email address">
+            </div>
             <button onclick="registerMember()">Register Member</button>
             <button onclick="showLoginForm()" class="btn-secondary">Back to Login</button>
         </div>
         
-        <!-- Main Dashboard -->
-        <div id="dashboard" class="hidden">
+        <!-- Member Dashboard -->
+        <div id="memberDashboard" class="hidden">
             <div class="tabs">
-                <button class="tab active" onclick="showTab('attendance')">📋 Attendance</button>
-                <button class="tab" onclick="showTab('members')">👥 Members</button>
-                <button class="tab" onclick="showTab('records')">📊 Records</button>
+                <button class="tab active" onclick="showMemberTab('attendance')">📋 My Attendance</button>
+                <button class="tab" onclick="showMemberTab('leave')">📄 Apply for Leave</button>
+                <button class="tab" onclick="showMemberTab('profile')">👤 My Profile</button>
             </div>
             
-            <!-- Attendance Tab -->
-            <div id="attendanceTab" class="section">
-                <h2 class="section-title">📋 Mark Attendance</h2>
+            <div id="memberAttendanceTab" class="section">
+                <h2 class="section-title">📋 Mark My Attendance</h2>
                 <div class="form-group">
                     <label for="attendanceDate">Date:</label>
                     <input type="date" id="attendanceDate">
@@ -319,22 +336,117 @@
                         <option value="Special Event">Special Event</option>
                         <option value="Wedding">Wedding</option>
                         <option value="Funeral">Funeral</option>
+                        <option value="Prayer Meeting">Prayer Meeting</option>
                     </select>
                 </div>
-                <button onclick="markAttendance()">Mark My Attendance</button>
+                <button onclick="markMemberAttendance()">Submit Attendance</button>
+                <button onclick="logout()" class="btn-secondary">Logout</button>
+                
+                <div id="memberAttendanceHistory" style="margin-top: 2rem;">
+                    <h3>My Attendance History</h3>
+                    <div id="memberRecords"></div>
+                </div>
+            </div>
+            
+            <div id="memberLeaveTab" class="section hidden">
+                <h2 class="section-title">📄 Apply for Leave</h2>
+                
+                <div class="form-group">
+                    <label for="leaveStartDate">Leave Start Date:</label>
+                    <input type="date" id="leaveStartDate">
+                </div>
+                <div class="form-group">
+                    <label for="leaveEndDate">Leave End Date:</label>
+                    <input type="date" id="leaveEndDate">
+                </div>
+                <div class="form-group">
+                    <label for="leaveType">Leave Type:</label>
+                    <select id="leaveType">
+                        <option value="">Select leave type</option>
+                        <option value="Sick Leave">Sick Leave</option>
+                        <option value="Family Emergency">Family Emergency</option>
+                        <option value="Work Commitment">Work Commitment</option>
+                        <option value="Travel">Travel/Vacation</option>
+                        <option value="Personal Reasons">Personal Reasons</option>
+                        <option value="Study/Exams">Study/Exams</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="leaveReason">Reason for Leave:</label>
+                    <textarea id="leaveReason" rows="4" placeholder="Please provide details about your leave request..."></textarea>
+                </div>
+                
+                <button onclick="submitLeaveApplication()">Submit Leave Application</button>
+                <button onclick="logout()" class="btn-secondary">Logout</button>
+                
+                <div id="memberLeaveHistory" style="margin-top: 2rem;">
+                    <h3>My Leave Applications</h3>
+                    <div id="memberLeaveRecords"></div>
+                </div>
+            </div>
+            
+            <div id="memberProfileTab" class="section hidden">
+                <h2 class="section-title">👤 My Profile</h2>
+                <div id="profileInfo"></div>
+                <button onclick="logout()" class="btn-secondary">Logout</button>
+            </div>
+        </div>
+        
+        <!-- Admin Dashboard -->
+        <div id="adminDashboard" class="hidden">
+            <div class="tabs">
+                <button class="tab active" onclick="showAdminTab('overview')">📊 Overview</button>
+                <button class="tab" onclick="showAdminTab('members')">👥 Members</button>
+                <button class="tab" onclick="showAdminTab('leave')">📄 Leave Requests</button>
+                <button class="tab" onclick="showAdminTab('verification')">✅ Verify Attendance</button>
+            </div>
+            
+            <!-- Admin Overview Tab -->
+            <div id="adminOverviewTab" class="section">
+                <h2 class="section-title">📊 Choir Overview</h2>
+                
+                <div class="member-stats">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalMembers">0</div>
+                        <div class="stat-label">Total Members</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="activeMembers">0</div>
+                        <div class="stat-label">Active Members</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="pendingLeave">0</div>
+                        <div class="stat-label">Pending Leave Requests</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="pendingVerifications">0</div>
+                        <div class="stat-label">Pending Verifications</div>
+                    </div>
+                </div>
+                
                 <button onclick="logout()" class="btn-secondary">Logout</button>
             </div>
             
-            <!-- Members Tab -->
-            <div id="membersTab" class="section hidden">
-                <h2 class="section-title">👥 Choir Members</h2>
-                <div id="membersList" class="member-list"></div>
+            <!-- Admin Members Tab -->
+            <div id="adminMembersTab" class="section hidden">
+                <h2 class="section-title">👥 Member Management</h2>
+                <button onclick="showAddMemberForm()" class="btn-success">+ Add New Member</button>
+                <div id="membersList"></div>
             </div>
             
-            <!-- Records Tab -->
-            <div id="recordsTab" class="section hidden">
-                <h2 class="section-title">📊 My Attendance Records</h2>
-                <div id="attendanceRecords" class="attendance-record"></div>
+            <!-- Admin Leave Tab -->
+            <div id="adminLeaveTab" class="section hidden">
+                <h2 class="section-title">📄 Leave Request Management</h2>
+                <button onclick="approveAllLeave()" class="btn-success">✅ Approve All Pending</button>
+                <div id="leaveRequestsList"></div>
+            </div>
+            
+            <!-- Admin Verification Tab -->
+            <div id="adminVerificationTab" class="section hidden">
+                <h2 class="section-title">✅ Attendance Verification</h2>
+                <button onclick="verifyAllPending()" class="btn-success">✅ Verify All Pending</button>
+                <div id="verificationsList"></div>
             </div>
         </div>
         
@@ -342,69 +454,129 @@
     </div>
     
     <script>
-        // In-memory storage (Note: data will be lost on page refresh)
+        // Global variables
         let members = [
             {
                 id: 1,
                 name: "Grace Mwansa",
                 phone: "0977123456",
                 voicePart: "Soprano",
-                registeredDate: "2024-01-15"
+                email: "grace@example.com",
+                registeredDate: "2024-01-15",
+                status: "Active"
             },
             {
                 id: 2,
                 name: "John Phiri",
                 phone: "0966789012",
                 voicePart: "Tenor",
-                registeredDate: "2024-01-20"
+                email: "john@example.com",
+                registeredDate: "2024-01-20",
+                status: "Active"
             },
             {
                 id: 3,
                 name: "Mary Banda",
                 phone: "0955456789",
                 voicePart: "Alto",
-                registeredDate: "2024-02-05"
+                email: "mary@example.com",
+                registeredDate: "2024-02-05",
+                status: "Active"
             }
         ];
         
-        let attendance = [];
+        let attendance = [
+            {
+                id: 1,
+                memberId: 1,
+                memberName: "Grace Mwansa",
+                date: "2024-09-01",
+                serviceType: "Sabbath Morning",
+                status: "Pending",
+                timestamp: new Date().toISOString(),
+                reportingTime: "01/09/2024, 09:15:30"
+            }
+        ];
+        
+        let leaveApplications = [
+            {
+                id: 1,
+                memberId: 2,
+                memberName: "John Phiri",
+                startDate: "2024-09-15",
+                endDate: "2024-09-17",
+                leaveType: "Work Commitment",
+                reason: "Business trip to Ndola",
+                status: "Pending",
+                appliedAt: new Date().toISOString()
+            }
+        ];
+        
         let currentUser = null;
+        let isAdmin = false;
         let nextMemberId = 4;
+        let nextAttendanceId = 2;
+        let nextLeaveId = 2;
+        const adminPassword = "admin123";
         
-        // Initialize the system
-        document.getElementById('attendanceDate').valueAsDate = new Date();
+        // Initialize when page loads
+        window.onload = function() {
+            document.getElementById('attendanceDate').valueAsDate = new Date();
+        };
         
+        // Utility functions
         function showMessage(message, type = 'success') {
             const messageArea = document.getElementById('messageArea');
             messageArea.innerHTML = `<div class="message ${type}">${message}</div>`;
             setTimeout(() => {
                 messageArea.innerHTML = '';
-            }, 3000);
+            }, 5000);
         }
         
-        function loginMember() {
+        // Authentication functions
+        function loginUser() {
             const name = document.getElementById('loginName').value.trim();
             const phone = document.getElementById('loginPhone').value.trim();
+            const password = document.getElementById('loginPassword').value;
             
             if (!name || !phone) {
                 showMessage('Please enter both name and phone number.', 'error');
                 return;
             }
             
-            const member = members.find(m => 
-                m.name.toLowerCase() === name.toLowerCase() && m.phone === phone
-            );
+            // Admin login
+            if (password === adminPassword) {
+                isAdmin = true;
+                currentUser = { name: name, role: 'admin' };
+                document.getElementById('loginSection').classList.add('hidden');
+                document.getElementById('adminDashboard').classList.remove('hidden');
+                updateAdminDashboard();
+                showMessage(`Welcome Admin! ${name}`, 'success');
+                return;
+            }
+            
+            // Member login with flexible matching
+            const normalizedPhone = phone.replace(/[\s\-\(\)]/g, '');
+            const member = members.find(m => {
+                const memberPhone = m.phone.replace(/[\s\-\(\)]/g, '');
+                const nameMatch = m.name.toLowerCase().includes(name.toLowerCase()) || 
+                                 name.toLowerCase().includes(m.name.toLowerCase());
+                const phoneMatch = memberPhone === normalizedPhone || 
+                                  memberPhone.includes(normalizedPhone) || 
+                                  normalizedPhone.includes(memberPhone);
+                
+                return (nameMatch || phoneMatch) && m.status === 'Active';
+            });
             
             if (member) {
                 currentUser = member;
+                isAdmin = false;
                 document.getElementById('loginSection').classList.add('hidden');
-                document.getElementById('registrationSection').classList.add('hidden');
-                document.getElementById('dashboard').classList.remove('hidden');
-                updateMembersList();
-                updateAttendanceRecords();
-                showMessage(`Welcome back, ${member.name}! 🎵`);
+                document.getElementById('memberDashboard').classList.remove('hidden');
+                updateMemberDashboard();
+                showMessage(`Welcome back, ${member.name}!`, 'success');
             } else {
-                showMessage('Member not found. Please check your details or register as a new member.', 'error');
+                showMessage('Member not found. Please check your details or register.', 'error');
             }
         }
         
@@ -422,19 +594,10 @@
             const name = document.getElementById('memberName').value.trim();
             const phone = document.getElementById('memberPhone').value.trim();
             const voicePart = document.getElementById('voicePart').value;
+            const email = document.getElementById('memberEmail').value.trim();
             
             if (!name || !phone || !voicePart) {
-                showMessage('Please fill in all fields.', 'error');
-                return;
-            }
-            
-            // Check if member already exists
-            const existingMember = members.find(m => 
-                m.name.toLowerCase() === name.toLowerCase() || m.phone === phone
-            );
-            
-            if (existingMember) {
-                showMessage('A member with this name or phone number already exists.', 'error');
+                showMessage('Please fill in all required fields.', 'error');
                 return;
             }
             
@@ -443,22 +606,58 @@
                 name: name,
                 phone: phone,
                 voicePart: voicePart,
-                registeredDate: new Date().toISOString().split('T')[0]
+                email: email,
+                registeredDate: new Date().toISOString().split('T')[0],
+                status: 'Active'
             };
             
             members.push(newMember);
-            showMessage(`Registration successful! Welcome to the choir, ${name}! 🎉`);
+            showMessage(`Registration successful! Welcome ${name}!`, 'success');
             
             // Clear form
             document.getElementById('memberName').value = '';
             document.getElementById('memberPhone').value = '';
             document.getElementById('voicePart').value = '';
+            document.getElementById('memberEmail').value = '';
             
-            // Switch to login
             showLoginForm();
         }
         
-        function markAttendance() {
+        function logout() {
+            currentUser = null;
+            isAdmin = false;
+            document.getElementById('memberDashboard').classList.add('hidden');
+            document.getElementById('adminDashboard').classList.add('hidden');
+            document.getElementById('loginSection').classList.remove('hidden');
+            document.getElementById('loginName').value = '';
+            document.getElementById('loginPhone').value = '';
+            document.getElementById('loginPassword').value = '';
+            showMessage('Logged out successfully.');
+        }
+        
+        // Member functions
+        function showMemberTab(tabName) {
+            document.getElementById('memberAttendanceTab').classList.add('hidden');
+            document.getElementById('memberLeaveTab').classList.add('hidden');
+            document.getElementById('memberProfileTab').classList.add('hidden');
+            
+            document.querySelectorAll('#memberDashboard .tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            document.getElementById(`member${tabName.charAt(0).toUpperCase() + tabName.slice(1)}Tab`).classList.remove('hidden');
+            event.target.classList.add('active');
+            
+            if (tabName === 'attendance') {
+                updateMemberAttendanceHistory();
+            } else if (tabName === 'leave') {
+                updateMemberLeaveHistory();
+            } else if (tabName === 'profile') {
+                updateMemberProfile();
+            }
+        }
+        
+        function markMemberAttendance() {
             if (!currentUser) return;
             
             const date = document.getElementById('attendanceDate').value;
@@ -469,113 +668,435 @@
                 return;
             }
             
-            // Check if already marked attendance for this date and service
-            const existingRecord = attendance.find(a => 
-                a.memberId === currentUser.id && 
-                a.date === date && 
-                a.serviceType === serviceType
-            );
-            
-            if (existingRecord) {
-                showMessage('You have already marked attendance for this date and service type.', 'error');
-                return;
-            }
+            const now = new Date();
+            const reportingTime = now.toLocaleString('en-GB', {
+                timeZone: 'Africa/Lusaka',
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            });
             
             const attendanceRecord = {
-                id: attendance.length + 1,
+                id: nextAttendanceId++,
                 memberId: currentUser.id,
                 memberName: currentUser.name,
                 date: date,
                 serviceType: serviceType,
-                status: 'Present',
-                timestamp: new Date().toISOString()
+                status: 'Pending',
+                timestamp: new Date().toISOString(),
+                reportingTime: reportingTime
             };
             
             attendance.push(attendanceRecord);
-            updateAttendanceRecords();
-            showMessage(`Attendance marked successfully for ${serviceType} on ${date}! ✅`);
+            updateMemberAttendanceHistory();
+            showMessage(`Attendance submitted for ${serviceType} on ${date}. Awaiting verification.`, 'warning');
         }
         
-        function showTab(tabName) {
-            // Hide all tabs
-            document.getElementById('attendanceTab').classList.add('hidden');
-            document.getElementById('membersTab').classList.add('hidden');
-            document.getElementById('recordsTab').classList.add('hidden');
-            
-            // Remove active class from all tab buttons
-            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
-            
-            // Show selected tab
-            document.getElementById(tabName + 'Tab').classList.remove('hidden');
-            event.target.classList.add('active');
-            
-            if (tabName === 'members') {
-                updateMembersList();
-            } else if (tabName === 'records') {
-                updateAttendanceRecords();
-            }
-        }
-        
-        function updateMembersList() {
-            const membersList = document.getElementById('membersList');
-            if (members.length === 0) {
-                membersList.innerHTML = '<p>No members registered yet.</p>';
+        function submitLeaveApplication() {
+            if (!currentUser) {
+                showMessage('Please login first.', 'error');
                 return;
             }
             
-            membersList.innerHTML = members.map(member => `
-                <div class="member-item">
-                    <div class="member-info">
-                        <div class="member-name">${member.name}</div>
-                        <div class="member-details">${member.voicePart} • Joined: ${member.registeredDate}</div>
-                    </div>
-                </div>
-            `).join('');
+            const startDate = document.getElementById('leaveStartDate').value;
+            const endDate = document.getElementById('leaveEndDate').value;
+            const leaveType = document.getElementById('leaveType').value;
+            const reason = document.getElementById('leaveReason').value.trim();
+            
+            if (!startDate || !endDate || !leaveType || !reason) {
+                showMessage('Please fill in all required fields.', 'error');
+                return;
+            }
+            
+            if (new Date(startDate) > new Date(endDate)) {
+                showMessage('End date must be after start date.', 'error');
+                return;
+            }
+            
+            const leaveApplication = {
+                id: nextLeaveId++,
+                memberId: currentUser.id,
+                memberName: currentUser.name,
+                startDate: startDate,
+                endDate: endDate,
+                leaveType: leaveType,
+                reason: reason,
+                status: 'Pending',
+                appliedAt: new Date().toISOString()
+            };
+            
+            leaveApplications.push(leaveApplication);
+            
+            // Clear form
+            document.getElementById('leaveStartDate').value = '';
+            document.getElementById('leaveEndDate').value = '';
+            document.getElementById('leaveType').value = '';
+            document.getElementById('leaveReason').value = '';
+            
+            updateMemberLeaveHistory();
+            showMessage('Leave application submitted successfully. Awaiting approval.', 'success');
         }
         
-        function updateAttendanceRecords() {
-            const recordsDiv = document.getElementById('attendanceRecords');
-            if (!currentUser) return;
+        function updateMemberDashboard() {
+            updateMemberAttendanceHistory();
+            updateMemberLeaveHistory();
+            updateMemberProfile();
+        }
+        
+        function updateMemberAttendanceHistory() {
+            const recordsDiv = document.getElementById('memberRecords');
+            if (!currentUser || isAdmin) return;
             
             const userAttendance = attendance.filter(a => a.memberId === currentUser.id)
-                                            .sort((a, b) => new Date(b.date) - new Date(a.date));
+                .sort((a, b) => new Date(b.date) - new Date(a.date));
             
             if (userAttendance.length === 0) {
                 recordsDiv.innerHTML = '<p>No attendance records found.</p>';
                 return;
             }
             
-            const totalServices = userAttendance.length;
-            const presentCount = userAttendance.filter(a => a.status === 'Present').length;
-            const attendanceRate = ((presentCount / totalServices) * 100).toFixed(1);
+            let html = '<table class="data-table"><thead><tr><th>Date</th><th>Service Type</th><th>Status</th><th>Reported Time</th></tr></thead><tbody>';
             
-            recordsDiv.innerHTML = `
-                <div style="margin-bottom: 1rem; padding: 1rem; background: rgba(102, 126, 234, 0.1); border-radius: 8px;">
-                    <strong>Attendance Summary:</strong> ${presentCount} out of ${totalServices} services attended (${attendanceRate}% attendance rate)
-                </div>
-                ${userAttendance.map(record => `
-                    <div class="attendance-item">
-                        <div>
-                            <strong>${record.date}</strong><br>
-                            <small>${record.serviceType}</small>
-                        </div>
-                        <div class="status-${record.status.toLowerCase()}">${record.status}</div>
-                    </div>
-                `).join('')}
-            `;
+            userAttendance.forEach(record => {
+                const statusColor = record.status === 'Confirmed' ? '#27ae60' : record.status === 'Pending' ? '#f39c12' : '#e74c3c';
+                const statusIcon = record.status === 'Confirmed' ? ' ✅' : record.status === 'Pending' ? ' ⏳' : ' ❌';
+                
+                html += `<tr><td>${record.date}</td><td>${record.serviceType}</td>`;
+                html += `<td style="color: ${statusColor}; font-weight: bold;">${record.status}${statusIcon}</td>`;
+                html += `<td style="font-size: 0.9rem; color: #7f8c8d;">${record.reportingTime || 'N/A'}</td></tr>`;
+            });
+            
+            html += '</tbody></table>';
+            recordsDiv.innerHTML = html;
         }
         
-        function logout() {
-            currentUser = null;
-            document.getElementById('dashboard').classList.add('hidden');
-            document.getElementById('loginSection').classList.remove('hidden');
-            document.getElementById('loginName').value = '';
-            document.getElementById('loginPhone').value = '';
-            showMessage('You have been logged out successfully.');
+        function updateMemberLeaveHistory() {
+            const recordsDiv = document.getElementById('memberLeaveRecords');
+            if (!currentUser || isAdmin) return;
+            
+            const userLeave = leaveApplications.filter(l => l.memberId === currentUser.id)
+                .sort((a, b) => new Date(b.appliedAt) - new Date(a.appliedAt));
+            
+            if (userLeave.length === 0) {
+                recordsDiv.innerHTML = '<p>No leave applications found.</p>';
+                return;
+            }
+            
+            let html = '<table class="data-table"><thead><tr><th>Leave Period</th><th>Type</th><th>Status</th><th>Applied Date</th></tr></thead><tbody>';
+            
+            userLeave.forEach(leave => {
+                const statusColor = leave.status === 'Approved' ? '#27ae60' : leave.status === 'Pending' ? '#f39c12' : '#e74c3c';
+                const statusIcon = leave.status === 'Approved' ? ' ✅' : leave.status === 'Pending' ? ' ⏳' : ' ❌';
+                
+                html += `<tr><td><strong>${leave.startDate}</strong> to <strong>${leave.endDate}</strong></td>`;
+                html += `<td>${leave.leaveType}</td>`;
+                html += `<td style="color: ${statusColor}; font-weight: bold;">${leave.status}${statusIcon}</td>`;
+                html += `<td style="font-size: 0.9rem; color: #7f8c8d;">${new Date(leave.appliedAt).toLocaleDateString()}</td></tr>`;
+            });
+            
+            html += '</tbody></table>';
+            recordsDiv.innerHTML = html;
         }
         
-        // Initialize with sample data
-        updateMembersList();
+        function updateMemberProfile() {
+            const profileDiv = document.getElementById('profileInfo');
+            if (!currentUser || isAdmin) return;
+            
+            const member = members.find(m => m.id === currentUser.id);
+            if (!member) return;
+            
+            profileDiv.innerHTML = `
+                <div class="stat-card" style="text-align: left;">
+                    <p><strong>Name:</strong> ${member.name}</p>
+                    <p><strong>Phone:</strong> ${member.phone}</p>
+                    <p><strong>Voice Part:</strong> ${member.voicePart}</p>
+                    <p><strong>Email:</strong> ${member.email || 'Not provided'}</p>
+                    <p><strong>Member Since:</strong> ${member.registeredDate}</p>
+                    <p><strong>Status:</strong> <span style="color: ${member.status === 'Active' ? '#27ae60' : '#e74c3c'}">${member.status}</span></p>
+                </div>`;
+        }
+        
+        // Admin functions
+        function showAdminTab(tabName) {
+            document.getElementById('adminOverviewTab').classList.add('hidden');
+            document.getElementById('adminMembersTab').classList.add('hidden');
+            document.getElementById('adminLeaveTab').classList.add('hidden');
+            document.getElementById('adminVerificationTab').classList.add('hidden');
+            
+            document.querySelectorAll('#adminDashboard .tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            document.getElementById(`admin${tabName.charAt(0).toUpperCase() + tabName.slice(1)}Tab`).classList.remove('hidden');
+            event.target.classList.add('active');
+            
+            if (tabName === 'overview') {
+                updateAdminOverview();
+            } else if (tabName === 'members') {
+                updateMembersList();
+            } else if (tabName === 'leave') {
+                updateLeaveRequestsList();
+            } else if (tabName === 'verification') {
+                updateVerificationsList();
+            }
+        }
+        
+        function updateAdminDashboard() {
+            updateAdminOverview();
+            updateMembersList();
+            updateLeaveRequestsList();
+            updateVerificationsList();
+        }
+        
+        function updateAdminOverview() {
+            document.getElementById('totalMembers').textContent = members.length;
+            
+            const activeCount = members.filter(m => m.status === 'Active').length;
+            document.getElementById('activeMembers').textContent = activeCount;
+            
+            const pendingLeaveCount = leaveApplications.filter(l => l.status === 'Pending').length;
+            document.getElementById('pendingLeave').textContent = pendingLeaveCount;
+            
+            const pendingVerificationCount = attendance.filter(a => a.status === 'Pending').length;
+            document.getElementById('pendingVerifications').textContent = pendingVerificationCount;
+        }
+        
+        function updateMembersList() {
+            const membersDiv = document.getElementById('membersList');
+            
+            if (members.length === 0) {
+                membersDiv.innerHTML = '<p>No members registered yet.</p>';
+                return;
+            }
+            
+            let html = '<table class="data-table"><thead><tr><th>Name</th><th>Phone</th><th>Voice Part</th><th>Email</th><th>Status</th><th>Actions</th></tr></thead><tbody>';
+            
+            members.forEach(member => {
+                html += `<tr><td>${member.name}</td><td>${member.phone}</td><td>${member.voicePart}</td>`;
+                html += `<td>${member.email || 'N/A'}</td>`;
+                html += `<td><span style="color: ${member.status === 'Active' ? '#27ae60' : '#e74c3c'}">${member.status}</span></td>`;
+                html += `<td><button onclick="toggleMemberStatus(${member.id})" class="btn-secondary" style="padding: 0.3rem 0.6rem;">`;
+                html += member.status === 'Active' ? 'Deactivate' : 'Activate';
+                html += '</button></td></tr>';
+            });
+            
+            html += '</tbody></table>';
+            membersDiv.innerHTML = html;
+        }
+        
+        function updateLeaveRequestsList() {
+            const leaveDiv = document.getElementById('leaveRequestsList');
+            const pendingLeave = leaveApplications.filter(l => l.status === 'Pending');
+            
+            if (pendingLeave.length === 0) {
+                leaveDiv.innerHTML = '<p style="color: #27ae60; font-style: italic;">✅ No pending leave requests!</p>';
+                return;
+            }
+            
+            let html = '<table class="data-table"><thead><tr><th>Member</th><th>Leave Period</th><th>Type</th><th>Reason</th><th>Actions</th></tr></thead><tbody>';
+            
+            pendingLeave.forEach(leave => {
+                html += `<tr style="background: rgba(243, 156, 18, 0.1);"><td><strong>${leave.memberName}</strong></td>`;
+                html += `<td>${leave.startDate} to ${leave.endDate}</td>`;
+                html += `<td>${leave.leaveType}</td>`;
+                html += `<td style="max-width: 200px; word-wrap: break-word;">${leave.reason}</td>`;
+                html += `<td><button onclick="processLeaveRequest(${leave.id}, 'Approved')" class="btn-success" style="padding: 0.4rem 0.8rem; margin: 0.2rem;">✅ Approve</button>`;
+                html += `<button onclick="processLeaveRequest(${leave.id}, 'Rejected')" class="btn-danger" style="padding: 0.4rem 0.8rem; margin: 0.2rem;">❌ Reject</button></td></tr>`;
+            });
+            
+            html += '</tbody></table>';
+            leaveDiv.innerHTML = html;
+        }
+        
+        function updateVerificationsList() {
+            const verificationDiv = document.getElementById('verificationsList');
+            const pendingVerifications = attendance.filter(a => a.status === 'Pending');
+            
+            if (pendingVerifications.length === 0) {
+                verificationDiv.innerHTML = '<p style="color: #27ae60; font-style: italic;">✅ No pending verifications!</p>';
+                return;
+            }
+            
+            let html = '<table class="data-table"><thead><tr><th>Date</th><th>Member</th><th>Service Type</th><th>Reported Time</th><th>Actions</th></tr></thead><tbody>';
+            
+            pendingVerifications.forEach(record => {
+                html += `<tr style="background: rgba(243, 156, 18, 0.1);"><td>${record.date}</td>`;
+                html += `<td><strong>${record.memberName}</strong></td>`;
+                html += `<td>${record.serviceType}</td>`;
+                html += `<td style="font-size: 0.9rem;">${record.reportingTime || 'N/A'}</td>`;
+                html += `<td><button onclick="verifyAttendance(${record.id}, 'Confirmed')" class="btn-success" style="padding: 0.4rem 0.8rem; margin: 0.2rem;">✅ Confirm</button>`;
+                html += `<button onclick="verifyAttendance(${record.id}, 'Rejected')" class="btn-danger" style="padding: 0.4rem 0.8rem; margin: 0.2rem;">❌ Reject</button></td></tr>`;
+            });
+            
+            html += '</tbody></table>';
+            verificationDiv.innerHTML = html;
+        }
+        
+        function toggleMemberStatus(memberId) {
+            const member = members.find(m => m.id === memberId);
+            
+            if (member) {
+                member.status = member.status === 'Active' ? 'Inactive' : 'Active';
+                updateMembersList();
+                updateAdminOverview();
+                showMessage(`${member.name} status updated to ${member.status}`, 'success');
+            }
+        }
+        
+        function processLeaveRequest(leaveId, newStatus) {
+            const leave = leaveApplications.find(l => l.id === leaveId);
+            
+            if (!leave) {
+                showMessage('Leave application not found.', 'error');
+                return;
+            }
+            
+            let adminNotes = '';
+            if (newStatus === 'Rejected') {
+                adminNotes = prompt('Please provide a reason for rejection (optional):') || '';
+            } else {
+                adminNotes = prompt('Add any notes for the member (optional):') || 'Leave approved.';
+            }
+            
+            leave.status = newStatus;
+            leave.processedBy = currentUser.name || 'Admin';
+            leave.processedAt = new Date().toISOString();
+            leave.adminNotes = adminNotes;
+            
+            updateLeaveRequestsList();
+            updateAdminOverview();
+            
+            const statusText = newStatus === 'Approved' ? 'approved' : 'rejected';
+            const emoji = newStatus === 'Approved' ? '✅' : '❌';
+            showMessage(`${emoji} Leave request ${statusText} for ${leave.memberName}`, 'success');
+        }
+        
+        function verifyAttendance(recordId, newStatus) {
+            const record = attendance.find(a => a.id === recordId);
+            
+            if (!record) {
+                showMessage('Attendance record not found.', 'error');
+                return;
+            }
+            
+            const now = new Date();
+            const verificationTime = now.toLocaleString('en-GB', {
+                timeZone: 'Africa/Lusaka',
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            });
+            
+            record.status = newStatus;
+            record.confirmedBy = currentUser.name || 'Admin';
+            record.confirmedAt = verificationTime;
+            
+            updateVerificationsList();
+            updateAdminOverview();
+            
+            const statusText = newStatus === 'Confirmed' ? 'confirmed' : 'rejected';
+            const emoji = newStatus === 'Confirmed' ? '✅' : '❌';
+            showMessage(`${emoji} Attendance ${statusText} for ${record.memberName}`, 'success');
+        }
+        
+        function approveAllLeave() {
+            const pendingLeave = leaveApplications.filter(l => l.status === 'Pending');
+            
+            if (pendingLeave.length === 0) {
+                showMessage('No pending leave requests to process.', 'warning');
+                return;
+            }
+            
+            if (!confirm(`Are you sure you want to approve all ${pendingLeave.length} pending leave requests?`)) {
+                return;
+            }
+            
+            const now = new Date();
+            
+            pendingLeave.forEach(leave => {
+                leave.status = 'Approved';
+                leave.processedBy = currentUser.name || 'Admin';
+                leave.processedAt = now.toISOString();
+                leave.adminNotes = 'Bulk approved by admin';
+            });
+            
+            updateLeaveRequestsList();
+            updateAdminOverview();
+            
+            showMessage(`✅ All ${pendingLeave.length} pending leave requests have been approved!`, 'success');
+        }
+        
+        function verifyAllPending() {
+            const pendingRecords = attendance.filter(a => a.status === 'Pending');
+            
+            if (pendingRecords.length === 0) {
+                showMessage('No pending verifications to process.', 'warning');
+                return;
+            }
+            
+            if (!confirm(`Are you sure you want to confirm all ${pendingRecords.length} pending attendance records?`)) {
+                return;
+            }
+            
+            const now = new Date();
+            const verificationTime = now.toLocaleString('en-GB', {
+                timeZone: 'Africa/Lusaka',
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            });
+            
+            pendingRecords.forEach(record => {
+                record.status = 'Confirmed';
+                record.confirmedBy = currentUser.name || 'Admin';
+                record.confirmedAt = verificationTime;
+            });
+            
+            updateVerificationsList();
+            updateAdminOverview();
+            
+            showMessage(`✅ All ${pendingRecords.length} pending attendance records have been confirmed!`, 'success');
+        }
+        
+        function showAddMemberForm() {
+            const name = prompt('Enter member name:');
+            if (!name) return;
+            
+            const phone = prompt('Enter phone number:');
+            if (!phone) return;
+            
+            const voicePart = prompt('Enter voice part (Soprano/Alto/Tenor/Bass):');
+            if (!voicePart) return;
+            
+            const email = prompt('Enter email (optional):') || '';
+            
+            const newMember = {
+                id: nextMemberId++,
+                name: name,
+                phone: phone,
+                voicePart: voicePart,
+                email: email,
+                registeredDate: new Date().toISOString().split('T')[0],
+                status: 'Active'
+            };
+            
+            members.push(newMember);
+            updateMembersList();
+            updateAdminOverview();
+            showMessage(`${name} added successfully!`, 'success');
+        }
     </script>
 </body>
 </html>
