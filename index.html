@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kabwe Central SDA Church Choir - Management System</title>
+    <title>Kabwe Central SDA Church Choir - Setup</title>
     <style>
         * {
             margin: 0;
@@ -18,6 +18,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            padding: 20px;
         }
         
         .container {
@@ -26,7 +27,7 @@
             border-radius: 20px;
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
             width: 90%;
-            max-width: 1000px;
+            max-width: 800px;
             backdrop-filter: blur(10px);
         }
         
@@ -131,150 +132,6 @@
             background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
         }
         
-        .tabs {
-            display: flex;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
-            border-bottom: 2px solid #e1e8ed;
-            flex-wrap: wrap;
-        }
-        
-        .tab {
-            padding: 0.8rem 1.5rem;
-            background: none;
-            border: none;
-            color: #7f8c8d;
-            font-weight: 500;
-            cursor: pointer;
-            border-bottom: 3px solid transparent;
-            transition: all 0.3s ease;
-            margin-bottom: 0;
-        }
-        
-        .tab.active {
-            color: #667eea;
-            border-bottom-color: #667eea;
-        }
-        
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 1rem;
-            background: white;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        
-        .data-table th {
-            background: #667eea;
-            color: white;
-            padding: 1rem;
-            text-align: left;
-            font-weight: 600;
-        }
-        
-        .data-table td {
-            padding: 0.8rem 1rem;
-            border-bottom: 1px solid #e1e8ed;
-        }
-        
-        .data-table tr:hover {
-            background: #f8fafc;
-        }
-        
-        .member-stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-        
-        .stat-card {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 10px;
-            text-align: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            border-left: 4px solid #667eea;
-        }
-        
-        .stat-number {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #2c3e50;
-            margin-bottom: 0.5rem;
-        }
-        
-        .stat-label {
-            color: #7f8c8d;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        .hidden {
-            display: none;
-        }
-        
-        .message {
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 1rem;
-        }
-        
-        .success {
-            background: rgba(39, 174, 96, 0.1);
-            color: #27ae60;
-            border: 1px solid rgba(39, 174, 96, 0.3);
-        }
-        
-        .error {
-            background: rgba(231, 76, 60, 0.1);
-            color: #e74c3c;
-            border: 1px solid rgba(231, 76, 60, 0.3);
-        }
-        
-        .warning {
-            background: rgba(243, 156, 18, 0.1);
-            color: #f39c12;
-            border: 1px solid rgba(243, 156, 18, 0.3);
-        }
-        
-        .loading {
-            background: rgba(52, 152, 219, 0.1);
-            color: #3498db;
-            border: 1px solid rgba(52, 152, 219, 0.3);
-        }
-        
-        .login-form {
-            max-width: 400px;
-            margin: 0 auto;
-        }
-        
-        .admin-controls {
-            background: rgba(102, 126, 234, 0.1);
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 1rem;
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-        
-        .filter-group {
-            display: flex;
-            gap: 1rem;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-        
-        .filter-group select {
-            width: auto;
-            min-width: 150px;
-        }
-        
         .google-sheets-setup {
             background: linear-gradient(135deg, #4285f4 0%, #34a853 100%);
             color: white;
@@ -311,27 +168,40 @@
             counter-reset: step-counter;
         }
         
+        .message {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+        
+        .success {
+            background: rgba(39, 174, 96, 0.1);
+            color: #27ae60;
+            border: 1px solid rgba(39, 174, 96, 0.3);
+        }
+        
+        .error {
+            background: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+            border: 1px solid rgba(231, 76, 60, 0.3);
+        }
+        
+        .warning {
+            background: rgba(243, 156, 18, 0.1);
+            color: #f39c12;
+            border: 1px solid rgba(243, 156, 18, 0.3);
+        }
+        
+        .loading {
+            background: rgba(52, 152, 219, 0.1);
+            color: #3498db;
+            border: 1px solid rgba(52, 152, 219, 0.3);
+        }
+        
         @media (max-width: 768px) {
             .container {
                 width: 95%;
                 padding: 1rem;
-            }
-            
-            .tabs {
-                justify-content: center;
-            }
-            
-            .tab {
-                font-size: 0.9rem;
-                padding: 0.6rem 1rem;
-            }
-            
-            .data-table {
-                font-size: 0.9rem;
-            }
-            
-            .member-stats {
-                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -340,7 +210,7 @@
     <div class="container">
         <div class="header">
             <div class="church-name">Kabwe Central Seventh-day Adventist Church</div>
-            <div class="choir-title">Choir Management System</div>
+            <div class="choir-title">Choir Management System - Setup</div>
         </div>
         
         <!-- Setup Section -->
@@ -348,6 +218,25 @@
             <h2 class="section-title">⚙️ Initial Setup</h2>
             <div class="google-sheets-setup">
                 <h3 style="margin-bottom: 1rem;">📊 Google Apps Script Configuration</h3>
+                
+                <div class="setup-steps">
+                    <div class="setup-step">
+                        Go to <a href="https://script.google.com/" target="_blank" style="color: white; text-decoration: underline;">script.google.com</a> and create a new project
+                    </div>
+                    <div class="setup-step">
+                        Copy and paste the Google Apps Script code into the editor
+                    </div>
+                    <div class="setup-step">
+                        Click "Deploy" > "New deployment", select "Web app" as the type
+                    </div>
+                    <div class="setup-step">
+                        Set "Execute as" to "Me" and "Who has access" to "Anyone"
+                    </div>
+                    <div class="setup-step">
+                        Copy the generated Web App URL and paste it below
+                    </div>
+                </div>
+                
                 <div class="form-group">
                     <label for="gasUrl">Google Apps Script Web App URL:</label>
                     <input type="url" id="gasUrl" placeholder="https://script.google.com/macros/s/your-script-id/exec">
@@ -355,241 +244,9 @@
                         Deploy your Google Apps Script as a web app and paste the URL here
                     </small>
                 </div>
-                <button onclick="saveGasUrl()" class="btn-success">Save Configuration</button>
-                <button onclick="testConnection()" class="btn-secondary">Test Connection</button>
-                <button onclick="initializeDatabase()" class="btn-secondary">Initialize Database</button>
-            </div>
-        </div>
-        
-        <!-- Login Section -->
-        <div id="loginSection" class="section hidden">
-            <h2 class="section-title">🎵 System Access</h2>
-            <div class="login-form">
-                <div class="form-group">
-                    <label for="loginName">Full Name:</label>
-                    <input type="text" id="loginName" placeholder="Enter your full name">
-                </div>
-                <div class="form-group">
-                    <label for="loginPhone">Phone Number:</label>
-                    <input type="tel" id="loginPhone" placeholder="Enter your phone number">
-                </div>
-                <div class="form-group">
-                    <label for="loginPassword">Password (Admin Only):</label>
-                    <input type="password" id="loginPassword" placeholder="Leave blank for member access">
-                </div>
-                <button onclick="loginUser()">Login</button>
-                <button onclick="showRegisterForm()" class="btn-secondary">New Member? Register</button>
-            </div>
-        </div>
-        
-        <!-- Registration Section -->
-        <div id="registrationSection" class="section hidden">
-            <h2 class="section-title">📝 New Member Registration</h2>
-            <div class="form-group">
-                <label for="memberName">Full Name:</label>
-                <input type="text" id="memberName" placeholder="Enter full name">
-            </div>
-            <div class="form-group">
-                <label for="memberPhone">Phone Number:</label>
-                <input type="tel" id="memberPhone" placeholder="Enter phone number">
-            </div>
-            <div class="form-group">
-                <label for="voicePart">Voice Part:</label>
-                <select id="voicePart">
-                    <option value="">Select voice part</option>
-                    <option value="Soprano">Soprano</option>
-                    <option value="Alto">Alto</option>
-                    <option value="Tenor">Tenor</option>
-                    <option value="Bass">Bass</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="memberEmail">Email (Optional):</label>
-                <input type="email" id="memberEmail" placeholder="Enter email address">
-            </div>
-            <button onclick="registerMember()">Register Member</button>
-            <button onclick="showLoginForm()" class="btn-secondary">Back to Login</button>
-        </div>
-        
-        <!-- Member Dashboard -->
-        <div id="memberDashboard" class="hidden">
-            <div class="tabs">
-                <button class="tab active" onclick="showMemberTab('attendance')">📋 My Attendance</button>
-                <button class="tab" onclick="showMemberTab('profile')">👤 My Profile</button>
-                <button class="tab" onclick="showMemberTab('directory')">📞 Member Directory</button>
-            </div>
-            
-            <div id="memberAttendanceTab" class="section">
-                <h2 class="section-title">📋 Mark My Attendance</h2>
-                <div class="form-group">
-                    <label for="attendanceDate">Date:</label>
-                    <input type="date" id="attendanceDate">
-                </div>
-                <div class="form-group">
-                    <label for="attendanceType">Service Type:</label>
-                    <select id="attendanceType">
-                        <option value="Sabbath Morning">Sabbath Morning Service</option>
-                        <option value="Choir Practice">Choir Practice</option>
-                        <option value="Special Event">Special Event</option>
-                        <option value="Wedding">Wedding</option>
-                        <option value="Funeral">Funeral</option>
-                        <option value="Prayer Meeting">Prayer Meeting</option>
-                    </select>
-                </div>
-                <button onclick="markMemberAttendance()">Mark My Attendance</button>
-                <button onclick="logout()" class="btn-secondary">Logout</button>
-                
-                <div id="memberAttendanceHistory" style="margin-top: 2rem;">
-                    <h3>My Attendance History</h3>
-                    <div id="memberRecords"></div>
-                </div>
-            </div>
-            
-            <div id="memberProfileTab" class="section hidden">
-                <h2 class="section-title">👤 My Profile</h2>
-                <div id="profileInfo"></div>
-                <button onclick="logout()" class="btn-secondary">Logout</button>
-            </div>
-            
-            <div id="memberDirectoryTab" class="section hidden">
-                <h2 class="section-title">📞 Choir Member Directory</h2>
-                <div id="publicDirectory"></div>
-                <button onclick="logout()" class="btn-secondary">Logout</button>
-            </div>
-        </div>
-        
-        <!-- Admin Dashboard -->
-        <div id="adminDashboard" class="hidden">
-            <div class="tabs">
-                <button class="tab active" onclick="showAdminTab('overview')">📊 Overview</button>
-                <button class="tab" onclick="showAdminTab('members')">👥 Members</button>
-                <button class="tab" onclick="showAdminTab('attendance')">📋 Attendance</button>
-                <button class="tab" onclick="showAdminTab('reports')">📈 Reports</button>
-                <button class="tab" onclick="showAdminTab('settings')">⚙️ Settings</button>
-            </div>
-            
-            <!-- Admin Overview Tab -->
-            <div id="adminOverviewTab" class="section">
-                <h2 class="section-title">📊 Choir Overview</h2>
-                
-                <div class="member-stats">
-                    <div class="stat-card">
-                        <div class="stat-number" id="totalMembers">0</div>
-                        <div class="stat-label">Total Members</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number" id="activeMembers">0</div>
-                        <div class="stat-label">Active Members</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number" id="thisWeekAttendance">0</div>
-                        <div class="stat-label">This Week Attendance</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number" id="averageAttendance">0%</div>
-                        <div class="stat-label">Average Attendance</div>
-                    </div>
-                </div>
-                
-                <button onclick="refreshData()" class="btn-success">🔄 Refresh Data</button>
-                <button onclick="logout()" class="btn-secondary">Logout</button>
-            </div>
-            
-            <!-- Admin Members Tab -->
-            <div id="adminMembersTab" class="section hidden">
-                <h2 class="section-title">👥 Member Management</h2>
-                
-                <div class="admin-controls">
-                    <button onclick="showAddMemberForm()" class="btn-success">+ Add New Member</button>
-                    <button onclick="exportMembersCSV()" class="btn-secondary">📊 Export CSV</button>
-                    <div class="filter-group">
-                        <select id="voicePartFilter" onchange="filterMembers()">
-                            <option value="">All Voice Parts</option>
-                            <option value="Soprano">Soprano</option>
-                            <option value="Alto">Alto</option>
-                            <option value="Tenor">Tenor</option>
-                            <option value="Bass">Bass</option>
-                        </select>
-                        <select id="statusFilter" onchange="filterMembers()">
-                            <option value="">All Status</option>
-                            <option value="Active">Active</option>
-                            <option value="Inactive">Inactive</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <table class="data-table" id="membersTable">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Phone</th>
-                            <th>Voice Part</th>
-                            <th>Email</th>
-                            <th>Join Date</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="membersTableBody">
-                    </tbody>
-                </table>
-            </div>
-            
-            <!-- Admin Attendance Tab -->
-            <div id="adminAttendanceTab" class="section hidden">
-                <h2 class="section-title">📋 Attendance Management</h2>
-                
-                <div class="admin-controls">
-                    <button onclick="showBulkAttendanceForm()" class="btn-success">+ Mark Bulk Attendance</button>
-                    <button onclick="exportAttendanceCSV()" class="btn-secondary">📊 Export Attendance</button>
-                    <div class="filter-group">
-                        <input type="date" id="attendanceDateFilter" onchange="filterAttendance()">
-                        <select id="serviceTypeFilter" onchange="filterAttendance()">
-                            <option value="">All Services</option>
-                            <option value="Sabbath Morning">Sabbath Morning</option>
-                            <option value="Choir Practice">Choir Practice</option>
-                            <option value="Special Event">Special Event</option>
-                            <option value="Wedding">Wedding</option>
-                            <option value="Funeral">Funeral</option>
-                            <option value="Prayer Meeting">Prayer Meeting</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <div id="attendanceDisplay"></div>
-            </div>
-            
-            <!-- Admin Reports Tab -->
-            <div id="adminReportsTab" class="section hidden">
-                <h2 class="section-title">📈 Reports & Analytics</h2>
-                
-                <div class="admin-controls">
-                    <div class="filter-group">
-                        <input type="date" id="reportStartDate">
-                        <input type="date" id="reportEndDate">
-                        <button onclick="generateReport()">Generate Report</button>
-                    </div>
-                </div>
-                
-                <div id="reportsDisplay"></div>
-            </div>
-            
-            <!-- Admin Settings Tab -->
-            <div id="adminSettingsTab" class="section hidden">
-                <h2 class="section-title">⚙️ System Settings</h2>
-                
-                <div class="form-group">
-                    <label for="adminPassword">Admin Password:</label>
-                    <input type="password" id="adminPassword" placeholder="Set admin password">
-                </div>
-                
-                <div class="form-group">
-                    <label for="churchSettings">Church Settings:</label>
-                    <textarea id="churchSettings" rows="4" placeholder="Additional church-specific settings..."></textarea>
-                </div>
-                
-                <button onclick="saveSettings()" class="btn-success">Save Settings</button>
-                <button onclick="logout()" class="btn-secondary">Logout</button>
+                <button id="saveConfigBtn" class="btn-success">Save Configuration</button>
+                <button id="testConnBtn" class="btn-secondary">Test Connection</button>
+                <button id="initDbBtn" class="btn-secondary">Initialize Database</button>
             </div>
         </div>
         
@@ -597,32 +254,33 @@
     </div>
     
     <script>
+        // DOM elements
+        const gasUrlInput = document.getElementById('gasUrl');
+        const saveConfigBtn = document.getElementById('saveConfigBtn');
+        const testConnBtn = document.getElementById('testConnBtn');
+        const initDbBtn = document.getElementById('initDbBtn');
+        const messageArea = document.getElementById('messageArea');
+        
         // Configuration
         let API_URL = '';
-        
-        // Data variables
-        let members = [];
-        let attendance = [];
-        let currentUser = null;
-        let isAdmin = false;
         
         // Initialize the system
         document.addEventListener('DOMContentLoaded', function() {
             const savedUrl = localStorage.getItem('gasUrl');
             if (savedUrl) {
                 API_URL = savedUrl;
-                document.getElementById('gasUrl').value = savedUrl;
-                document.getElementById('setupSection').classList.add('hidden');
-                document.getElementById('loginSection').classList.remove('hidden');
-                loadData();
+                gasUrlInput.value = savedUrl;
+                showMessage('Loaded saved configuration. Click "Test Connection" to verify.', 'success');
             }
             
-            document.getElementById('attendanceDate').valueAsDate = new Date();
+            // Add event listeners
+            saveConfigBtn.addEventListener('click', saveGasUrl);
+            testConnBtn.addEventListener('click', testConnection);
+            initDbBtn.addEventListener('click', initializeDatabase);
         });
         
         // Utility functions
         function showMessage(message, type = 'success') {
-            const messageArea = document.getElementById('messageArea');
             messageArea.innerHTML = `<div class="message ${type}">${message}</div>`;
             setTimeout(() => {
                 messageArea.innerHTML = '';
@@ -674,91 +332,17 @@
             });
         }
         
-       // Replace your current API functions with this
-async function callAPI(action, data = {}) {
-  if (!API_URL) {
-    showMessage('Please configure Google Apps Script URL first', 'error');
-    return null;
-  }
-  
-  try {
-    setLoading(true);
-    
-    // Convert data object to URL parameters
-    const params = new URLSearchParams();
-    params.append('action', action);
-    
-    for (const key in data) {
-      if (data[key] !== null && data[key] !== undefined) {
-        if (typeof data[key] === 'object') {
-          params.append(key, JSON.stringify(data[key]));
-        } else {
-          params.append(key, data[key]);
-        }
-      }
-    }
-    
-    // Use JSONP for all requests to avoid CORS issues
-    const result = await callAPIWithJSONP(action, params);
-    setLoading(false);
-    
-    if (!result.success) {
-      showMessage(result.message || 'Operation failed', 'error');
-      return null;
-    }
-    
-    return result;
-  } catch (error) {
-    setLoading(false);
-    showMessage(`Error: ${error.message}`, 'error');
-    return null;
-  }
-}
-
-// Update the JSONP function to handle parameters
-function callAPIWithJSONP(action, params = new URLSearchParams()) {
-  return new Promise((resolve, reject) => {
-    if (!API_URL) {
-      reject(new Error('Please configure Google Apps Script URL first'));
-      return;
-    }
-    
-    setLoading(true);
-    const callbackName = 'jsonp_callback_' + Math.round(100000 * Math.random());
-    const script = document.createElement('script');
-    
-    // Add action and callback to parameters
-    params.append('action', action);
-    params.append('callback', callbackName);
-    
-    const url = API_URL + '?' + params.toString();
-    
-    // Set up callback
-    window[callbackName] = function(data) {
-      setLoading(false);
-      delete window[callbackName];
-      document.body.removeChild(script);
-      resolve(data);
-    };
-    
-    // Handle errors
-    script.onerror = function() {
-      setLoading(false);
-      delete window[callbackName];
-      document.body.removeChild(script);
-      reject(new Error('Failed to load script'));
-    };
-    
-    script.src = url;
-    document.body.appendChild(script);
-  });
-      
         // Setup functions
         function saveGasUrl() {
-            const url = document.getElementById('gasUrl').value.trim();
+            const url = gasUrlInput.value.trim();
             if (!url) {
                 showMessage('Please enter a valid URL', 'error');
                 return;
+            }
+            
+            // Basic URL validation
+            if (!url.startsWith('https://script.google.com/')) {
+                showMessage('URL should start with https://script.google.com/', 'warning');
             }
             
             API_URL = url;
@@ -767,12 +351,22 @@ function callAPIWithJSONP(action, params = new URLSearchParams()) {
         }
         
         async function testConnection() {
+            // First save the URL if it's not saved yet
+            if (gasUrlInput.value.trim() && gasUrlInput.value.trim() !== API_URL) {
+                saveGasUrl();
+            }
+            
+            if (!API_URL) {
+                showMessage('Please enter and save a URL first', 'error');
+                return;
+            }
+            
             try {
                 const result = await callAPIWithJSONP('debug');
-                if (result && result.success) {
-                    showMessage('Connection successful!', 'success');
+                if (result && result.success !== false) {
+                    showMessage('Connection successful! You can now initialize the database.', 'success');
                 } else {
-                    showMessage('Connection failed: ' + (result.message || 'Unknown error'), 'error');
+                    showMessage('Connection failed: ' + (result?.message || 'Unknown error'), 'error');
                 }
             } catch (error) {
                 showMessage('Connection failed: ' + error.message, 'error');
@@ -780,681 +374,27 @@ function callAPIWithJSONP(action, params = new URLSearchParams()) {
         }
         
         async function initializeDatabase() {
+            // First save the URL if it's not saved yet
+            if (gasUrlInput.value.trim() && gasUrlInput.value.trim() !== API_URL) {
+                saveGasUrl();
+            }
+            
+            if (!API_URL) {
+                showMessage('Please enter and save a URL first', 'error');
+                return;
+            }
+            
             try {
                 const result = await callAPIWithJSONP('initializeSheets');
                 if (result && result.success) {
-                    showMessage('Database initialized successfully!', 'success');
-                    document.getElementById('setupSection').classList.add('hidden');
-                    document.getElementById('loginSection').classList.remove('hidden');
-                    loadData();
+                    showMessage('Database initialized successfully! You can now use the system.', 'success');
                 } else {
-                    showMessage('Initialization failed: ' + (result.message || 'Unknown error'), 'error');
+                    showMessage('Initialization failed: ' + (result?.message || 'Unknown error'), 'error');
                 }
             } catch (error) {
                 showMessage('Initialization failed: ' + error.message, 'error');
             }
         }
-        
-        // Data loading functions
-        async function loadData() {
-            await loadMembers();
-            await loadAttendance();
-        }
-        
-        async function loadMembers() {
-            const result = await callAPI('getMembers');
-            if (result) {
-                members = result.data || [];
-            }
-        }
-        
-        async function loadAttendance() {
-            const result = await callAPI('getAttendance');
-            if (result) {
-                attendance = result.data || [];
-            }
-        }
-        
-        async function refreshData() {
-            await loadData();
-            if (isAdmin) {
-                updateAdminDashboard();
-            } else {
-                updateMemberDashboard();
-            }
-            showMessage('Data refreshed successfully!', 'success');
-        }
-        
-        // Authentication functions
-        async function loginUser() {
-            const name = document.getElementById('loginName').value.trim();
-            const phone = document.getElementById('loginPhone').value.trim();
-            const password = document.getElementById('loginPassword').value;
-            
-            if (!name || !phone) {
-                showMessage('Please enter both name and phone number.', 'error');
-                return;
-            }
-            
-            if (password) {
-                // Admin login
-                const result = await callAPI('authenticateAdmin', { password });
-                if (result && result.success) {
-                    isAdmin = true;
-                    currentUser = { name: name, role: 'admin' };
-                    document.getElementById('loginSection').classList.add('hidden');
-                    document.getElementById('adminDashboard').classList.remove('hidden');
-                    await loadData();
-                    updateAdminDashboard();
-                    showMessage(`Welcome Admin! Full system access granted.`, 'success');
-                }
-            } else {
-                // Member login
-                const result = await callAPI('authenticateMember', { name, phone });
-                if (result && result.success) {
-                    currentUser = result.data;
-                    isAdmin = false;
-                    document.getElementById('loginSection').classList.add('hidden');
-                    document.getElementById('memberDashboard').classList.remove('hidden');
-                    await loadData();
-                    updateMemberDashboard();
-                    showMessage(`Welcome back, ${currentUser.name}!`);
-                }
-            }
-        }
-        
-        function showRegisterForm() {
-            document.getElementById('loginSection').classList.add('hidden');
-            document.getElementById('registrationSection').classList.remove('hidden');
-        }
-        
-        function showLoginForm() {
-            document.getElementById('registrationSection').classList.add('hidden');
-            document.getElementById('loginSection').classList.remove('hidden');
-        }
-        
-        async function registerMember() {
-            const name = document.getElementById('memberName').value.trim();
-            const phone = document.getElementById('memberPhone').value.trim();
-            const voicePart = document.getElementById('voicePart').value;
-            const email = document.getElementById('memberEmail').value.trim();
-            
-            if (!name || !phone || !voicePart) {
-                showMessage('Please fill in all required fields.', 'error');
-                return;
-            }
-            
-            const member = {
-                name: name,
-                phone: phone,
-                voicePart: voicePart,
-                email: email,
-                registeredDate: new Date().toISOString().split('T')[0],
-                status: 'Active'
-            };
-            
-            const result = await callAPI('addMember', { member });
-            if (result) {
-                showMessage(`Registration successful! Welcome to the choir, ${name}!`);
-                
-                // Clear form
-                document.getElementById('memberName').value = '';
-                document.getElementById('memberPhone').value = '';
-                document.getElementById('voicePart').value = '';
-                document.getElementById('memberEmail').value = '';
-                
-                showLoginForm();
-            }
-        }
-        
-        // Member functions
-        async function markMemberAttendance() {
-            if (!currentUser) return;
-            
-            const date = document.getElementById('attendanceDate').value;
-            const serviceType = document.getElementById('attendanceType').value;
-            
-            if (!date) {
-                showMessage('Please select a date.', 'error');
-                return;
-            }
-            
-            const attendanceRecord = {
-                memberId: currentUser.id,
-                memberName: currentUser.name,
-                date: date,
-                serviceType: serviceType,
-                status: 'Present',
-                timestamp: new Date().toISOString()
-            };
-            
-            const result = await callAPI('addAttendance', { attendance: attendanceRecord });
-            if (result) {
-                await loadAttendance();
-                updateMemberDashboard();
-                showMessage(`Attendance marked successfully for ${serviceType} on ${date}!`);
-            }
-        }
-        
-        function showMemberTab(tabName) {
-            document.getElementById('memberAttendanceTab').classList.add('hidden');
-            document.getElementById('memberProfileTab').classList.add('hidden');
-            document.getElementById('memberDirectoryTab').classList.add('hidden');
-            
-            document.querySelectorAll('#memberDashboard .tab').forEach(tab => tab.classList.remove('active'));
-            
-            document.getElementById('member' + tabName.charAt(0).toUpperCase() + tabName.slice(1) + 'Tab').classList.remove('hidden');
-            event.target.classList.add('active');
-            
-            if (tabName === 'profile') {
-                updateMemberProfile();
-            } else if (tabName === 'directory') {
-                updateMemberDirectory();
-            } else if (tabName === 'attendance') {
-                updateMemberAttendanceHistory();
-            }
-        }
-        
-        function updateMemberDashboard() {
-            updateMemberAttendanceHistory();
-            updateMemberProfile();
-            updateMemberDirectory();
-        }
-        
-        function updateMemberAttendanceHistory() {
-            const recordsDiv = document.getElementById('memberRecords');
-            if (!currentUser || isAdmin) return;
-            
-            const userAttendance = attendance.filter(a => a.memberId == currentUser.id)
-                                            .sort((a, b) => new Date(b.date) - new Date(a.date));
-            
-            if (userAttendance.length === 0) {
-                recordsDiv.innerHTML = '<p>No attendance records found.</p>';
-                return;
-            }
-            
-            const totalServices = userAttendance.length;
-            const presentCount = userAttendance.filter(a => a.status === 'Present').length;
-            const attendanceRate = ((presentCount / totalServices) * 100).toFixed(1);
-            
-            recordsDiv.innerHTML = `
-                <div style="margin-bottom: 1rem; padding: 1rem; background: rgba(102, 126, 234, 0.1); border-radius: 8px;">
-                    <strong>My Attendance Summary:</strong> ${presentCount} out of ${totalServices} services attended (${attendanceRate}% attendance rate)
-                </div>
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Service Type</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${userAttendance.map(record => `
-                            <tr>
-                                <td>${record.date}</td>
-                                <td>${record.serviceType}</td>
-                                <td style="color: ${record.status === 'Present' ? '#27ae60' : '#e74c3c'}; font-weight: bold;">
-                                    ${record.status}
-                                </td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-            `;
-        }
-        
-        function updateMemberProfile() {
-            const profileDiv = document.getElementById('profileInfo');
-            if (!currentUser || isAdmin) return;
-            
-            const member = members.find(m => m.id == currentUser.id);
-            if (!member) return;
-            
-            profileDiv.innerHTML = `
-                <div class="stat-card" style="text-align: left;">
-                    <p><strong>Name:</strong> ${member.name}</p>
-                    <p><strong>Phone:</strong> ${member.phone}</p>
-                    <p><strong>Voice Part:</strong> ${member.voicePart}</p>
-                    <p><strong>Email:</strong> ${member.email || 'Not provided'}</p>
-                    <p><strong>Member Since:</strong> ${member.registeredDate}</p>
-                    <p><strong>Status:</strong> <span style="color: ${member.status === 'Active' ? '#27ae60' : '#e74c3c'}">${member.status}</span></p>
-                </div>
-            `;
-        }
-        
-        function updateMemberDirectory() {
-            const directoryDiv = document.getElementById('publicDirectory');
-            const activeMembers = members.filter(m => m.status === 'Active');
-            
-            if (activeMembers.length === 0) {
-                directoryDiv.innerHTML = '<p>No active members found.</p>';
-                return;
-            }
-            
-            directoryDiv.innerHTML = `
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Voice Part</th>
-                            <th>Phone</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${activeMembers.map(member => `
-                            <tr>
-                                <td>${member.name}</td>
-                                <td>${member.voicePart}</td>
-                                <td>${member.phone}</td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-            `;
-        }
-        
-        // Admin functions
-        function showAdminTab(tabName) {
-            document.getElementById('adminOverviewTab').classList.add('hidden');
-            document.getElementById('adminMembersTab').classList.add('hidden');
-            document.getElementById('adminAttendanceTab').classList.add('hidden');
-            document.getElementById('adminReportsTab').classList.add('hidden');
-            document.getElementById('adminSettingsTab').classList.add('hidden');
-            
-            document.querySelectorAll('#adminDashboard .tab').forEach(tab => tab.classList.remove('active'));
-            
-            document.getElementById('admin' + tabName.charAt(0).toUpperCase() + tabName.slice(1) + 'Tab').classList.remove('hidden');
-            event.target.classList.add('active');
-            
-            if (tabName === 'members') {
-                updateMembersTable();
-            } else if (tabName === 'attendance') {
-                updateAttendanceDisplay();
-            } else if (tabName === 'reports') {
-                updateReportsDisplay();
-            } else if (tabName === 'overview') {
-                updateOverviewStats();
-            }
-        }
-        
-        function updateAdminDashboard() {
-            updateOverviewStats();
-            updateMembersTable();
-            updateAttendanceDisplay();
-        }
-        
-        function updateOverviewStats() {
-            const totalMembers = members.length;
-            const activeMembers = members.filter(m => m.status === 'Active').length;
-            
-            const oneWeekAgo = new Date();
-            oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-            const thisWeekAttendance = attendance.filter(a => 
-                new Date(a.date) >= oneWeekAgo
-            ).length;
-            
-            const totalAttendanceRecords = attendance.length;
-            const presentRecords = attendance.filter(a => a.status === 'Present').length;
-            const averageAttendance = totalAttendanceRecords > 0 
-                ? ((presentRecords / totalAttendanceRecords) * 100).toFixed(0)
-                : 0;
-            
-            document.getElementById('totalMembers').textContent = totalMembers;
-            document.getElementById('activeMembers').textContent = activeMembers;
-            document.getElementById('thisWeekAttendance').textContent = thisWeekAttendance;
-            document.getElementById('averageAttendance').textContent = averageAttendance + '%';
-        }
-        
-        function updateMembersTable() {
-            const tbody = document.getElementById('membersTableBody');
-            let filteredMembers = [...members];
-            
-            const voicePartFilter = document.getElementById('voicePartFilter')?.value || '';
-            const statusFilter = document.getElementById('statusFilter')?.value || '';
-            
-            if (voicePartFilter) {
-                filteredMembers = filteredMembers.filter(m => m.voicePart === voicePartFilter);
-            }
-            
-            if (statusFilter) {
-                filteredMembers = filteredMembers.filter(m => m.status === statusFilter);
-            }
-            
-            tbody.innerHTML = filteredMembers.map(member => `
-                <tr>
-                    <td>${member.name}</td>
-                    <td>${member.phone}</td>
-                    <td>${member.voicePart}</td>
-                    <td>${member.email || 'N/A'}</td>
-                    <td>${member.registeredDate}</td>
-                    <td><span style="color: ${member.status === 'Active' ? '#27ae60' : '#e74c3c'}">${member.status}</span></td>
-                    <td>
-                        <button onclick="editMember(${member.id})" class="btn-secondary" style="padding: 0.3rem 0.6rem; margin: 0.2rem;">Edit</button>
-                        <button onclick="toggleMemberStatus(${member.id})" class="btn-secondary" style="padding: 0.3rem 0.6rem; margin: 0.2rem;">
-                            ${member.status === 'Active' ? 'Deactivate' : 'Activate'}
-                        </button>
-                    </td>
-                </tr>
-            `).join('');
-        }
-        
-        function filterMembers() {
-            updateMembersTable();
-        }
-        
-        async function toggleMemberStatus(memberId) {
-            const member = members.find(m => m.id == memberId);
-            if (member) {
-                member.status = member.status === 'Active' ? 'Inactive' : 'Active';
-                const result = await callAPI('updateMember', { member });
-                if (result) {
-                    await loadMembers();
-                    updateMembersTable();
-                    updateOverviewStats();
-                    showMessage(`${member.name} status updated to ${member.status}`, 'success');
-                }
-            }
-        }
-        
-        async function editMember(memberId) {
-            const member = members.find(m => m.id == memberId);
-            if (!member) return;
-            
-            const newName = prompt('Enter new name:', member.name);
-            if (newName && newName !== member.name) {
-                member.name = newName;
-            }
-            
-            const newPhone = prompt('Enter new phone:', member.phone);
-            if (newPhone && newPhone !== member.phone) {
-                member.phone = newPhone;
-            }
-            
-            const newEmail = prompt('Enter new email:', member.email);
-            if (newEmail !== null) {
-                member.email = newEmail;
-            }
-            
-            const result = await callAPI('updateMember', { member });
-            if (result) {
-                await loadMembers();
-                updateMembersTable();
-                showMessage(`${member.name} updated successfully`, 'success');
-            }
-        }
-        
-        async function showAddMemberForm() {
-            const name = prompt('Enter member name:');
-            if (!name) return;
-            
-            const phone = prompt('Enter phone number:');
-            if (!phone) return;
-            
-            const voicePart = prompt('Enter voice part (Soprano/Alto/Tenor/Bass):');
-            if (!voicePart) return;
-            
-            const email = prompt('Enter email (optional):') || '';
-            
-            const member = {
-                name: name,
-                phone: phone,
-                voicePart: voicePart,
-                email: email,
-                registeredDate: new Date().toISOString().split('T')[0],
-                status: 'Active'
-            };
-            
-            const result = await callAPI('addMember', { member });
-            if (result) {
-                await loadMembers();
-                updateMembersTable();
-                updateOverviewStats();
-                showMessage(`${name} added successfully!`, 'success');
-            }
-        }
-        
-        function updateAttendanceDisplay() {
-            const attendanceDiv = document.getElementById('attendanceDisplay');
-            
-            const dateFilter = document.getElementById('attendanceDateFilter')?.value || '';
-            const serviceTypeFilter = document.getElementById('serviceTypeFilter')?.value || '';
-            
-            let filteredAttendance = [...attendance];
-            
-            if (dateFilter) {
-                filteredAttendance = filteredAttendance.filter(a => a.date === dateFilter);
-            }
-            
-            if (serviceTypeFilter) {
-                filteredAttendance = filteredAttendance.filter(a => a.serviceType === serviceTypeFilter);
-            }
-            
-            filteredAttendance.sort((a, b) => new Date(b.date) - new Date(a.date));
-            
-            if (filteredAttendance.length === 0) {
-                attendanceDiv.innerHTML = '<p>No attendance records found.</p>';
-                return;
-            }
-            
-            attendanceDiv.innerHTML = `
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Member</th>
-                            <th>Service Type</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${filteredAttendance.map(record => `
-                            <tr>
-                                <td>${record.date}</td>
-                                <td>${record.memberName}</td>
-                                <td>${record.serviceType}</td>
-                                <td style="color: ${record.status === 'Present' ? '#27ae60' : '#e74c3c'}; font-weight: bold;">
-                                    ${record.status}
-                                </td>
-                                <td>
-                                    <button onclick="deleteAttendanceRecord(${record.id})" class="btn-danger" style="padding: 0.3rem 0.6rem;">Delete</button>
-                                </td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-            `;
-        }
-        
-        function filterAttendance() {
-            updateAttendanceDisplay();
-        }
-        
-        async function deleteAttendanceRecord(recordId) {
-            if (confirm('Are you sure you want to delete this attendance record?')) {
-                const result = await callAPI('deleteAttendance', { attendanceId: recordId });
-                if (result) {
-                    await loadAttendance();
-                    updateAttendanceDisplay();
-                    updateOverviewStats();
-                    showMessage('Attendance record deleted', 'success');
-                }
-            }
-        }
-        
-        async function showBulkAttendanceForm() {
-            const date = prompt('Enter date (YYYY-MM-DD):', new Date().toISOString().split('T')[0]);
-            if (!date) return;
-            
-            const serviceType = prompt('Enter service type:', 'Sabbath Morning');
-            if (!serviceType) return;
-            
-            const activeMembers = members.filter(m => m.status === 'Active');
-            
-            for (const member of activeMembers) {
-                const present = confirm(`Mark ${member.name} as present for ${serviceType} on ${date}?`);
-                if (present) {
-                    const attendanceRecord = {
-                        memberId: member.id,
-                        memberName: member.name,
-                        date: date,
-                        serviceType: serviceType,
-                        status: 'Present',
-                        timestamp: new Date().toISOString()
-                    };
-                    await callAPI('addAttendance', { attendance: attendanceRecord });
-                }
-            }
-            
-            await loadAttendance();
-            updateAttendanceDisplay();
-            updateOverviewStats();
-            showMessage(`Bulk attendance marked for ${date}`, 'success');
-        }
-        
-        function generateReport() {
-            const startDate = document.getElementById('reportStartDate').value;
-            const endDate = document.getElementById('reportEndDate').value;
-            
-            if (!startDate || !endDate) {
-                showMessage('Please select both start and end dates', 'error');
-                return;
-            }
-            
-            const filteredAttendance = attendance.filter(a => 
-                a.date >= startDate && a.date <= endDate
-            );
-            
-            const reportsDiv = document.getElementById('reportsDisplay');
-            
-            const totalRecords = filteredAttendance.length;
-            const presentRecords = filteredAttendance.filter(a => a.status === 'Present').length;
-            const attendanceRate = totalRecords > 0 ? ((presentRecords / totalRecords) * 100).toFixed(1) : 0;
-            
-            const serviceTypes = {};
-            filteredAttendance.forEach(record => {
-                if (!serviceTypes[record.serviceType]) {
-                    serviceTypes[record.serviceType] = { total: 0, present: 0 };
-                }
-                serviceTypes[record.serviceType].total++;
-                if (record.status === 'Present') {
-                    serviceTypes[record.serviceType].present++;
-                }
-            });
-            
-            reportsDiv.innerHTML = `
-                <div class="member-stats">
-                    <div class="stat-card">
-                        <div class="stat-number">${totalRecords}</div>
-                        <div class="stat-label">Total Records</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number">${presentRecords}</div>
-                        <div class="stat-label">Present Records</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number">${attendanceRate}%</div>
-                        <div class="stat-label">Attendance Rate</div>
-                    </div>
-                </div>
-                
-                <h3>Service Type Breakdown</h3>
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>Service Type</th>
-                            <th>Total Records</th>
-                            <th>Present</th>
-                            <th>Rate</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${Object.entries(serviceTypes).map(([serviceType, stats]) => `
-                            <tr>
-                                <td>${serviceType}</td>
-                                <td>${stats.total}</td>
-                                <td>${stats.present}</td>
-                                <td>${((stats.present / stats.total) * 100).toFixed(1)}%</td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-            `;
-        }
-        
-        function updateReportsDisplay() {
-            const today = new Date();
-            const lastMonth = new Date();
-            lastMonth.setMonth(lastMonth.getMonth() - 1);
-            
-            document.getElementById('reportStartDate').value = lastMonth.toISOString().split('T')[0];
-            document.getElementById('reportEndDate').value = today.toISOString().split('T')[0];
-            
-            generateReport();
-        }
-        
-        // Export functions
-        function exportMembersCSV() {
-            const csv = convertToCSV(members, ['id', 'name', 'phone', 'voicePart', 'email', 'registeredDate', 'status']);
-            downloadCSV(csv, 'choir_members.csv');
-            showMessage('Members exported successfully!', 'success');
-        }
-        
-        function exportAttendanceCSV() {
-            const csv = convertToCSV(attendance, ['id', 'memberName', 'date', 'serviceType', 'status']);
-            downloadCSV(csv, 'choir_attendance.csv');
-            showMessage('Attendance exported successfully!', 'success');
-        }
-        
-        function convertToCSV(data, headers) {
-            const csvHeaders = headers.join(',');
-            const csvData = data.map(row => 
-                headers.map(header => `"${row[header] || ''}"`).join(',')
-            ).join('\n');
-            return csvHeaders + '\n' + csvData;
-        }
-        
-        function downloadCSV(csv, filename) {
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const url = window.URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = filename;
-            link.click();
-            window.URL.revokeObjectURL(url);
-        }
-        
-        async function saveSettings() {
-            const adminPassword = document.getElementById('adminPassword').value;
-            const churchSettings = document.getElementById('churchSettings').value;
-            
-            const settings = {};
-            if (adminPassword) {
-                settings.adminPassword = adminPassword;
-            }
-            if (churchSettings) {
-                settings.churchSettings = churchSettings;
-            }
-            
-            const result = await callAPI('updateSettings', { settings });
-            if (result) {
-                showMessage('Settings saved successfully!', 'success');
-            }
-        }
-        
-        function logout() {
-            currentUser = null;
-            isAdmin = false;
-            document.getElementById('memberDashboard').classList.add('hidden');
-            document.getElementById('adminDashboard').classList.add('hidden');
-            document.getElementById('loginSection').classList.remove('hidden');
-            document.getElementById('loginName').value = '';
-            document.getElementById('loginPhone').value = '';
-            document.getElementById('loginPassword').value = '';
-            showMessage('You have been logged out successfully.');
-        }
     </script>
 </body>
 </html>
-
