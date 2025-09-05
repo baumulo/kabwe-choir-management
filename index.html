@@ -691,19 +691,31 @@
         }
         
         async function testConnection() {
-            const result = await callAPI('getMembers');
-            if (result) {
-                showMessage('Connection successful!', 'success');
+            try {
+                const result = await callAPIWithJSONP('debug');
+                if (result && result.success) {
+                    showMessage('Connection successful!', 'success');
+                } else {
+                    showMessage('Connection failed: ' + (result.message || 'Unknown error'), 'error');
+                }
+            } catch (error) {
+                showMessage('Connection failed: ' + error.message, 'error');
             }
         }
         
         async function initializeDatabase() {
-            const result = await callAPI('initializeSheets');
-            if (result) {
-                showMessage('Database initialized successfully!', 'success');
-                document.getElementById('setupSection').classList.add('hidden');
-                document.getElementById('loginSection').classList.remove('hidden');
-                loadData();
+            try {
+                const result = await callAPIWithJSONP('initializeSheets');
+                if (result && result.success) {
+                    showMessage('Database initialized successfully!', 'success');
+                    document.getElementById('setupSection').classList.add('hidden');
+                    document.getElementById('loginSection').classList.remove('hidden');
+                    loadData();
+                } else {
+                    showMessage('Initialization failed: ' + (result.message || 'Unknown error'), 'error');
+                }
+            } catch (error) {
+                showMessage('Initialization failed: ' + error.message, 'error');
             }
         }
         
