@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kabwe Central SDA Church Choir - Enhanced Management System</title>
+    <title>Kabwe Central SDA Church Choir - Management System</title>
     <style>
         * {
             margin: 0;
@@ -111,6 +111,12 @@
         button:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        button:disabled {
+            opacity: 0.6;
+            transform: none;
+            cursor: not-allowed;
         }
         
         .btn-secondary {
@@ -235,6 +241,12 @@
             border: 1px solid rgba(243, 156, 18, 0.3);
         }
         
+        .loading {
+            background: rgba(52, 152, 219, 0.1);
+            color: #3498db;
+            border: 1px solid rgba(52, 152, 219, 0.3);
+        }
+        
         .login-form {
             max-width: 400px;
             margin: 0 auto;
@@ -261,28 +273,6 @@
         .filter-group select {
             width: auto;
             min-width: 150px;
-        }
-        
-        .attendance-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-        
-        .attendance-card {
-            background: white;
-            padding: 1rem;
-            border-radius: 8px;
-            border-left: 4px solid #667eea;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        
-        .export-section {
-            background: #f8fafc;
-            padding: 1rem;
-            border-radius: 8px;
-            margin-top: 1rem;
         }
         
         .google-sheets-setup {
@@ -350,11 +340,29 @@
     <div class="container">
         <div class="header">
             <div class="church-name">Kabwe Central Seventh-day Adventist Church</div>
-            <div class="choir-title">Enhanced Choir Management System</div>
+            <div class="choir-title">Choir Management System</div>
+        </div>
+        
+        <!-- Setup Section -->
+        <div id="setupSection" class="section">
+            <h2 class="section-title">⚙️ Initial Setup</h2>
+            <div class="google-sheets-setup">
+                <h3 style="margin-bottom: 1rem;">📊 Google Apps Script Configuration</h3>
+                <div class="form-group">
+                    <label for="gasUrl">Google Apps Script Web App URL:</label>
+                    <input type="url" id="gasUrl" placeholder="https://script.google.com/macros/s/your-script-id/exec">
+                    <small style="color: white; display: block; margin-top: 0.5rem;">
+                        Deploy your Google Apps Script as a web app and paste the URL here
+                    </small>
+                </div>
+                <button onclick="saveGasUrl()" class="btn-success">Save Configuration</button>
+                <button onclick="testConnection()" class="btn-secondary">Test Connection</button>
+                <button onclick="initializeDatabase()" class="btn-secondary">Initialize Database</button>
+            </div>
         </div>
         
         <!-- Login Section -->
-        <div id="loginSection" class="section">
+        <div id="loginSection" class="section hidden">
             <h2 class="section-title">🎵 System Access</h2>
             <div class="login-form">
                 <div class="form-group">
@@ -440,7 +448,6 @@
             <div id="memberProfileTab" class="section hidden">
                 <h2 class="section-title">👤 My Profile</h2>
                 <div id="profileInfo"></div>
-                <button onclick="editProfile()" class="btn-secondary">Edit Profile</button>
                 <button onclick="logout()" class="btn-secondary">Logout</button>
             </div>
             
@@ -484,17 +491,7 @@
                     </div>
                 </div>
                 
-                <div class="google-sheets-setup">
-                    <h3 style="margin-bottom: 1rem;">🔗 Google Sheets Integration Setup</h3>
-                    <div class="setup-steps">
-                        <div class="setup-step">Create a new Google Sheet called "Kabwe Choir Database"</div>
-                        <div class="setup-step">Share the sheet publicly with "Anyone with the link can edit"</div>
-                        <div class="setup-step">Copy the sheet URL and paste it in Settings tab</div>
-                        <div class="setup-step">Click "Initialize Sheets" to set up the database structure</div>
-                        <div class="setup-step">Your data will now automatically save to Google Sheets!</div>
-                    </div>
-                </div>
-                
+                <button onclick="refreshData()" class="btn-success">🔄 Refresh Data</button>
                 <button onclick="logout()" class="btn-secondary">Logout</button>
             </div>
             
@@ -582,14 +579,6 @@
                 <h2 class="section-title">⚙️ System Settings</h2>
                 
                 <div class="form-group">
-                    <label for="googleSheetUrl">Google Sheets URL:</label>
-                    <input type="url" id="googleSheetUrl" placeholder="https://docs.google.com/spreadsheets/d/your-sheet-id/edit">
-                    <small style="color: #7f8c8d; display: block; margin-top: 0.5rem;">
-                        Paste your Google Sheet URL here to enable automatic data saving
-                    </small>
-                </div>
-                
-                <div class="form-group">
                     <label for="adminPassword">Admin Password:</label>
                     <input type="password" id="adminPassword" placeholder="Set admin password">
                 </div>
@@ -600,15 +589,7 @@
                 </div>
                 
                 <button onclick="saveSettings()" class="btn-success">Save Settings</button>
-                <button onclick="initializeGoogleSheets()" class="btn-secondary">Initialize Google Sheets</button>
                 <button onclick="logout()" class="btn-secondary">Logout</button>
-                
-                <div class="export-section">
-                    <h3>📊 Data Export Options</h3>
-                    <button onclick="exportAllData()" class="btn-secondary">Export All Data (JSON)</button>
-                    <button onclick="backupData()" class="btn-secondary">Create Data Backup</button>
-                    <button onclick="importData()" class="btn-secondary">Import Data</button>
-                </div>
             </div>
         </div>
         
@@ -616,82 +597,30 @@
     </div>
     
     <script>
-        // Enhanced data structure with persistent storage simulation
-        let members = [
-            {
-                id: 1,
-                name: "Grace Mwansa",
-                phone: "0977123456",
-                voicePart: "Soprano",
-                email: "grace@example.com",
-                registeredDate: "2024-01-15",
-                status: "Active"
-            },
-            {
-                id: 2,
-                name: "John Phiri",
-                phone: "0966789012",
-                voicePart: "Tenor",
-                email: "john@example.com",
-                registeredDate: "2024-01-20",
-                status: "Active"
-            },
-            {
-                id: 3,
-                name: "Mary Banda",
-                phone: "0955456789",
-                voicePart: "Alto",
-                email: "mary@example.com",
-                registeredDate: "2024-02-05",
-                status: "Active"
-            },
-            {
-                id: 4,
-                name: "David Tembo",
-                phone: "0944123456",
-                voicePart: "Bass",
-                email: "david@example.com",
-                registeredDate: "2024-02-10",
-                status: "Active"
-            }
-        ];
+        // Configuration
+        let API_URL = '';
         
-        let attendance = [
-            {
-                id: 1,
-                memberId: 1,
-                memberName: "Grace Mwansa",
-                date: "2024-09-01",
-                serviceType: "Sabbath Morning",
-                status: "Present",
-                timestamp: new Date().toISOString()
-            },
-            {
-                id: 2,
-                memberId: 2,
-                memberName: "John Phiri", 
-                date: "2024-09-01",
-                serviceType: "Sabbath Morning",
-                status: "Present",
-                timestamp: new Date().toISOString()
-            }
-        ];
-        
+        // Data variables
+        let members = [];
+        let attendance = [];
         let currentUser = null;
         let isAdmin = false;
-        let nextMemberId = 5;
-        let nextAttendanceId = 3;
-        let settings = {
-            adminPassword: "admin123", // Default admin password
-            googleSheetUrl: "",
-            churchSettings: ""
-        };
         
         // Initialize the system
         document.addEventListener('DOMContentLoaded', function() {
+            const savedUrl = localStorage.getItem('gasUrl');
+            if (savedUrl) {
+                API_URL = savedUrl;
+                document.getElementById('gasUrl').value = savedUrl;
+                document.getElementById('setupSection').classList.add('hidden');
+                document.getElementById('loginSection').classList.remove('hidden');
+                loadData();
+            }
+            
             document.getElementById('attendanceDate').valueAsDate = new Date();
         });
         
+        // Utility functions
         function showMessage(message, type = 'success') {
             const messageArea = document.getElementById('messageArea');
             messageArea.innerHTML = `<div class="message ${type}">${message}</div>`;
@@ -700,7 +629,116 @@
             }, 5000);
         }
         
-        function loginUser() {
+        function setLoading(isLoading) {
+            const buttons = document.querySelectorAll('button');
+            buttons.forEach(btn => {
+                btn.disabled = isLoading;
+            });
+            
+            if (isLoading) {
+                showMessage('Loading...', 'loading');
+            }
+        }
+        
+        // API functions
+        async function callAPI(action, data = {}) {
+            if (!API_URL) {
+                showMessage('Please configure Google Apps Script URL first', 'error');
+                return null;
+            }
+            
+            try {
+                setLoading(true);
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ action, ...data })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                setLoading(false);
+                
+                if (!result.success) {
+                    showMessage(result.message || 'Operation failed', 'error');
+                    return null;
+                }
+                
+                return result;
+            } catch (error) {
+                setLoading(false);
+                showMessage(`Error: ${error.message}`, 'error');
+                return null;
+            }
+        }
+        
+        // Setup functions
+        function saveGasUrl() {
+            const url = document.getElementById('gasUrl').value.trim();
+            if (!url) {
+                showMessage('Please enter a valid URL', 'error');
+                return;
+            }
+            
+            API_URL = url;
+            localStorage.setItem('gasUrl', url);
+            showMessage('Configuration saved successfully!', 'success');
+        }
+        
+        async function testConnection() {
+            const result = await callAPI('getMembers');
+            if (result) {
+                showMessage('Connection successful!', 'success');
+            }
+        }
+        
+        async function initializeDatabase() {
+            const result = await callAPI('initializeSheets');
+            if (result) {
+                showMessage('Database initialized successfully!', 'success');
+                document.getElementById('setupSection').classList.add('hidden');
+                document.getElementById('loginSection').classList.remove('hidden');
+                loadData();
+            }
+        }
+        
+        // Data loading functions
+        async function loadData() {
+            await loadMembers();
+            await loadAttendance();
+        }
+        
+        async function loadMembers() {
+            const result = await callAPI('getMembers');
+            if (result) {
+                members = result.data || [];
+            }
+        }
+        
+        async function loadAttendance() {
+            const result = await callAPI('getAttendance');
+            if (result) {
+                attendance = result.data || [];
+            }
+        }
+        
+        async function refreshData() {
+            await loadData();
+            if (isAdmin) {
+                updateAdminDashboard();
+            } else {
+                updateMemberDashboard();
+            }
+            showMessage('Data refreshed successfully!', 'success');
+        }
+        
+        // Authentication functions
+        async function loginUser() {
             const name = document.getElementById('loginName').value.trim();
             const phone = document.getElementById('loginPhone').value.trim();
             const password = document.getElementById('loginPassword').value;
@@ -710,33 +748,30 @@
                 return;
             }
             
-            // Check for admin login
-            if (password === settings.adminPassword) {
-                isAdmin = true;
-                currentUser = { name: name, role: 'admin' };
-                document.getElementById('loginSection').classList.add('hidden');
-                document.getElementById('adminDashboard').classList.remove('hidden');
-                updateAdminDashboard();
-                showMessage(`Welcome Admin! Full system access granted.`, 'success');
-                return;
-            }
-            
-            // Regular member login
-            const member = members.find(m => 
-                m.name.toLowerCase() === name.toLowerCase() && 
-                m.phone === phone &&
-                m.status === 'Active'
-            );
-            
-            if (member) {
-                currentUser = member;
-                isAdmin = false;
-                document.getElementById('loginSection').classList.add('hidden');
-                document.getElementById('memberDashboard').classList.remove('hidden');
-                updateMemberDashboard();
-                showMessage(`Welcome back, ${member.name}!`);
+            if (password) {
+                // Admin login
+                const result = await callAPI('authenticateAdmin', { password });
+                if (result && result.success) {
+                    isAdmin = true;
+                    currentUser = { name: name, role: 'admin' };
+                    document.getElementById('loginSection').classList.add('hidden');
+                    document.getElementById('adminDashboard').classList.remove('hidden');
+                    await loadData();
+                    updateAdminDashboard();
+                    showMessage(`Welcome Admin! Full system access granted.`, 'success');
+                }
             } else {
-                showMessage('Member not found or inactive. Please check your details or register as a new member.', 'error');
+                // Member login
+                const result = await callAPI('authenticateMember', { name, phone });
+                if (result && result.success) {
+                    currentUser = result.data;
+                    isAdmin = false;
+                    document.getElementById('loginSection').classList.add('hidden');
+                    document.getElementById('memberDashboard').classList.remove('hidden');
+                    await loadData();
+                    updateMemberDashboard();
+                    showMessage(`Welcome back, ${currentUser.name}!`);
+                }
             }
         }
         
@@ -750,7 +785,7 @@
             document.getElementById('loginSection').classList.remove('hidden');
         }
         
-        function registerMember() {
+        async function registerMember() {
             const name = document.getElementById('memberName').value.trim();
             const phone = document.getElementById('memberPhone').value.trim();
             const voicePart = document.getElementById('voicePart').value;
@@ -761,18 +796,7 @@
                 return;
             }
             
-            // Check if member already exists
-            const existingMember = members.find(m => 
-                m.name.toLowerCase() === name.toLowerCase() || m.phone === phone
-            );
-            
-            if (existingMember) {
-                showMessage('A member with this name or phone number already exists.', 'error');
-                return;
-            }
-            
-            const newMember = {
-                id: nextMemberId++,
+            const member = {
                 name: name,
                 phone: phone,
                 voicePart: voicePart,
@@ -781,24 +805,22 @@
                 status: 'Active'
             };
             
-            members.push(newMember);
-            
-            // Simulate saving to Google Sheets
-            saveToGoogleSheets('members', newMember);
-            
-            showMessage(`Registration successful! Welcome to the choir, ${name}!`);
-            
-            // Clear form
-            document.getElementById('memberName').value = '';
-            document.getElementById('memberPhone').value = '';
-            document.getElementById('voicePart').value = '';
-            document.getElementById('memberEmail').value = '';
-            
-            // Switch to login
-            showLoginForm();
+            const result = await callAPI('addMember', { member });
+            if (result) {
+                showMessage(`Registration successful! Welcome to the choir, ${name}!`);
+                
+                // Clear form
+                document.getElementById('memberName').value = '';
+                document.getElementById('memberPhone').value = '';
+                document.getElementById('voicePart').value = '';
+                document.getElementById('memberEmail').value = '';
+                
+                showLoginForm();
+            }
         }
         
-        function markMemberAttendance() {
+        // Member functions
+        async function markMemberAttendance() {
             if (!currentUser) return;
             
             const date = document.getElementById('attendanceDate').value;
@@ -809,20 +831,7 @@
                 return;
             }
             
-            // Check if already marked attendance for this date and service
-            const existingRecord = attendance.find(a => 
-                a.memberId === currentUser.id && 
-                a.date === date && 
-                a.serviceType === serviceType
-            );
-            
-            if (existingRecord) {
-                showMessage('You have already marked attendance for this date and service type.', 'error');
-                return;
-            }
-            
             const attendanceRecord = {
-                id: nextAttendanceId++,
                 memberId: currentUser.id,
                 memberName: currentUser.name,
                 date: date,
@@ -831,26 +840,21 @@
                 timestamp: new Date().toISOString()
             };
             
-            attendance.push(attendanceRecord);
-            
-            // Simulate saving to Google Sheets
-            saveToGoogleSheets('attendance', attendanceRecord);
-            
-            updateMemberDashboard();
-            showMessage(`Attendance marked successfully for ${serviceType} on ${date}!`);
+            const result = await callAPI('addAttendance', { attendance: attendanceRecord });
+            if (result) {
+                await loadAttendance();
+                updateMemberDashboard();
+                showMessage(`Attendance marked successfully for ${serviceType} on ${date}!`);
+            }
         }
         
-        // Member Dashboard Functions
         function showMemberTab(tabName) {
-            // Hide all member tabs
             document.getElementById('memberAttendanceTab').classList.add('hidden');
             document.getElementById('memberProfileTab').classList.add('hidden');
             document.getElementById('memberDirectoryTab').classList.add('hidden');
             
-            // Remove active class from all tab buttons
             document.querySelectorAll('#memberDashboard .tab').forEach(tab => tab.classList.remove('active'));
             
-            // Show selected tab and set active
             document.getElementById('member' + tabName.charAt(0).toUpperCase() + tabName.slice(1) + 'Tab').classList.remove('hidden');
             event.target.classList.add('active');
             
@@ -873,7 +877,7 @@
             const recordsDiv = document.getElementById('memberRecords');
             if (!currentUser || isAdmin) return;
             
-            const userAttendance = attendance.filter(a => a.memberId === currentUser.id)
+            const userAttendance = attendance.filter(a => a.memberId == currentUser.id)
                                             .sort((a, b) => new Date(b.date) - new Date(a.date));
             
             if (userAttendance.length === 0) {
@@ -916,7 +920,7 @@
             const profileDiv = document.getElementById('profileInfo');
             if (!currentUser || isAdmin) return;
             
-            const member = members.find(m => m.id === currentUser.id);
+            const member = members.find(m => m.id == currentUser.id);
             if (!member) return;
             
             profileDiv.innerHTML = `
@@ -962,27 +966,19 @@
             `;
         }
         
-        function editProfile() {
-            showMessage('Profile editing feature coming soon!', 'warning');
-        }
-        
-        // Admin Dashboard Functions
+        // Admin functions
         function showAdminTab(tabName) {
-            // Hide all admin tabs
             document.getElementById('adminOverviewTab').classList.add('hidden');
             document.getElementById('adminMembersTab').classList.add('hidden');
             document.getElementById('adminAttendanceTab').classList.add('hidden');
             document.getElementById('adminReportsTab').classList.add('hidden');
             document.getElementById('adminSettingsTab').classList.add('hidden');
             
-            // Remove active class from all tab buttons
             document.querySelectorAll('#adminDashboard .tab').forEach(tab => tab.classList.remove('active'));
             
-            // Show selected tab and set active
             document.getElementById('admin' + tabName.charAt(0).toUpperCase() + tabName.slice(1) + 'Tab').classList.remove('hidden');
             event.target.classList.add('active');
             
-            // Update tab-specific content
             if (tabName === 'members') {
                 updateMembersTable();
             } else if (tabName === 'attendance') {
@@ -1004,14 +1000,12 @@
             const totalMembers = members.length;
             const activeMembers = members.filter(m => m.status === 'Active').length;
             
-            // Calculate this week's attendance
             const oneWeekAgo = new Date();
             oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
             const thisWeekAttendance = attendance.filter(a => 
                 new Date(a.date) >= oneWeekAgo
             ).length;
             
-            // Calculate average attendance rate
             const totalAttendanceRecords = attendance.length;
             const presentRecords = attendance.filter(a => a.status === 'Present').length;
             const averageAttendance = totalAttendanceRecords > 0 
@@ -1028,7 +1022,6 @@
             const tbody = document.getElementById('membersTableBody');
             let filteredMembers = [...members];
             
-            // Apply filters
             const voicePartFilter = document.getElementById('voicePartFilter')?.value || '';
             const statusFilter = document.getElementById('statusFilter')?.value || '';
             
@@ -1062,18 +1055,22 @@
             updateMembersTable();
         }
         
-        function toggleMemberStatus(memberId) {
-            const member = members.find(m => m.id === memberId);
+        async function toggleMemberStatus(memberId) {
+            const member = members.find(m => m.id == memberId);
             if (member) {
                 member.status = member.status === 'Active' ? 'Inactive' : 'Active';
-                updateMembersTable();
-                updateOverviewStats();
-                showMessage(`${member.name} status updated to ${member.status}`, 'success');
+                const result = await callAPI('updateMember', { member });
+                if (result) {
+                    await loadMembers();
+                    updateMembersTable();
+                    updateOverviewStats();
+                    showMessage(`${member.name} status updated to ${member.status}`, 'success');
+                }
             }
         }
         
-        function editMember(memberId) {
-            const member = members.find(m => m.id === memberId);
+        async function editMember(memberId) {
+            const member = members.find(m => m.id == memberId);
             if (!member) return;
             
             const newName = prompt('Enter new name:', member.name);
@@ -1091,11 +1088,15 @@
                 member.email = newEmail;
             }
             
-            updateMembersTable();
-            showMessage(`${member.name} updated successfully`, 'success');
+            const result = await callAPI('updateMember', { member });
+            if (result) {
+                await loadMembers();
+                updateMembersTable();
+                showMessage(`${member.name} updated successfully`, 'success');
+            }
         }
         
-        function showAddMemberForm() {
+        async function showAddMemberForm() {
             const name = prompt('Enter member name:');
             if (!name) return;
             
@@ -1107,8 +1108,7 @@
             
             const email = prompt('Enter email (optional):') || '';
             
-            const newMember = {
-                id: nextMemberId++,
+            const member = {
                 name: name,
                 phone: phone,
                 voicePart: voicePart,
@@ -1117,16 +1117,18 @@
                 status: 'Active'
             };
             
-            members.push(newMember);
-            updateMembersTable();
-            updateOverviewStats();
-            showMessage(`${name} added successfully!`, 'success');
+            const result = await callAPI('addMember', { member });
+            if (result) {
+                await loadMembers();
+                updateMembersTable();
+                updateOverviewStats();
+                showMessage(`${name} added successfully!`, 'success');
+            }
         }
         
         function updateAttendanceDisplay() {
             const attendanceDiv = document.getElementById('attendanceDisplay');
             
-            // Apply filters
             const dateFilter = document.getElementById('attendanceDateFilter')?.value || '';
             const serviceTypeFilter = document.getElementById('serviceTypeFilter')?.value || '';
             
@@ -1140,7 +1142,6 @@
                 filteredAttendance = filteredAttendance.filter(a => a.serviceType === serviceTypeFilter);
             }
             
-            // Sort by date (newest first)
             filteredAttendance.sort((a, b) => new Date(b.date) - new Date(a.date));
             
             if (filteredAttendance.length === 0) {
@@ -1182,16 +1183,19 @@
             updateAttendanceDisplay();
         }
         
-        function deleteAttendanceRecord(recordId) {
+        async function deleteAttendanceRecord(recordId) {
             if (confirm('Are you sure you want to delete this attendance record?')) {
-                attendance = attendance.filter(a => a.id !== recordId);
-                updateAttendanceDisplay();
-                updateOverviewStats();
-                showMessage('Attendance record deleted', 'success');
+                const result = await callAPI('deleteAttendance', { attendanceId: recordId });
+                if (result) {
+                    await loadAttendance();
+                    updateAttendanceDisplay();
+                    updateOverviewStats();
+                    showMessage('Attendance record deleted', 'success');
+                }
             }
         }
         
-        function showBulkAttendanceForm() {
+        async function showBulkAttendanceForm() {
             const date = prompt('Enter date (YYYY-MM-DD):', new Date().toISOString().split('T')[0]);
             if (!date) return;
             
@@ -1200,11 +1204,10 @@
             
             const activeMembers = members.filter(m => m.status === 'Active');
             
-            activeMembers.forEach(member => {
+            for (const member of activeMembers) {
                 const present = confirm(`Mark ${member.name} as present for ${serviceType} on ${date}?`);
                 if (present) {
                     const attendanceRecord = {
-                        id: nextAttendanceId++,
                         memberId: member.id,
                         memberName: member.name,
                         date: date,
@@ -1212,10 +1215,11 @@
                         status: 'Present',
                         timestamp: new Date().toISOString()
                     };
-                    attendance.push(attendanceRecord);
+                    await callAPI('addAttendance', { attendance: attendanceRecord });
                 }
-            });
+            }
             
+            await loadAttendance();
             updateAttendanceDisplay();
             updateOverviewStats();
             showMessage(`Bulk attendance marked for ${date}`, 'success');
@@ -1236,12 +1240,10 @@
             
             const reportsDiv = document.getElementById('reportsDisplay');
             
-            // Generate statistics
             const totalRecords = filteredAttendance.length;
             const presentRecords = filteredAttendance.filter(a => a.status === 'Present').length;
             const attendanceRate = totalRecords > 0 ? ((presentRecords / totalRecords) * 100).toFixed(1) : 0;
             
-            // Group by service type
             const serviceTypes = {};
             filteredAttendance.forEach(record => {
                 if (!serviceTypes[record.serviceType]) {
@@ -1304,7 +1306,7 @@
             generateReport();
         }
         
-        // Export Functions
+        // Export functions
         function exportMembersCSV() {
             const csv = convertToCSV(members, ['id', 'name', 'phone', 'voicePart', 'email', 'registeredDate', 'status']);
             downloadCSV(csv, 'choir_members.csv');
@@ -1335,99 +1337,22 @@
             window.URL.revokeObjectURL(url);
         }
         
-        function exportAllData() {
-            const data = {
-                members: members,
-                attendance: attendance,
-                settings: settings,
-                exportDate: new Date().toISOString()
-            };
-            
-            const json = JSON.stringify(data, null, 2);
-            const blob = new Blob([json], { type: 'application/json' });
-            const url = window.URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = 'choir_data_backup.json';
-            link.click();
-            window.URL.revokeObjectURL(url);
-            
-            showMessage('Data backup created successfully!', 'success');
-        }
-        
-        function backupData() {
-            exportAllData();
-        }
-        
-        function importData() {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = '.json';
-            input.onchange = function(event) {
-                const file = event.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        try {
-                            const data = JSON.parse(e.target.result);
-                            if (data.members && data.attendance) {
-                                members = data.members;
-                                attendance = data.attendance;
-                                if (data.settings) {
-                                    settings = { ...settings, ...data.settings };
-                                }
-                                updateAdminDashboard();
-                                showMessage('Data imported successfully!', 'success');
-                            } else {
-                                showMessage('Invalid data format', 'error');
-                            }
-                        } catch (error) {
-                            showMessage('Error importing data: ' + error.message, 'error');
-                        }
-                    };
-                    reader.readAsText(file);
-                }
-            };
-            input.click();
-        }
-        
-        // Google Sheets Integration (Simulated)
-        function saveToGoogleSheets(sheetName, data) {
-            if (!settings.googleSheetUrl) {
-                console.log(`Would save to Google Sheets (${sheetName}):`, data);
-                return;
-            }
-            
-            // In a real implementation, this would use Google Sheets API
-            console.log(`Saving to Google Sheets: ${sheetName}`, data);
-        }
-        
-        function initializeGoogleSheets() {
-            const sheetUrl = document.getElementById('googleSheetUrl').value;
-            if (!sheetUrl) {
-                showMessage('Please enter a Google Sheets URL first', 'error');
-                return;
-            }
-            
-            settings.googleSheetUrl = sheetUrl;
-            
-            // Simulate initializing sheets structure
-            showMessage('Google Sheets initialized! Structure created for Members and Attendance sheets.', 'success');
-        }
-        
-        function saveSettings() {
-            const googleSheetUrl = document.getElementById('googleSheetUrl').value;
+        async function saveSettings() {
             const adminPassword = document.getElementById('adminPassword').value;
             const churchSettings = document.getElementById('churchSettings').value;
             
+            const settings = {};
             if (adminPassword) {
                 settings.adminPassword = adminPassword;
             }
+            if (churchSettings) {
+                settings.churchSettings = churchSettings;
+            }
             
-            settings.googleSheetUrl = googleSheetUrl;
-            settings.churchSettings = churchSettings;
-            
-            showMessage('Settings saved successfully!', 'success');
+            const result = await callAPI('updateSettings', { settings });
+            if (result) {
+                showMessage('Settings saved successfully!', 'success');
+            }
         }
         
         function logout() {
@@ -1441,11 +1366,6 @@
             document.getElementById('loginPassword').value = '';
             showMessage('You have been logged out successfully.');
         }
-        
-        // Initialize with sample data and set up the interface
-        document.addEventListener('DOMContentLoaded', function() {
-            updateOverviewStats();
-        });
     </script>
 </body>
 </html>
