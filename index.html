@@ -454,6 +454,9 @@
     </div>
     
     <script>
+       // Google Apps Script Web App URL - Replace with your deployed script URL
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzcOH9sFyA3tRN5HMm94GTuKzCZHtTRLhr_Y4YP68GKKuNM3EFCZoEfTVd9MHflgopg/exec';
+        
         // Global variables
         let members = [
             {
@@ -1007,7 +1010,7 @@
             showMessage(`${emoji} Attendance ${statusText} for ${record.memberName}`, 'success');
         }
         
-        function approveAllLeave() {
+        async function approveAllLeave() {
             const pendingLeave = leaveApplications.filter(l => l.status === 'Pending');
             
             if (pendingLeave.length === 0) {
@@ -1028,13 +1031,18 @@
                 leave.adminNotes = 'Bulk approved by admin';
             });
             
+            saveLocalData();
+            
+            // Sync with Google Sheets
+            await saveToGoogleSheets('bulkUpdateLeave', pendingLeave);
+            
             updateLeaveRequestsList();
             updateAdminOverview();
             
             showMessage(`✅ All ${pendingLeave.length} pending leave requests have been approved!`, 'success');
         }
         
-        function verifyAllPending() {
+        async function verifyAllPending() {
             const pendingRecords = attendance.filter(a => a.status === 'Pending');
             
             if (pendingRecords.length === 0) {
@@ -1064,13 +1072,18 @@
                 record.confirmedAt = verificationTime;
             });
             
+            saveLocalData();
+            
+            // Sync with Google Sheets
+            await saveToGoogleSheets('bulkUpdateAttendance', pendingRecords);
+            
             updateVerificationsList();
             updateAdminOverview();
             
             showMessage(`✅ All ${pendingRecords.length} pending attendance records have been confirmed!`, 'success');
         }
         
-        function showAddMemberForm() {
+        async function showAddMemberForm() {
             const name = prompt('Enter member name:');
             if (!name) return;
             
@@ -1093,6 +1106,11 @@
             };
             
             members.push(newMember);
+            saveLocalData();
+            
+            // Sync with Google Sheets
+            await saveToGoogleSheets('addMember', newMember);
+            
             updateMembersList();
             updateAdminOverview();
             showMessage(`${name} added successfully!`, 'success');
