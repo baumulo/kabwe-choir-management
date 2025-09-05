@@ -640,6 +640,40 @@
             }
         }
         
+        // JSONP function to bypass CORS for GET requests
+        function callAPIWithJSONP(action) {
+            return new Promise((resolve, reject) => {
+                if (!API_URL) {
+                    reject(new Error('Please configure Google Apps Script URL first'));
+                    return;
+                }
+                
+                setLoading(true);
+                const callbackName = 'jsonp_callback_' + Math.round(100000 * Math.random());
+                const script = document.createElement('script');
+                const url = API_URL + '?action=' + action + '&callback=' + callbackName;
+                
+                // Set up callback
+                window[callbackName] = function(data) {
+                    setLoading(false);
+                    delete window[callbackName];
+                    document.body.removeChild(script);
+                    resolve(data);
+                };
+                
+                // Handle errors
+                script.onerror = function() {
+                    setLoading(false);
+                    delete window[callbackName];
+                    document.body.removeChild(script);
+                    reject(new Error('Failed to load script'));
+                };
+                
+                script.src = url;
+                document.body.appendChild(script);
+            });
+        }
+        
         // API functions
         async function callAPI(action, data = {}) {
             if (!API_URL) {
