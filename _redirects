@@ -1,0 +1,7 @@
+# Netlify redirects file
+# Handle SPA routing
+/*    /index.html   200
+
+# Security redirects
+/admin    /index.html   200
+/member   /index.html   200
