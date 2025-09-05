@@ -2,7 +2,7 @@
 // This script handles all database operations with Google Sheets
 
 // Configuration - Replace with your actual spreadsheet ID
-const SPREADSHEET_ID = '1T7bEWz6VeLNqYFMCTsOltEoyYEtN9Psi2LOFbN5iYd4'; // Replace this!
+const SPREADSHEET_ID = '1LFshNLxJiTiBNZyQAmjtzuOfFkgRfANEIkKi5VDAcio'; // Replace this!
 const MEMBERS_SHEET = 'Members';
 const ATTENDANCE_SHEET = 'Attendance';
 const SETTINGS_SHEET = 'Settings';
