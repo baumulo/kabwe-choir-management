@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kabwe Central SDA Church Choir - Management System</title>
-    
     <style>
-        /* Your existing CSS remains unchanged */
         * {
             margin: 0;
             padding: 0;
@@ -22,286 +20,1734 @@
             justify-content: center;
         }
         
-        /* ... rest of your CSS ... */
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 1000px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #667eea;
+        }
+        
+        .church-name {
+            color: #2c3e50;
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        
+        .choir-title {
+            color: #667eea;
+            font-size: 1.2rem;
+            font-weight: 500;
+        }
+        
+        .section {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+        }
+        
+        .section-title {
+            color: #2c3e50;
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #2c3e50;
+            font-weight: 500;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #e1e8ed;
+            flex-wrap: wrap;
+        }
+        
+        .tab {
+            padding: 0.8rem 1.5rem;
+            background: none;
+            border: none;
+            color: #7f8c8d;
+            font-weight: 500;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            margin-bottom: 0;
+        }
+        
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .data-table th {
+            background: #667eea;
+            color: white;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        .data-table td {
+            padding: 0.8rem 1rem;
+            border-bottom: 1px solid #e1e8ed;
+        }
+        
+        .data-table tr:hover {
+            background: #f8fafc;
+        }
+        
+        .member-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-left: 4px solid #667eea;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .message {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+        
+        .success {
+            background: rgba(39, 174, 96, 0.1);
+            color: #27ae60;
+            border: 1px solid rgba(39, 174, 96, 0.3);
+        }
+        
+        .error {
+            background: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+            border: 1px solid rgba(231, 76, 60, 0.3);
+        }
+        
+        .warning {
+            background: rgba(243, 156, 18, 0.1);
+            color: #f39c12;
+            border: 1px solid rgba(243, 156, 18, 0.3);
+        }
+        
+        .login-form {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        
+        .admin-controls {
+            background: rgba(102, 126, 234, 0.1);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .filter-group {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .filter-group select {
+            width: auto;
+            min-width: 150px;
+        }
+        
+        .leave-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-left: 4px solid #667eea;
+        }
+        
+        .leave-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .leave-status {
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .status-pending {
+            background: rgba(243, 156, 18, 0.1);
+            color: #f39c12;
+            border: 1px solid rgba(243, 156, 18, 0.3);
+        }
+        
+        .status-approved {
+            background: rgba(39, 174, 96, 0.1);
+            color: #27ae60;
+            border: 1px solid rgba(39, 174, 96, 0.3);
+        }
+        
+        .status-denied {
+            background: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+            border: 1px solid rgba(231, 76, 60, 0.3);
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #667eea;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                width: 95%;
+                padding: 1rem;
+            }
+            
+            .tabs {
+                justify-content: center;
+            }
+            
+            .tab {
+                font-size: 0.9rem;
+                padding: 0.6rem 1rem;
+            }
+            
+            .data-table {
+                font-size: 0.9rem;
+            }
+            
+            .member-stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .leave-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Your existing HTML structure remains the same -->
+        <div class="header">
+            <div class="church-name">Kabwe Central Seventh-day Adventist Church</div>
+            <div class="choir-title">Choir Management System</div>
+        </div>
+        
+        <!-- Login Section -->
+        <div id="loginSection" class="section">
+            <h2 class="section-title">🎵 System Access</h2>
+            <div class="login-form">
+                <div class="form-group">
+                    <label for="loginName">Full Name:</label>
+                    <input type="text" id="loginName" placeholder="Enter your full name">
+                </div>
+                <div class="form-group">
+                    <label for="loginPhone">Phone Number:</label>
+                    <input type="tel" id="loginPhone" placeholder="Enter your phone number">
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Password (Admin Only):</label>
+                    <input type="password" id="loginPassword" placeholder="Leave blank for member access">
+                </div>
+                <button onclick="loginUser()">Login</button>
+                <button onclick="showRegisterForm()" class="btn-secondary">New Member? Register</button>
+            </div>
+        </div>
+        
+        <!-- Registration Section -->
+        <div id="registrationSection" class="section hidden">
+            <h2 class="section-title">📝 New Member Registration</h2>
+            <div class="form-group">
+                <label for="memberName">Full Name:</label>
+                <input type="text" id="memberName" placeholder="Enter full name">
+            </div>
+            <div class="form-group">
+                <label for="memberPhone">Phone Number:</label>
+                <input type="tel" id="memberPhone" placeholder="Enter phone number">
+            </div>
+            <div class="form-group">
+                <label for="voicePart">Voice Part:</label>
+                <select id="voicePart">
+                    <option value="">Select voice part</option>
+                    <option value="Soprano">Soprano</option>
+                    <option value="Alto">Alto</option>
+                    <option value="Tenor">Tenor</option>
+                    <option value="Bass">Bass</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="memberEmail">Email:</label>
+                <input type="email" id="memberEmail" placeholder="Enter email address">
+            </div>
+            <button onclick="registerMember()">Register Member</button>
+            <button onclick="showLoginForm()" class="btn-secondary">Back to Login</button>
+        </div>
+        
+        <!-- Member Dashboard -->
+        <div id="memberDashboard" class="hidden">
+            <div class="tabs">
+                <button class="tab active" onclick="showMemberTab('attendance')">📋 My Attendance</button>
+                <button class="tab" onclick="showMemberTab('leave')">🏖️ Leave Management</button>
+                <button class="tab" onclick="showMemberTab('profile')">👤 My Profile</button>
+                <button class="tab" onclick="showMemberTab('directory')">📞 Member Directory</button>
+            </div>
+            
+            <div id="memberAttendanceTab" class="section">
+                <h2 class="section-title">📋 Mark My Attendance</h2>
+                <div class="form-group">
+                    <label for="attendanceDate">Date:</label>
+                    <input type="date" id="attendanceDate">
+                </div>
+                <div class="form-group">
+                    <label for="attendanceType">Service Type:</label>
+                    <select id="attendanceType">
+                        <option value="Sabbath Morning">Sabbath Worship Service</option>
+                        <option value="Choir Practice">Choir Practice</option>
+                        <option value="Special Event">Special Event</option>
+                        <option value="Wedding">Wedding</option>
+                        <option value="Funeral">Funeral</option>
+                        <option value="Prayer Meeting">Prayer Meeting</option>
+                    </select>
+                </div>
+                <button onclick="markMemberAttendance()">Mark My Attendance</button>
+                <button onclick="logout()" class="btn-secondary">Logout</button>
+                
+                <div id="memberAttendanceHistory" style="margin-top: 2rem;">
+                    <h3>My Attendance History</h3>
+                    <div id="memberRecords"></div>
+                </div>
+            </div>
+            
+            <div id="memberLeaveTab" class="section hidden">
+                <h2 class="section-title">🏖️ Leave Management</h2>
+                
+                <div class="admin-controls">
+                    <button onclick="showLeaveApplicationForm()" class="btn-success">+ Apply for Leave</button>
+                </div>
+                
+                <div id="leaveApplicationForm" class="hidden" style="margin-bottom: 2rem; padding: 1.5rem; background: rgba(102, 126, 234, 0.05); border-radius: 10px;">
+                    <h3>New Leave Application</h3>
+                    <div class="form-group">
+                        <label for="leaveStartDate">Start Date:</label>
+                        <input type="date" id="leaveStartDate">
+                    </div>
+                    <div class="form-group">
+                        <label for="leaveEndDate">End Date:</label>
+                        <input type="date" id="leaveEndDate">
+                    </div>
+                    <div class="form-group">
+                        <label for="leaveType">Leave Type:</label>
+                        <select id="leaveType">
+                            <option value="Personal">Personal Leave</option>
+                            <option value="Medical">Medical Leave</option>
+                            <option value="Family">Family Emergency</option>
+                            <option value="Travel">Travel</option>
+                            <option value="Education">Educational</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="leaveReason">Reason for Leave:</label>
+                        <textarea id="leaveReason" rows="3" placeholder="Please provide details about your leave request..."></textarea>
+                    </div>
+                    <button onclick="submitLeaveApplication()">Submit Application</button>
+                    <button onclick="hideLeaveApplicationForm()" class="btn-secondary">Cancel</button>
+                </div>
+                
+                <h3>My Leave Applications</h3>
+                <div id="memberLeaveApplications"></div>
+                
+                <button onclick="logout()" class="btn-secondary" style="margin-top: 1rem;">Logout</button>
+            </div>
+            
+            <div id="memberProfileTab" class="section hidden">
+                <h2 class="section-title">👤 My Profile</h2>
+                <div id="profileInfo"></div>
+                <button onclick="editProfile()" class="btn-secondary">Edit Profile</button>
+                <button onclick="logout()" class="btn-secondary">Logout</button>
+            </div>
+            
+            <div id="memberDirectoryTab" class="section hidden">
+                <h2 class="section-title">📞 Choir Member Directory</h2>
+                <div id="publicDirectory"></div>
+                <button onclick="logout()" class="btn-secondary">Logout</button>
+            </div>
+        </div>
+        
+        <!-- Admin Dashboard -->
+        <div id="adminDashboard" class="hidden">
+            <div class="tabs">
+                <button class="tab active" onclick="showAdminTab('overview')">📊 Overview</button>
+                <button class="tab" onclick="showAdminTab('members')">👥 Members</button>
+                <button class="tab" onclick="showAdminTab('attendance')">📋 Attendance</button>
+                <button class="tab" onclick="showAdminTab('leave')">🏖️ Leave Management</button>
+                <button class="tab" onclick="showAdminTab('reports')">📈 Reports</button>
+                <button class="tab" onclick="showAdminTab('settings')">⚙️ Settings</button>
+            </div>
+            
+            <!-- Admin Overview Tab -->
+            <div id="adminOverviewTab" class="section">
+                <h2 class="section-title">📊 Choir Overview</h2>
+                
+                <div class="member-stats">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalMembers">0</div>
+                        <div class="stat-label">Total Members</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="activeMembers">0</div>
+                        <div class="stat-label">Active Members</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="thisWeekAttendance">0</div>
+                        <div class="stat-label">This Week Attendance</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="pendingLeaveRequests">0</div>
+                        <div class="stat-label">Pending Leave Requests</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="averageAttendance">0%</div>
+                        <div class="stat-label">Average Attendance</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="membersOnLeave">0</div>
+                        <div class="stat-label">Members on Leave</div>
+                    </div>
+                </div>
+                
+                <div class="admin-controls">
+                    <button onclick="loadDataFromSheets()" class="btn-success">🔄 Sync from Google Sheets</button>
+                    <button onclick="initializeSheets()" class="btn-warning">📋 Initialize Sheets Structure</button>
+                </div>
+                
+                <button onclick="logout()" class="btn-secondary">Logout</button>
+            </div>
+            
+            <!-- Admin Members Tab -->
+            <div id="adminMembersTab" class="section hidden">
+                <h2 class="section-title">👥 Member Management</h2>
+                
+                <div class="admin-controls">
+                    <button onclick="showAddMemberForm()" class="btn-success">+ Add New Member</button>
+                    <button onclick="exportMembersCSV()" class="btn-secondary">📊 Export CSV</button>
+                    <div class="filter-group">
+                        <select id="voicePartFilter" onchange="filterMembers()">
+                            <option value="">All Voice Parts</option>
+                            <option value="Soprano">Soprano</option>
+                            <option value="Alto">Alto</option>
+                            <option value="Tenor">Tenor</option>
+                            <option value="Bass">Bass</option>
+                        </select>
+                        <select id="statusFilter" onchange="filterMembers()">
+                            <option value="">All Status</option>
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <table class="data-table" id="membersTable">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Phone</th>
+                            <th>Voice Part</th>
+                            <th>Email</th>
+                            <th>Join Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="membersTableBody">
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Admin Attendance Tab -->
+            <div id="adminAttendanceTab" class="section hidden">
+                <h2 class="section-title">📋 Attendance Management</h2>
+                
+                <div class="admin-controls">
+                    <button onclick="showBulkAttendanceForm()" class="btn-success">+ Mark Bulk Attendance</button>
+                    <button onclick="exportAttendanceCSV()" class="btn-secondary">📊 Export Attendance</button>
+                    <div class="filter-group">
+                        <input type="date" id="attendanceDateFilter" onchange="filterAttendance()">
+                        <select id="serviceTypeFilter" onchange="filterAttendance()">
+                            <option value="">All Services</option>
+                            <option value="Sabbath Morning">Sabbath Morning</option>
+                            <option value="Choir Practice">Choir Practice</option>
+                            <option value="Special Event">Special Event</option>
+                            <option value="Wedding">Wedding</option>
+                            <option value="Funeral">Funeral</option>
+                            <option value="Prayer Meeting">Prayer Meeting</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div id="attendanceDisplay"></div>
+            </div>
+            
+            <!-- Admin Leave Management Tab -->
+            <div id="adminLeaveTab" class="section hidden">
+                <h2 class="section-title">🏖️ Leave Management</h2>
+                
+                <div class="admin-controls">
+                    <button onclick="exportLeaveCSV()" class="btn-secondary">📊 Export Leave Data</button>
+                    <div class="filter-group">
+                        <select id="leaveStatusFilter" onchange="filterLeaveApplications()">
+                            <option value="">All Status</option>
+                            <option value="Pending">Pending</option>
+                            <option value="Approved">Approved</option>
+                            <option value="Denied">Denied</option>
+                        </select>
+                        <select id="leaveTypeFilter" onchange="filterLeaveApplications()">
+                            <option value="">All Types</option>
+                            <option value="Personal">Personal</option>
+                            <option value="Medical">Medical</option>
+                            <option value="Family">Family Emergency</option>
+                            <option value="Travel">Travel</option>
+                            <option value="Education">Educational</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div id="leaveApplicationsDisplay"></div>
+            </div>
+            
+            <!-- Admin Reports Tab -->
+            <div id="adminReportsTab" class="section hidden">
+                <h2 class="section-title">📈 Reports & Analytics</h2>
+                
+                <div class="admin-controls">
+                    <div class="filter-group">
+                        <input type="date" id="reportStartDate">
+                        <input type="date" id="reportEndDate">
+                        <button onclick="generateReport()">Generate Report</button>
+                    </div>
+                </div>
+                
+                <div id="reportsDisplay"></div>
+            </div>
+            
+            <!-- Admin Settings Tab -->
+            <div id="adminSettingsTab" class="section hidden">
+                <h2 class="section-title">⚙️ System Settings</h2>
+                
+                <div class="form-group">
+                    <label for="googleSheetId">Google Sheets ID:</label>
+                    <input type="text" id="googleSheetId" placeholder="Enter your Google Sheet ID">
+                    <small style="color: #7f8c8d; display: block; margin-top: 0.5rem;">
+                        Copy from your sheet URL: docs.google.com/spreadsheets/d/SHEET_ID_HERE/edit
+                    </small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="googleApiKey">Google Sheets API Key:</label>
+                    <input type="text" id="googleApiKey" placeholder="Enter your Google API Key">
+                </div>
+                
+                <div class="form-group">
+                    <label for="adminPassword">Admin Password:</label>
+                    <input type="password" id="adminPassword" placeholder="Set admin password">
+                </div>
+                
+                <button onclick="saveSettings()" class="btn-success">Save Settings</button>
+                <button onclick="testConnection()" class="btn-warning">Test Connection</button>
+                <button onclick="logout()" class="btn-secondary">Logout</button>
+            </div>
+        </div>
         
         <div id="messageArea"></div>
     </div>
     
     <script>
-        // ===== GOOGLE SHEETS INTEGRATION =====
-        // Replace with your Google Sheets ID (from the URL of your published sheet)
-        const SHEET_ID = '1elHJEJFPucr66Lvylb0u4XkaZT-tiyD4V7rl6aLhYhA';
-        
-        // Sheet names/tabs in your Google Sheet
-        const SHEETS = {
-            MEMBERS: 'Members',
-            ATTENDANCE: 'Attendance',
-            LEAVE: 'LeaveApplications',
-            SETTINGS: 'Settings'
+        // Configuration - REPLACE WITH YOUR VALUES
+        const CONFIG = {
+            SHEET_ID: '1elHJEJFPucr66Lvylb0u4XkaZT-tiyD4V7rl6aLhYhA',
+            API_KEY: 'AIzaSyBewL5Cb4Q4OC7eJhszEz2d3JkFQgxmumk'
         };
-           // Base URL for Google Sheets API
-        const SHEETS_API = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/`;
         
-        // Public API key (restrict this in Google Cloud Console)
-        const API_KEY = 'AIzaSyBewL5Cb4Q4OC7eJhszEz2d3JkFQgxmumk';
-        
-        // Function to get data from Google Sheets
-        async function getSheetData(sheetName, range = '') {
-            try {
-                const response = await fetch(`${SHEETS_API}${sheetName}${range}?key=${API_KEY}`);
-                const data = await response.json();
-                return data.values || [];
-            } catch (error) {
-                console.error('Error fetching data:', error);
-                showMessage('Error loading data. Please check your connection.', 'error');
-                return [];
+        // Data arrays
+        let members = [
+            {
+                id: 1,
+                name: "Grace Mwansa",
+                phone: "0977123456",
+                voicePart: "Soprano",
+                email: "grace@example.com",
+                registeredDate: "2024-01-15",
+                status: "Active"
+            },
+            {
+                id: 2,
+                name: "John Phiri",
+                phone: "0966789012",
+                voicePart: "Tenor",
+                email: "john@example.com",
+                registeredDate: "2024-01-20",
+                status: "Active"
             }
-        }
+        ];
         
-        // Function to append data to Google Sheets
-        async function appendToSheet(sheetName, values) {
-            try {
-                const response = await fetch(`${SHEETS_API}${sheetName}:append?valueInputOption=USER_ENTERED&key=${API_KEY}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        values: [values]
-                    })
-                });
-                
-                const result = await response.json();
-                return result;
-            } catch (error) {
-                console.error('Error appending data:', error);
-                showMessage('Error saving data. Please try again.', 'error');
-                return null;
-            }
-        }
+        let attendance = [];
+        let leaveApplications = [];
         
-        // Function to update data in Google Sheets
-        async function updateSheet(sheetName, range, values) {
-            try {
-                const response = await fetch(`${SHEETS_API}${sheetName}!${range}?valueInputOption=USER_ENTERED&key=${API_KEY}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        values: [values]
-                    })
-                });
-                
-                const result = await response.json();
-                return result;
-            } catch (error) {
-                console.error('Error updating data:', error);
-                showMessage('Error updating data. Please try again.', 'error');
-                return null;
-            }
-        }
-        
-        // Initialize data from Google Sheets
-        async function initializeData() {
-            try {
-                // Load members
-                const membersData = await getSheetData(SHEETS.MEMBERS);
-                if (membersData.length > 1) {
-                    members = membersData.slice(1).map(row => ({
-                        id: parseInt(row[0]),
-                        name: row[1],
-                        phone: row[2],
-                        voicePart: row[3],
-                        email: row[4],
-                        registeredDate: row[5],
-                        status: row[6]
-                    }));
-                    nextMemberId = Math.max(...members.map(m => m.id)) + 1;
-                }
-                
-                // Load attendance
-                const attendanceData = await getSheetData(SHEETS.ATTENDANCE);
-                if (attendanceData.length > 1) {
-                    attendance = attendanceData.slice(1).map(row => ({
-                        id: parseInt(row[0]),
-                        memberId: parseInt(row[1]),
-                        memberName: row[2],
-                        date: row[3],
-                        serviceType: row[4],
-                        status: row[5],
-                        timestamp: row[6]
-                    }));
-                    nextAttendanceId = Math.max(...attendance.map(a => a.id)) + 1;
-                }
-                
-                // Load leave applications
-                const leaveData = await getSheetData(SHEETS.LEAVE);
-                if (leaveData.length > 1) {
-                    leaveApplications = leaveData.slice(1).map(row => ({
-                        id: parseInt(row[0]),
-                        memberId: parseInt(row[1]),
-                        memberName: row[2],
-                        startDate: row[3],
-                        endDate: row[4],
-                        leaveType: row[5],
-                        reason: row[6],
-                        status: row[7],
-                        applicationDate: row[8],
-                        adminComments: row[9],
-                        reviewedBy: row[10],
-                        reviewDate: row[11]
-                    }));
-                    nextLeaveId = Math.max(...leaveApplications.map(l => l.id)) + 1;
-                }
-                
-                // Load settings
-                const settingsData = await getSheetData(SHEETS.SETTINGS);
-                if (settingsData.length > 1) {
-                    settingsData.slice(1).forEach(row => {
-                        if (row[0] === 'adminPassword') settings.adminPassword = row[1];
-                        if (row[0] === 'googleSheetUrl') settings.googleSheetUrl = row[1];
-                        if (row[0] === 'churchSettings') settings.churchSettings = row[1];
-                    });
-                }
-                
-                // Update UI with loaded data
-                if (currentUser && isAdmin) {
-                    updateAdminDashboard();
-                } else if (currentUser) {
-                    updateMemberDashboard();
-                }
-                
-            } catch (error) {
-                console.error('Error initializing data:', error);
-                showMessage('Error loading data. Using local storage as fallback.', 'warning');
-                loadFromLocalStorage();
-            }
-        }
-        
-        // Replace the saveToGoogleSheets function with this implementation
-        async function saveToGoogleSheets(sheetName, data) {
-            try {
-                let values = [];
-                
-                switch(sheetName) {
-                    case 'members':
-                        values = [
-                            data.id,
-                            data.name,
-                            data.phone,
-                            data.voicePart,
-                            data.email || '',
-                            data.registeredDate,
-                            data.status
-                        ];
-                        await appendToSheet(SHEETS.MEMBERS, values);
-                        break;
-                        
-                    case 'attendance':
-                        values = [
-                            data.id,
-                            data.memberId,
-                            data.memberName,
-                            data.date,
-                            data.serviceType,
-                            data.status,
-                            data.timestamp
-                        ];
-                        await appendToSheet(SHEETS.ATTENDANCE, values);
-                        break;
-                        
-                    case 'leave_applications':
-                        values = [
-                            data.id,
-                            data.memberId,
-                            data.memberName,
-                            data.startDate,
-                            data.endDate,
-                            data.leaveType,
-                            data.reason,
-                            data.status,
-                            data.applicationDate,
-                            data.adminComments || '',
-                            data.reviewedBy || '',
-                            data.reviewDate || ''
-                        ];
-                        await appendToSheet(SHEETS.LEAVE, values);
-                        break;
-                }
-                
-                // Also save to local storage as backup
-                saveToLocalStorage();
-                
-            } catch (error) {
-                console.error('Error saving to Google Sheets:', error);
-                showMessage('Could not save to cloud. Using local storage.', 'warning');
-                saveToLocalStorage();
-            }
-        }
-        
-        // Local storage fallback functions
-        function saveToLocalStorage() {
-            localStorage.setItem('choirMembers', JSON.stringify(members));
-            localStorage.setItem('choirAttendance', JSON.stringify(attendance));
-            localStorage.setItem('choirLeaveApplications', JSON.stringify(leaveApplications));
-            localStorage.setItem('choirSettings', JSON.stringify(settings));
-            localStorage.setItem('choirNextIds', JSON.stringify({
-                nextMemberId,
-                nextAttendanceId,
-                nextLeaveId
-            }));
-        }
-        
-        function loadFromLocalStorage() {
-            const savedMembers = localStorage.getItem('choirMembers');
-            const savedAttendance = localStorage.getItem('choirAttendance');
-            const savedLeave = localStorage.getItem('choirLeaveApplications');
-            const savedSettings = localStorage.getItem('choirSettings');
-            const savedIds = localStorage.getItem('choirNextIds');
-            
-            if (savedMembers) members = JSON.parse(savedMembers);
-            if (savedAttendance) attendance = JSON.parse(savedAttendance);
-            if (savedLeave) leaveApplications = JSON.parse(savedLeave);
-            if (savedSettings) settings = JSON.parse(savedSettings);
-            if (savedIds) {
-                const ids = JSON.parse(savedIds);
-                nextMemberId = ids.nextMemberId;
-                nextAttendanceId = ids.nextAttendanceId;
-                nextLeaveId = ids.nextLeaveId;
-            }
-        }
-        
-        // Initialize the application
-        document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('attendanceDate').valueAsDate = new Date();
-            initializeData();
-        });
-        
-        // Your existing JavaScript code continues here...
-        let members = [ /* ... */ ];
-        let attendance = [ /* ... */ ];
-        let leaveApplications = [ /* ... */ ];
         let currentUser = null;
         let isAdmin = false;
-        let nextMemberId = 5;
-        let nextAttendanceId = 3;
-        let nextLeaveId = 3;
-        let settings = { /* ... */ };
+        let nextMemberId = 3;
+        let nextAttendanceId = 1;
+        let nextLeaveId = 1;
+        let settings = {
+            adminPassword: "admin123",
+            googleSheetId: CONFIG.SHEET_ID,
+            googleApiKey: CONFIG.API_KEY
+        };
         
-        // All your existing functions remain the same
-        function showMessage(message, type = 'success') { /* ... */ }
-        function loginUser() { /* ... */ }
-        // ... etc.
+        // Initialize system
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('attendanceDate').valueAsDate = new Date();
+            loadDataFromSheets();
+        });
+        
+        // Google Sheets API Functions
+        async function saveToGoogleSheets(sheetName, data) {
+            const sheetId = settings.googleSheetId || CONFIG.SHEET_ID;
+            const apiKey = settings.googleApiKey || CONFIG.API_KEY;
+            
+            if (!sheetId || !apiKey) {
+                console.warn('Google Sheets not configured');
+                return false;
+            }
+            
+            try {
+                const range = `${sheetName}!A:Z`;
+                const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}:append?valueInputOption=USER_ENTERED&key=${apiKey}`;
+                
+                const values = [Object.values(data)];
+                
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        values: values
+                    })
+                });
+                
+                if (response.ok) {
+                    console.log('Data saved to Google Sheets');
+                    return true;
+                } else {
+                    console.error('Error saving to Google Sheets:', await response.text());
+                    return false;
+                }
+            } catch (error) {
+                console.error('Error saving to Google Sheets:', error);
+                return false;
+            }
+        }
+        
+        async function loadDataFromSheets() {
+            const sheetId = settings.googleSheetId || CONFIG.SHEET_ID;
+            const apiKey = settings.googleApiKey || CONFIG.API_KEY;
+            
+            if (!sheetId || !apiKey) {
+                console.warn('Google Sheets not configured');
+                return;
+            }
+            
+            try {
+                // Load Members
+                await loadSheetData('Members', (data) => {
+                    if (data.length > 1) { // Skip header row
+                        members = data.slice(1).map((row, index) => ({
+                            id: parseInt(row[0]) || (index + 1),
+                            name: row[1] || '',
+                            phone: row[2] || '',
+                            voicePart: row[3] || '',
+                            email: row[4] || '',
+                            registeredDate: row[5] || '',
+                            status: row[6] || 'Active'
+                        })).filter(member => member.name);
+                    }
+                });
+                
+                // Load Attendance
+                await loadSheetData('Attendance', (data) => {
+                    if (data.length > 1) {
+                        attendance = data.slice(1).map((row, index) => ({
+                            id: parseInt(row[0]) || (index + 1),
+                            memberId: parseInt(row[1]) || 0,
+                            memberName: row[2] || '',
+                            date: row[3] || '',
+                            serviceType: row[4] || '',
+                            status: row[5] || '',
+                            timestamp: row[6] || ''
+                        })).filter(att => att.memberName);
+                    }
+                });
+                
+                // Load Leave Applications
+                await loadSheetData('LeaveApplications', (data) => {
+                    if (data.length > 1) {
+                        leaveApplications = data.slice(1).map((row, index) => ({
+                            id: parseInt(row[0]) || (index + 1),
+                            memberId: parseInt(row[1]) || 0,
+                            memberName: row[2] || '',
+                            startDate: row[3] || '',
+                            endDate: row[4] || '',
+                            leaveType: row[5] || '',
+                            reason: row[6] || '',
+                            status: row[7] || 'Pending',
+                            applicationDate: row[8] || '',
+                            adminComments: row[9] || '',
+                            reviewedBy: row[10] || '',
+                            reviewDate: row[11] || ''
+                        })).filter(leave => leave.memberName);
+                    }
+                });
+                
+                updateOverviewStats();
+                showMessage('Data synced from Google Sheets successfully!');
+                
+            } catch (error) {
+                console.error('Error loading data from Google Sheets:', error);
+                showMessage('Error loading data from Google Sheets', 'warning');
+            }
+        }
+        
+        async function loadSheetData(sheetName, callback) {
+            const sheetId = settings.googleSheetId || CONFIG.SHEET_ID;
+            const apiKey = settings.googleApiKey || CONFIG.API_KEY;
+            
+            const range = `${sheetName}!A:Z`;
+            const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`;
+            
+            const response = await fetch(url);
+            if (response.ok) {
+                const data = await response.json();
+                if (data.values) {
+                    callback(data.values);
+                }
+            }
+        }
+        
+        async function initializeSheets() {
+            const sheetId = settings.googleSheetId || CONFIG.SHEET_ID;
+            const apiKey = settings.googleApiKey || CONFIG.API_KEY;
+            
+            if (!sheetId || !apiKey) {
+                showMessage('Please configure Google Sheets settings first', 'error');
+                return;
+            }
+            
+            try {
+                // Initialize Members sheet
+                const membersHeaders = ['ID', 'Name', 'Phone', 'Voice Part', 'Email', 'Registered Date', 'Status'];
+                await updateSheet('Members', [membersHeaders]);
+                
+                // Initialize Attendance sheet
+                const attendanceHeaders = ['ID', 'Member ID', 'Member Name', 'Date', 'Service Type', 'Status', 'Timestamp'];
+                await updateSheet('Attendance', [attendanceHeaders]);
+                
+                // Initialize Leave Applications sheet
+                const leaveHeaders = ['ID', 'Member ID', 'Member Name', 'Start Date', 'End Date', 'Leave Type', 'Reason', 'Status', 'Application Date', 'Admin Comments', 'Reviewed By', 'Review Date'];
+                await updateSheet('LeaveApplications', [leaveHeaders]);
+                
+                showMessage('Google Sheets structure initialized successfully!');
+                
+            } catch (error) {
+                console.error('Error initializing sheets:', error);
+                showMessage('Error initializing Google Sheets structure', 'error');
+            }
+        }
+        
+        async function updateSheet(sheetName, values) {
+            const sheetId = settings.googleSheetId || CONFIG.SHEET_ID;
+            const apiKey = settings.googleApiKey || CONFIG.API_KEY;
+            
+            const range = `${sheetName}!A1:Z1`;
+            const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?valueInputOption=USER_ENTERED&key=${apiKey}`;
+            
+            const response = await fetch(url, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    values: values
+                })
+            });
+            
+            return response.ok;
+        }
+        
+        function testConnection() {
+            const sheetId = document.getElementById('googleSheetId').value || settings.googleSheetId;
+            const apiKey = document.getElementById('googleApiKey').value || settings.googleApiKey;
+            
+            if (!sheetId || !apiKey) {
+                showMessage('Please enter both Sheet ID and API Key', 'error');
+                return;
+            }
+            
+            const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}?key=${apiKey}`;
+            
+            fetch(url)
+                .then(response => {
+                    if (response.ok) {
+                        showMessage('Connection successful! Google Sheets API is working.', 'success');
+                    } else {
+                        showMessage('Connection failed. Check your Sheet ID and API Key.', 'error');
+                    }
+                })
+                .catch(error => {
+                    showMessage('Connection error: ' + error.message, 'error');
+                });
+        }
+        
+        // Utility functions
+        function showMessage(message, type = 'success') {
+            const messageArea = document.getElementById('messageArea');
+            messageArea.innerHTML = `<div class="message ${type}">${message}</div>`;
+            setTimeout(() => {
+                messageArea.innerHTML = '';
+            }, 5000);
+        }
+        
+        function generateId() {
+            return Date.now() + Math.random().toString(36).substr(2, 9);
+        }
+        
+        // Login functions
+        function loginUser() {
+            const name = document.getElementById('loginName').value.trim();
+            const phone = document.getElementById('loginPhone').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            
+            if (!name || !phone) {
+                showMessage('Please enter both name and phone number.', 'error');
+                return;
+            }
+            
+            // Check for admin login
+            if (password === settings.adminPassword) {
+                isAdmin = true;
+                currentUser = { name: name, role: 'admin' };
+                document.getElementById('loginSection').classList.add('hidden');
+                document.getElementById('adminDashboard').classList.remove('hidden');
+                updateAdminDashboard();
+                showMessage(`Welcome Admin! Full system access granted.`);
+                return;
+            }
+            
+            // Regular member login
+            const member = members.find(m => 
+                m.name.toLowerCase() === name.toLowerCase() && 
+                m.phone === phone &&
+                m.status === 'Active'
+            );
+            
+            if (member) {
+                currentUser = member;
+                isAdmin = false;
+                document.getElementById('loginSection').classList.add('hidden');
+                document.getElementById('memberDashboard').classList.remove('hidden');
+                updateMemberDashboard();
+                showMessage(`Welcome back, ${member.name}!`);
+            } else {
+                showMessage('Member not found or inactive. Please check your details or register as a new member.', 'error');
+            }
+        }
+        
+        function showRegisterForm() {
+            document.getElementById('loginSection').classList.add('hidden');
+            document.getElementById('registrationSection').classList.remove('hidden');
+        }
+        
+        function showLoginForm() {
+            document.getElementById('registrationSection').classList.add('hidden');
+            document.getElementById('loginSection').classList.remove('hidden');
+        }
+        
+        async function registerMember() {
+            const name = document.getElementById('memberName').value.trim();
+            const phone = document.getElementById('memberPhone').value.trim();
+            const voicePart = document.getElementById('voicePart').value;
+            const email = document.getElementById('memberEmail').value.trim();
+            
+            if (!name || !phone || !voicePart) {
+                showMessage('Please fill in all required fields.', 'error');
+                return;
+            }
+            
+            const existingMember = members.find(m => 
+                m.name.toLowerCase() === name.toLowerCase() || m.phone === phone
+            );
+            
+            if (existingMember) {
+                showMessage('A member with this name or phone number already exists.', 'error');
+                return;
+            }
+            
+            const newMember = {
+                id: nextMemberId++,
+                name: name,
+                phone: phone,
+                voicePart: voicePart,
+                email: email,
+                registeredDate: new Date().toISOString().split('T')[0],
+                status: 'Active'
+            };
+            
+            const saved = await saveToGoogleSheets('Members', newMember);
+            if (saved) {
+                members.push(newMember);
+                showMessage(`Registration successful! Welcome to the choir, ${name}!`);
+                
+                // Clear form
+                document.getElementById('memberName').value = '';
+                document.getElementById('memberPhone').value = '';
+                document.getElementById('voicePart').value = '';
+                document.getElementById('memberEmail').value = '';
+                
+                showLoginForm();
+            } else {
+                showMessage('Registration failed. Please try again.', 'error');
+            }
+        }
+        
+        async function markMemberAttendance() {
+            if (!currentUser) return;
+            
+            const date = document.getElementById('attendanceDate').value;
+            const serviceType = document.getElementById('attendanceType').value;
+            
+            if (!date) {
+                showMessage('Please select a date.', 'error');
+                return;
+            }
+            
+            // Check if member is on approved leave
+            const memberOnLeave = leaveApplications.find(leave => 
+                leave.memberId === currentUser.id &&
+                leave.status === 'Approved' &&
+                date >= leave.startDate &&
+                date <= leave.endDate
+            );
+            
+            if (memberOnLeave) {
+                showMessage('You are currently on approved leave for this date.', 'warning');
+                return;
+            }
+            
+            // Check if already marked
+            const existingRecord = attendance.find(a => 
+                a.memberId === currentUser.id && 
+                a.date === date && 
+                a.serviceType === serviceType
+            );
+            
+            if (existingRecord) {
+                showMessage('You have already marked attendance for this date and service type.', 'error');
+                return;
+            }
+            
+            const attendanceRecord = {
+                id: nextAttendanceId++,
+                memberId: currentUser.id,
+                memberName: currentUser.name,
+                date: date,
+                serviceType: serviceType,
+                status: 'Present',
+                timestamp: new Date().toISOString()
+            };
+            
+            const saved = await saveToGoogleSheets('Attendance', attendanceRecord);
+            if (saved) {
+                attendance.push(attendanceRecord);
+                updateMemberDashboard();
+                showMessage(`Attendance marked successfully!`);
+            } else {
+                showMessage('Failed to mark attendance. Please try again.', 'error');
+            }
+        }
+        
+        // Leave Management Functions
+        function showLeaveApplicationForm() {
+            document.getElementById('leaveApplicationForm').classList.remove('hidden');
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            document.getElementById('leaveStartDate').min = tomorrow.toISOString().split('T')[0];
+        }
+        
+        function hideLeaveApplicationForm() {
+            document.getElementById('leaveApplicationForm').classList.add('hidden');
+        }
+        
+        async function submitLeaveApplication() {
+            if (!currentUser) return;
+            
+            const startDate = document.getElementById('leaveStartDate').value;
+            const endDate = document.getElementById('leaveEndDate').value;
+            const leaveType = document.getElementById('leaveType').value;
+            const reason = document.getElementById('leaveReason').value.trim();
+            
+            if (!startDate || !endDate || !reason) {
+                showMessage('Please fill in all required fields.', 'error');
+                return;
+            }
+            
+            if (new Date(endDate) < new Date(startDate)) {
+                showMessage('End date cannot be before start date.', 'error');
+                return;
+            }
+            
+            const leaveApplication = {
+                id: nextLeaveId++,
+                memberId: currentUser.id,
+                memberName: currentUser.name,
+                startDate: startDate,
+                endDate: endDate,
+                leaveType: leaveType,
+                reason: reason,
+                status: 'Pending',
+                applicationDate: new Date().toISOString().split('T')[0],
+                adminComments: '',
+                reviewedBy: '',
+                reviewDate: ''
+            };
+            
+            const saved = await saveToGoogleSheets('LeaveApplications', leaveApplication);
+            if (saved) {
+                leaveApplications.push(leaveApplication);
+                hideLeaveApplicationForm();
+                updateMemberLeaveApplications();
+                showMessage('Leave application submitted successfully!');
+            } else {
+                showMessage('Failed to submit leave application. Please try again.', 'error');
+            }
+        }
+        
+        // Tab functions
+        function showMemberTab(tabName) {
+            document.getElementById('memberAttendanceTab').classList.add('hidden');
+            document.getElementById('memberLeaveTab').classList.add('hidden');
+            document.getElementById('memberProfileTab').classList.add('hidden');
+            document.getElementById('memberDirectoryTab').classList.add('hidden');
+            
+            document.querySelectorAll('#memberDashboard .tab').forEach(tab => tab.classList.remove('active'));
+            
+            document.getElementById('member' + tabName.charAt(0).toUpperCase() + tabName.slice(1) + 'Tab').classList.remove('hidden');
+            event.target.classList.add('active');
+            
+            if (tabName === 'leave') updateMemberLeaveApplications();
+            if (tabName === 'profile') updateMemberProfile();
+            if (tabName === 'directory') updateMemberDirectory();
+            if (tabName === 'attendance') updateMemberAttendanceHistory();
+        }
+        
+        function showAdminTab(tabName) {
+            document.getElementById('adminOverviewTab').classList.add('hidden');
+            document.getElementById('adminMembersTab').classList.add('hidden');
+            document.getElementById('adminAttendanceTab').classList.add('hidden');
+            document.getElementById('adminLeaveTab').classList.add('hidden');
+            document.getElementById('adminReportsTab').classList.add('hidden');
+            document.getElementById('adminSettingsTab').classList.add('hidden');
+            
+            document.querySelectorAll('#adminDashboard .tab').forEach(tab => tab.classList.remove('active'));
+            
+            document.getElementById('admin' + tabName.charAt(0).toUpperCase() + tabName.slice(1) + 'Tab').classList.remove('hidden');
+            event.target.classList.add('active');
+            
+            if (tabName === 'members') updateMembersTable();
+            if (tabName === 'attendance') updateAttendanceDisplay();
+            if (tabName === 'leave') updateLeaveApplicationsDisplay();
+            if (tabName === 'reports') updateReportsDisplay();
+            if (tabName === 'overview') updateOverviewStats();
+        }
+        
+        // Update functions
+        function updateMemberDashboard() {
+            updateMemberAttendanceHistory();
+            updateMemberProfile();
+            updateMemberDirectory();
+            updateMemberLeaveApplications();
+        }
+        
+        function updateAdminDashboard() {
+            updateOverviewStats();
+            updateMembersTable();
+            updateAttendanceDisplay();
+            updateLeaveApplicationsDisplay();
+        }
+        
+        function updateOverviewStats() {
+            document.getElementById('totalMembers').textContent = members.length;
+            document.getElementById('activeMembers').textContent = members.filter(m => m.status === 'Active').length;
+            
+            const oneWeekAgo = new Date();
+            oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+            document.getElementById('thisWeekAttendance').textContent = attendance.filter(a => new Date(a.date) >= oneWeekAgo).length;
+            
+            document.getElementById('pendingLeaveRequests').textContent = leaveApplications.filter(app => app.status === 'Pending').length;
+            
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('membersOnLeave').textContent = leaveApplications.filter(app => 
+                app.status === 'Approved' && today >= app.startDate && today <= app.endDate
+            ).length;
+            
+            const totalRecords = attendance.length;
+            const presentRecords = attendance.filter(a => a.status === 'Present').length;
+            document.getElementById('averageAttendance').textContent = totalRecords > 0 
+                ? ((presentRecords / totalRecords) * 100).toFixed(0) + '%'
+                : '0%';
+        }
+        
+        function updateMemberAttendanceHistory() {
+            const recordsDiv = document.getElementById('memberRecords');
+            if (!currentUser || isAdmin) return;
+            
+            const userAttendance = attendance.filter(a => a.memberId === currentUser.id)
+                                            .sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            if (userAttendance.length === 0) {
+                recordsDiv.innerHTML = '<p>No attendance records found.</p>';
+                return;
+            }
+            
+            const totalServices = userAttendance.length;
+            const presentCount = userAttendance.filter(a => a.status === 'Present').length;
+            const attendanceRate = ((presentCount / totalServices) * 100).toFixed(1);
+            
+            recordsDiv.innerHTML = `
+                <div style="margin-bottom: 1rem; padding: 1rem; background: rgba(102, 126, 234, 0.1); border-radius: 8px;">
+                    <strong>My Attendance Summary:</strong> ${presentCount} out of ${totalServices} services attended (${attendanceRate}% attendance rate)
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Service Type</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${userAttendance.map(record => `
+                            <tr>
+                                <td>${record.date}</td>
+                                <td>${record.serviceType}</td>
+                                <td style="color: ${record.status === 'Present' ? '#27ae60' : '#e74c3c'}; font-weight: bold;">
+                                    ${record.status}
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+        
+        function updateMemberLeaveApplications() {
+            if (!currentUser || isAdmin) return;
+            
+            const applicationsDiv = document.getElementById('memberLeaveApplications');
+            const memberApplications = leaveApplications
+                .filter(app => app.memberId === currentUser.id)
+                .sort((a, b) => new Date(b.applicationDate) - new Date(a.applicationDate));
+            
+            if (memberApplications.length === 0) {
+                applicationsDiv.innerHTML = '<p>No leave applications found.</p>';
+                return;
+            }
+            
+            applicationsDiv.innerHTML = memberApplications.map(app => `
+                <div class="leave-card">
+                    <div class="leave-header">
+                        <div>
+                            <strong>${app.leaveType} Leave</strong>
+                            <br>
+                            <small>Applied on: ${app.applicationDate}</small>
+                        </div>
+                        <span class="leave-status status-${app.status.toLowerCase()}">${app.status}</span>
+                    </div>
+                    <div class="leave-details">
+                        <p><strong>Period:</strong> ${app.startDate} to ${app.endDate}</p>
+                        <p><strong>Reason:</strong> ${app.reason}</p>
+                        ${app.adminComments ? `<p><strong>Admin Comments:</strong> ${app.adminComments}</p>` : ''}
+                        ${app.reviewDate ? `<p><strong>Reviewed on:</strong> ${app.reviewDate}</p>` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function updateMemberProfile() {
+            const profileDiv = document.getElementById('profileInfo');
+            if (!currentUser || isAdmin) return;
+            
+            const member = members.find(m => m.id === currentUser.id);
+            if (!member) return;
+            
+            profileDiv.innerHTML = `
+                <div class="stat-card" style="text-align: left;">
+                    <p><strong>Name:</strong> ${member.name}</p>
+                    <p><strong>Phone:</strong> ${member.phone}</p>
+                    <p><strong>Voice Part:</strong> ${member.voicePart}</p>
+                    <p><strong>Email:</strong> ${member.email || 'Not provided'}</p>
+                    <p><strong>Member Since:</strong> ${member.registeredDate}</p>
+                    <p><strong>Status:</strong> <span style="color: ${member.status === 'Active' ? '#27ae60' : '#e74c3c'}">${member.status}</span></p>
+                </div>
+            `;
+        }
+        
+        function updateMemberDirectory() {
+            const directoryDiv = document.getElementById('publicDirectory');
+            const activeMembers = members.filter(m => m.status === 'Active');
+            
+            if (activeMembers.length === 0) {
+                directoryDiv.innerHTML = '<p>No active members found.</p>';
+                return;
+            }
+            
+            directoryDiv.innerHTML = `
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Voice Part</th>
+                            <th>Phone</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${activeMembers.map(member => `
+                            <tr>
+                                <td>${member.name}</td>
+                                <td>${member.voicePart}</td>
+                                <td>${member.phone}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+        
+        function updateMembersTable() {
+            const tbody = document.getElementById('membersTableBody');
+            let filteredMembers = [...members];
+            
+            const voicePartFilter = document.getElementById('voicePartFilter').value;
+            const statusFilter = document.getElementById('statusFilter').value;
+            
+            if (voicePartFilter) {
+                filteredMembers = filteredMembers.filter(m => m.voicePart === voicePartFilter);
+            }
+            
+            if (statusFilter) {
+                filteredMembers = filteredMembers.filter(m => m.status === statusFilter);
+            }
+            
+            tbody.innerHTML = filteredMembers.map(member => `
+                <tr>
+                    <td>${member.name}</td>
+                    <td>${member.phone}</td>
+                    <td>${member.voicePart}</td>
+                    <td>${member.email || 'N/A'}</td>
+                    <td>${member.registeredDate}</td>
+                    <td><span style="color: ${member.status === 'Active' ? '#27ae60' : '#e74c3c'}">${member.status}</span></td>
+                    <td>
+                        <button onclick="editMember(${member.id})" class="btn-secondary" style="padding: 0.3rem 0.6rem; margin: 0.2rem;">Edit</button>
+                        <button onclick="toggleMemberStatus(${member.id})" class="btn-secondary" style="padding: 0.3rem 0.6rem; margin: 0.2rem;">
+                            ${member.status === 'Active' ? 'Deactivate' : 'Activate'}
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        function filterMembers() {
+            updateMembersTable();
+        }
+        
+        function updateAttendanceDisplay() {
+            const attendanceDiv = document.getElementById('attendanceDisplay');
+            
+            const dateFilter = document.getElementById('attendanceDateFilter').value;
+            const serviceTypeFilter = document.getElementById('serviceTypeFilter').value;
+            
+            let filteredAttendance = [...attendance];
+            
+            if (dateFilter) {
+                filteredAttendance = filteredAttendance.filter(a => a.date === dateFilter);
+            }
+            
+            if (serviceTypeFilter) {
+                filteredAttendance = filteredAttendance.filter(a => a.serviceType === serviceTypeFilter);
+            }
+            
+            filteredAttendance.sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            if (filteredAttendance.length === 0) {
+                attendanceDiv.innerHTML = '<p>No attendance records found.</p>';
+                return;
+            }
+            
+            attendanceDiv.innerHTML = `
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Member</th>
+                            <th>Service Type</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${filteredAttendance.map(record => `
+                            <tr>
+                                <td>${record.date}</td>
+                                <td>${record.memberName}</td>
+                                <td>${record.serviceType}</td>
+                                <td style="color: ${record.status === 'Present' ? '#27ae60' : '#e74c3c'}; font-weight: bold;">
+                                    ${record.status}
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+        
+        function filterAttendance() {
+            updateAttendanceDisplay();
+        }
+        
+        function updateLeaveApplicationsDisplay() {
+            const leaveDiv = document.getElementById('leaveApplicationsDisplay');
+            
+            const statusFilter = document.getElementById('leaveStatusFilter').value;
+            const typeFilter = document.getElementById('leaveTypeFilter').value;
+            
+            let filteredApplications = [...leaveApplications];
+            
+            if (statusFilter) {
+                filteredApplications = filteredApplications.filter(app => app.status === statusFilter);
+            }
+            
+            if (typeFilter) {
+                filteredApplications = filteredApplications.filter(app => app.leaveType === typeFilter);
+            }
+            
+            filteredApplications.sort((a, b) => new Date(b.applicationDate) - new Date(a.applicationDate));
+            
+            if (filteredApplications.length === 0) {
+                leaveDiv.innerHTML = '<p>No leave applications found.</p>';
+                return;
+            }
+            
+            leaveDiv.innerHTML = filteredApplications.map(app => `
+                <div class="leave-card">
+                    <div class="leave-header">
+                        <div>
+                            <strong>${app.memberName}</strong> - ${app.leaveType} Leave
+                            <br>
+                            <small>Applied on: ${app.applicationDate}</small>
+                        </div>
+                        <span class="leave-status status-${app.status.toLowerCase()}">${app.status}</span>
+                    </div>
+                    <div class="leave-details">
+                        <p><strong>Period:</strong> ${app.startDate} to ${app.endDate}</p>
+                        <p><strong>Reason:</strong> ${app.reason}</p>
+                        ${app.adminComments ? `<p><strong>Admin Comments:</strong> ${app.adminComments}</p>` : ''}
+                        ${app.reviewDate ? `<p><strong>Reviewed on:</strong> ${app.reviewDate} by ${app.reviewedBy}</p>` : ''}
+                    </div>
+                    ${app.status === 'Pending' ? `
+                        <div style="margin-top: 1rem;">
+                            <button onclick="approveLeaveApplication(${app.id})" class="btn-success">Approve</button>
+                            <button onclick="denyLeaveApplication(${app.id})" class="btn-danger">Deny</button>
+                        </div>
+                    ` : ''}
+                </div>
+            `).join('');
+        }
+        
+        function filterLeaveApplications() {
+            updateLeaveApplicationsDisplay();
+        }
+        
+        async function approveLeaveApplication(applicationId) {
+            const application = leaveApplications.find(app => app.id === applicationId);
+            if (!application) return;
+            
+            const comments = prompt('Add approval comments (optional):', '') || 'Leave approved';
+            
+            application.status = 'Approved';
+            application.adminComments = comments;
+            application.reviewedBy = 'Admin';
+            application.reviewDate = new Date().toISOString().split('T')[0];
+            
+            await saveToGoogleSheets('LeaveApplications', application);
+            
+            updateLeaveApplicationsDisplay();
+            updateOverviewStats();
+            showMessage(`Leave application for ${application.memberName} has been approved.`);
+        }
+        
+        async function denyLeaveApplication(applicationId) {
+            const application = leaveApplications.find(app => app.id === applicationId);
+            if (!application) return;
+            
+            const comments = prompt('Please provide reason for denial:', '');
+            if (!comments) {
+                showMessage('Please provide a reason for denial.', 'error');
+                return;
+            }
+            
+            application.status = 'Denied';
+            application.adminComments = comments;
+            application.reviewedBy = 'Admin';
+            application.reviewDate = new Date().toISOString().split('T')[0];
+            
+            await saveToGoogleSheets('LeaveApplications', application);
+            
+            updateLeaveApplicationsDisplay();
+            updateOverviewStats();
+            showMessage(`Leave application for ${application.memberName} has been denied.`);
+        }
+        
+        // Additional functions for completeness
+        function updateReportsDisplay() {
+            const today = new Date();
+            const lastMonth = new Date();
+            lastMonth.setMonth(lastMonth.getMonth() - 1);
+            
+            document.getElementById('reportStartDate').value = lastMonth.toISOString().split('T')[0];
+            document.getElementById('reportEndDate').value = today.toISOString().split('T')[0];
+        }
+        
+        function generateReport() {
+            const startDate = document.getElementById('reportStartDate').value;
+            const endDate = document.getElementById('reportEndDate').value;
+            
+            if (!startDate || !endDate) {
+                showMessage('Please select both start and end dates', 'error');
+                return;
+            }
+            
+            const filteredAttendance = attendance.filter(a => 
+                a.date >= startDate && a.date <= endDate
+            );
+            
+            const reportsDiv = document.getElementById('reportsDisplay');
+            const totalRecords = filteredAttendance.length;
+            const presentRecords = filteredAttendance.filter(a => a.status === 'Present').length;
+            const attendanceRate = totalRecords > 0 ? ((presentRecords / totalRecords) * 100).toFixed(1) : 0;
+            
+            reportsDiv.innerHTML = `
+                <div class="member-stats">
+                    <div class="stat-card">
+                        <div class="stat-number">${totalRecords}</div>
+                        <div class="stat-label">Total Records</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${presentRecords}</div>
+                        <div class="stat-label">Present Records</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${attendanceRate}%</div>
+                        <div class="stat-label">Attendance Rate</div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function toggleMemberStatus(memberId) {
+            const member = members.find(m => m.id === memberId);
+            if (member) {
+                member.status = member.status === 'Active' ? 'Inactive' : 'Active';
+                updateMembersTable();
+                updateOverviewStats();
+                showMessage(`${member.name} status updated to ${member.status}`);
+            }
+        }
+        
+        function editMember(memberId) {
+            const member = members.find(m => m.id === memberId);
+            if (!member) return;
+            
+            const newName = prompt('Enter new name:', member.name);
+            if (newName && newName !== member.name) {
+                member.name = newName;
+            }
+            
+            const newPhone = prompt('Enter new phone:', member.phone);
+            if (newPhone && newPhone !== member.phone) {
+                member.phone = newPhone;
+            }
+            
+            const newEmail = prompt('Enter new email:', member.email);
+            if (newEmail !== null) {
+                member.email = newEmail;
+            }
+            
+            updateMembersTable();
+            showMessage(`${member.name} updated successfully`);
+        }
+        
+        function showAddMemberForm() {
+            const name = prompt('Enter member name:');
+            if (!name) return;
+            
+            const phone = prompt('Enter phone number:');
+            if (!phone) return;
+            
+            const voicePart = prompt('Enter voice part (Soprano/Alto/Tenor/Bass):');
+            if (!voicePart) return;
+            
+            const email = prompt('Enter email (optional):') || '';
+            
+            const newMember = {
+                id: nextMemberId++,
+                name: name,
+                phone: phone,
+                voicePart: voicePart,
+                email: email,
+                registeredDate: new Date().toISOString().split('T')[0],
+                status: 'Active'
+            };
+            
+            saveToGoogleSheets('Members', newMember).then(saved => {
+                if (saved) {
+                    members.push(newMember);
+                    updateMembersTable();
+                    updateOverviewStats();
+                    showMessage(`${name} added successfully!`);
+                }
+            });
+        }
+        
+        function showBulkAttendanceForm() {
+            const date = prompt('Enter date (YYYY-MM-DD):', new Date().toISOString().split('T')[0]);
+            if (!date) return;
+            
+            const serviceType = prompt('Enter service type:', 'Sabbath Morning');
+            if (!serviceType) return;
+            
+            const activeMembers = members.filter(m => m.status === 'Active');
+            
+            activeMembers.forEach(member => {
+                const present = confirm(`Mark ${member.name} as present for ${serviceType} on ${date}?`);
+                if (present) {
+                    const attendanceRecord = {
+                        id: nextAttendanceId++,
+                        memberId: member.id,
+                        memberName: member.name,
+                        date: date,
+                        serviceType: serviceType,
+                        status: 'Present',
+                        timestamp: new Date().toISOString()
+                    };
+                    
+                    saveToGoogleSheets('Attendance', attendanceRecord).then(saved => {
+                        if (saved) {
+                            attendance.push(attendanceRecord);
+                        }
+                    });
+                }
+            });
+            
+            setTimeout(() => {
+                updateAttendanceDisplay();
+                updateOverviewStats();
+                showMessage(`Bulk attendance marked for ${date}`);
+            }, 1000);
+        }
+        
+        function exportMembersCSV() {
+            const csv = convertToCSV(members, ['id', 'name', 'phone', 'voicePart', 'email', 'registeredDate', 'status']);
+            downloadCSV(csv, 'choir_members.csv');
+            showMessage('Members exported successfully!');
+        }
+        
+        function exportAttendanceCSV() {
+            const csv = convertToCSV(attendance, ['id', 'memberName', 'date', 'serviceType', 'status']);
+            downloadCSV(csv, 'choir_attendance.csv');
+            showMessage('Attendance exported successfully!');
+        }
+        
+        function exportLeaveCSV() {
+            const csv = convertToCSV(leaveApplications, ['id', 'memberName', 'startDate', 'endDate', 'leaveType', 'reason', 'status', 'applicationDate']);
+            downloadCSV(csv, 'choir_leave_applications.csv');
+            showMessage('Leave applications exported successfully!');
+        }
+        
+        function convertToCSV(data, headers) {
+            const csvHeaders = headers.join(',');
+            const csvData = data.map(row => 
+                headers.map(header => `"${row[header] || ''}"`).join(',')
+            ).join('\n');
+            return csvHeaders + '\n' + csvData;
+        }
+        
+        function downloadCSV(csv, filename) {
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = filename;
+            link.click();
+            window.URL.revokeObjectURL(url);
+        }
+        
+        function saveSettings() {
+            const sheetId = document.getElementById('googleSheetId').value;
+            const apiKey = document.getElementById('googleApiKey').value;
+            const adminPassword = document.getElementById('adminPassword').value;
+            
+            if (sheetId) settings.googleSheetId = sheetId;
+            if (apiKey) settings.googleApiKey = apiKey;
+            if (adminPassword) settings.adminPassword = adminPassword;
+            
+            showMessage('Settings saved successfully!');
+        }
+        
+        function editProfile() {
+            showMessage('Profile editing feature coming soon!', 'warning');
+        }
+        
+        function logout() {
+            currentUser = null;
+            isAdmin = false;
+            document.getElementById('memberDashboard').classList.add('hidden');
+            document.getElementById('adminDashboard').classList.add('hidden');
+            document.getElementById('loginSection').classList.remove('hidden');
+            document.getElementById('loginName').value = '';
+            document.getElementById('loginPhone').value = '';
+            document.getElementById('loginPassword').value = '';
+            showMessage('You have been logged out successfully.');
+        }
     </script>
-   </body>
+</body>
 </html>
-
-
-
-
