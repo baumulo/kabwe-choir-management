@@ -689,6 +689,35 @@
             SHEET_ID: '1elHJEJFPucr66Lvylb0u4XkaZT-tiyD4V7rl6aLhYhA',
             API_KEY: 'AIzaSyBewL5Cb4Q4OC7eJhszEz2d3JkFQgxmumk'
         };
+    
+const SHEET_ID = '1elHJEJFPucr66Lvylb0u4XkaZT-tiyD4V7rl6aLhYhA';
+const API_KEY = 'AIzaSyBewL5Cb4Q4OC7eJhszEz2d3JkFQgxmumk';
+
+async function saveToGoogleSheets(sheetName, data) {
+  const range = `${sheetName}!A:Z`;
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${range}:append?valueInputOption=RAW&key=${API_KEY}`;
+  
+  const values = [Object.values(data)];
+  
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        values: values
+      })
+    });
+    
+    if (response.ok) {
+      console.log('Data saved to Google Sheets');
+    }
+  } catch (error) {
+    console.error('Error saving to Google Sheets:', error);
+  }
+}
+
         
         // Data arrays
         let members = [
@@ -1751,3 +1780,4 @@
     </script>
 </body>
 </html>
+
