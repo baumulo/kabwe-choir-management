@@ -3,69 +3,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kabwe Central SDA Church Choir Management System</title>
+    <title>Choir Management System</title>
+    <script src="https://unpkg.com/dexie@3.2.1/dist/dexie.js"></script>
     <style>
+        :root {
+            --primary: #4a6fa5;
+            --secondary: #6e9887;
+            --light: #f8f9fa;
+            --dark: #343a40;
+            --success: #28a745;
+            --danger: #dc3545;
+        }
+        
         * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            background-color: #f5f5f5;
+            color: var(--dark);
+            line-height: 1.6;
         }
         
         .container {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 2rem;
-            border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-            width: 90%;
-            max-width: 1000px;
-            backdrop-filter: blur(10px);
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
         }
         
-        .header {
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 1rem;
             text-align: center;
             margin-bottom: 2rem;
-            padding-bottom: 1rem;
-            border-bottom: 2px solid #667eea;
+            border-radius: 5px;
         }
         
-        .church-name {
-            color: #2c3e50;
-            font-size: 1.8rem;
-            font-weight: bold;
-            margin-bottom: 0.5rem;
-        }
-        
-        .choir-title {
-            color: #667eea;
-            font-size: 1.2rem;
-            font-weight: 500;
-        }
-        
-        .section {
-            margin-bottom: 2rem;
-            padding: 1.5rem;
-            border-radius: 15px;
-            background: rgba(255, 255, 255, 0.7);
-            border: 1px solid rgba(102, 126, 234, 0.2);
-        }
-        
-        .section-title {
-            color: #2c3e50;
-            font-size: 1.3rem;
-            font-weight: bold;
-            margin-bottom: 1rem;
+        .tabs {
             display: flex;
-            align-items: center;
-            gap: 0.5rem;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            background: #eee;
+            border: 1px solid #ddd;
+            border-bottom: none;
+            border-radius: 5px 5px 0 0;
+            margin-right: 5px;
+        }
+        
+        .tab.active {
+            background: white;
+            font-weight: bold;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 20px;
+            background: white;
+            border: 1px solid #ddd;
+            border-top: none;
+            border-radius: 0 0 5px 5px;
+        }
+        
+        .tab-content.active {
+            display: block;
         }
         
         .form-group {
@@ -75,1889 +84,517 @@
         label {
             display: block;
             margin-bottom: 0.5rem;
-            color: #2c3e50;
-            font-weight: 500;
+            font-weight: bold;
         }
         
-        input, select, textarea {
+        input, select {
             width: 100%;
-            padding: 0.8rem;
-            border: 2px solid #e1e8ed;
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-        }
-        
-        input:focus, select:focus, textarea:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
         }
         
         button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-color: var(--primary);
             color: white;
             border: none;
-            padding: 0.8rem 1.5rem;
-            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
             cursor: pointer;
             font-size: 1rem;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            margin-right: 0.5rem;
-            margin-bottom: 0.5rem;
         }
         
         button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            background-color: #3a5a80;
         }
         
-        .btn-secondary {
-            background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
+        button.danger {
+            background-color: var(--danger);
         }
         
-        .btn-danger {
-            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        button.danger:hover {
+            background-color: #bd2130;
         }
         
-        .btn-success {
-            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
-        }
-        
-        .btn-warning {
-            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
-        }
-        
-        .tabs {
-            display: flex;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
-            border-bottom: 2px solid #e1e8ed;
-            flex-wrap: wrap;
-        }
-        
-        .tab {
-            padding: 0.8rem 1.5rem;
-            background: none;
-            border: none;
-            color: #7f8c8d;
-            font-weight: 500;
-            cursor: pointer;
-            border-bottom: 3px solid transparent;
-            transition: all 0.3s ease;
-            margin-bottom: 0;
-        }
-        
-        .tab.active {
-            color: #667eea;
-            border-bottom-color: #667eea;
-        }
-        
-        .data-table {
+        table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 1rem;
-            background: white;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
         
-        .data-table th {
-            background: #667eea;
-            color: white;
-            padding: 1rem;
+        th, td {
+            padding: 0.75rem;
             text-align: left;
-            font-weight: 600;
+            border-bottom: 1px solid #ddd;
         }
         
-        .data-table td {
-            padding: 0.8rem 1rem;
-            border-bottom: 1px solid #e1e8ed;
-        }
-        
-        .data-table tr:hover {
-            background: #f8fafc;
-        }
-        
-        .member-stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-        
-        .stat-card {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 10px;
-            text-align: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            border-left: 4px solid #667eea;
-        }
-        
-        .stat-number {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #2c3e50;
-            margin-bottom: 0.5rem;
-        }
-        
-        .stat-label {
-            color: #7f8c8d;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        .hidden {
-            display: none;
-        }
-        
-        .message {
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 1rem;
-        }
-        
-        .success {
-            background: rgba(39, 174, 96, 0.1);
-            color: #27ae60;
-            border: 1px solid rgba(39, 174, 96, 0.3);
-        }
-        
-        .error {
-            background: rgba(231, 76, 60, 0.1);
-            color: #e74c3c;
-            border: 1px solid rgba(231, 76, 60, 0.3);
-        }
-        
-        .warning {
-            background: rgba(243, 156, 18, 0.1);
-            color: #f39c12;
-            border: 1px solid rgba(243, 156, 18, 0.3);
-        }
-        
-        .login-form {
-            max-width: 400px;
-            margin: 0 auto;
-        }
-        
-        .admin-controls {
-            background: rgba(102, 126, 234, 0.1);
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 1rem;
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-        
-        .filter-group {
-            display: flex;
-            gap: 1rem;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-        
-        .filter-group select {
-            width: auto;
-            min-width: 150px;
-        }
-        
-        .leave-card {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 10px;
-            margin-bottom: 1rem;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            border-left: 4px solid #667eea;
-        }
-        
-        .leave-header {
-            display: flex;
-            justify-content: between;
-            align-items: center;
-            margin-bottom: 1rem;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-        
-        .leave-status {
-            padding: 0.3rem 0.8rem;
-            border-radius: 15px;
-            font-size: 0.9rem;
-            font-weight: bold;
-            text-transform: uppercase;
-        }
-        
-        .status-pending {
-            background: rgba(243, 156, 18, 0.1);
-            color: #f39c12;
-            border: 1px solid rgba(243, 156, 18, 0.3);
-        }
-        
-        .status-approved {
-            background: rgba(39, 174, 96, 0.1);
-            color: #27ae60;
-            border: 1px solid rgba(39, 174, 96, 0.3);
-        }
-        
-        .status-denied {
-            background: rgba(231, 76, 60, 0.1);
-            color: #e74c3c;
-            border: 1px solid rgba(231, 76, 60, 0.3);
-        }
-        
-        .leave-details {
-            margin-bottom: 1rem;
-        }
-        
-        .leave-actions {
-            display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-        }
-        
-        .export-section {
-            background: #f8fafc;
-            padding: 1rem;
-            border-radius: 8px;
-            margin-top: 1rem;
-        }
-        
-        .google-sheets-setup {
-            background: linear-gradient(135deg, #4285f4 0%, #34a853 100%);
-            color: white;
-            padding: 1.5rem;
-            border-radius: 10px;
-            margin-bottom: 1rem;
-        }
-        
-        .setup-step {
-            margin-bottom: 1rem;
-            padding-left: 1.5rem;
-            position: relative;
-        }
-        
-        .setup-step::before {
-            content: counter(step-counter);
-            counter-increment: step-counter;
-            position: absolute;
-            left: 0;
-            top: 0;
-            background: rgba(255,255,255,0.2);
-            color: white;
-            width: 1.2rem;
-            height: 1.2rem;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.8rem;
+        th {
+            background-color: #f8f9fa;
             font-weight: bold;
         }
         
-        .setup-steps {
-            counter-reset: step-counter;
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .alert {
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 4px;
+        }
+        
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .section-title {
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--secondary);
         }
         
         @media (max-width: 768px) {
-            .container {
-                width: 95%;
-                padding: 1rem;
-            }
-            
             .tabs {
-                justify-content: center;
+                flex-direction: column;
             }
             
             .tab {
-                font-size: 0.9rem;
-                padding: 0.6rem 1rem;
+                margin-bottom: 5px;
+                border-radius: 5px;
             }
             
-            .data-table {
-                font-size: 0.9rem;
-            }
-            
-            .member-stats {
-                grid-template-columns: 1fr;
-            }
-            
-            .leave-header {
-                flex-direction: column;
-                align-items: flex-start;
+            .tab.active {
+                border-radius: 5px 5px 0 0;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <div class="church-name">Kabwe Central Seventh-day Adventist Church</div>
-            <div class="choir-title">Enhanced Choir Management System</div>
+        <header>
+            <h1>Choir Management System</h1>
+        </header>
+        
+        <div class="tabs">
+            <div class="tab active" data-tab="members">Members</div>
+            <div class="tab" data-tab="rehearsals">Rehearsals</div>
+            <div class="tab" data-tab="performances">Performances</div>
+            <div class="tab" data-tab="attendance">Attendance</div>
         </div>
         
-        <!-- Login Section -->
-        <div id="loginSection" class="section">
-            <h2 class="section-title">🎵 System Access</h2>
-            <div class="login-form">
+        <div id="members-tab" class="tab-content active">
+            <h2 class="section-title">Choir Members</h2>
+            <form id="member-form">
                 <div class="form-group">
-                    <label for="loginName">Full Name:</label>
-                    <input type="text" id="loginName" placeholder="Enter your full name">
+                    <label for="name">Full Name</label>
+                    <input type="text" id="name" required>
                 </div>
                 <div class="form-group">
-                    <label for="loginPhone">Phone Number:</label>
-                    <input type="tel" id="loginPhone" placeholder="Enter your phone number">
-                </div>
-                <div class="form-group">
-                    <label for="loginPassword">Password (Admin Only):</label>
-                    <input type="password" id="loginPassword" placeholder="Leave blank for member access">
-                </div>
-                <button onclick="loginUser()">Login</button>
-                <button onclick="showRegisterForm()" class="btn-secondary">New Member? Register</button>
-            </div>
-        </div>
-        
-        <!-- Registration Section -->
-        <div id="registrationSection" class="section hidden">
-            <h2 class="section-title">📝 New Member Registration</h2>
-            <div class="form-group">
-                <label for="memberName">Full Name:</label>
-                <input type="text" id="memberName" placeholder="Enter full name">
-            </div>
-            <div class="form-group">
-                <label for="memberPhone">Phone Number:</label>
-                <input type="tel" id="memberPhone" placeholder="Enter phone number">
-            </div>
-            <div class="form-group">
-                <label for="voicePart">Voice Part:</label>
-                <select id="voicePart">
-                    <option value="">Select voice part</option>
-                    <option value="Soprano">Soprano</option>
-                    <option value="Alto">Alto</option>
-                    <option value="Tenor">Tenor</option>
-                    <option value="Bass">Bass</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="memberEmail">Email:</label>
-                <input type="email" id="memberEmail" placeholder="Enter email address">
-            </div>
-            <button onclick="registerMember()">Register Member</button>
-            <button onclick="showLoginForm()" class="btn-secondary">Back to Login</button>
-        </div>
-        
-        <!-- Member Dashboard -->
-        <div id="memberDashboard" class="hidden">
-            <div class="tabs">
-                <button class="tab active" onclick="showMemberTab('attendance')">📋 My Attendance</button>
-                <button class="tab" onclick="showMemberTab('leave')">🏖️ Leave Management</button>
-                <button class="tab" onclick="showMemberTab('profile')">👤 My Profile</button>
-                <button class="tab" onclick="showMemberTab('directory')">📞 Member Directory</button>
-            </div>
-            
-            <div id="memberAttendanceTab" class="section">
-                <h2 class="section-title">📋 Mark My Attendance</h2>
-                <div class="form-group">
-                    <label for="attendanceDate">Date:</label>
-                    <input type="date" id="attendanceDate">
-                </div>
-                <div class="form-group">
-                    <label for="attendanceType">Service Type:</label>
-                    <select id="attendanceType">
-                        <option value="Sabbath Morning">Sabbath Morning Service</option>
-                        <option value="Choir Practice">Choir Practice</option>
-                        <option value="Special Event">Special Event</option>
-                        <option value="Wedding">Wedding</option>
-                        <option value="Funeral">Funeral</option>
-                        <option value="Prayer Meeting">Prayer Meeting</option>
+                    <label for="voicePart">Voice Part</label>
+                    <select id="voicePart" required>
+                        <option value="">Select Voice Part</option>
+                        <option value="Soprano">Soprano</option>
+                        <option value="Alto">Alto</option>
+                        <option value="Tenor">Tenor</option>
+                        <option value="Bass">Bass</option>
                     </select>
                 </div>
-                <button onclick="markMemberAttendance()">Mark My Attendance</button>
-                <button onclick="logout()" class="btn-secondary">Logout</button>
-                
-                <div id="memberAttendanceHistory" style="margin-top: 2rem;">
-                    <h3>My Attendance History</h3>
-                    <div id="memberRecords"></div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email">
                 </div>
-            </div>
-            
-            <div id="memberLeaveTab" class="section hidden">
-                <h2 class="section-title">🏖️ Leave Management</h2>
-                
-                <div class="admin-controls">
-                    <button onclick="showLeaveApplicationForm()" class="btn-success">+ Apply for Leave</button>
+                <div class="form-group">
+                    <label for="phone">Phone</label>
+                    <input type="tel" id="phone">
                 </div>
-                
-                <div id="leaveApplicationForm" class="hidden" style="margin-bottom: 2rem; padding: 1.5rem; background: rgba(102, 126, 234, 0.05); border-radius: 10px;">
-                    <h3>New Leave Application</h3>
-                    <div class="form-group">
-                        <label for="leaveStartDate">Start Date:</label>
-                        <input type="date" id="leaveStartDate">
-                    </div>
-                    <div class="form-group">
-                        <label for="leaveEndDate">End Date:</label>
-                        <input type="date" id="leaveEndDate">
-                    </div>
-                    <div class="form-group">
-                        <label for="leaveType">Leave Type:</label>
-                        <select id="leaveType">
-                            <option value="Personal">Personal Leave</option>
-                            <option value="Medical">Medical Leave</option>
-                            <option value="Family">Family Emergency</option>
-                            <option value="Travel">Travel</option>
-                            <option value="Education">Educational</option>
-                            <option value="Other">Other</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="leaveReason">Reason for Leave:</label>
-                        <textarea id="leaveReason" rows="3" placeholder="Please provide details about your leave request..."></textarea>
-                    </div>
-                    <button onclick="submitLeaveApplication()">Submit Application</button>
-                    <button onclick="hideLeaveApplicationForm()" class="btn-secondary">Cancel</button>
-                </div>
-                
-                <h3>My Leave Applications</h3>
-                <div id="memberLeaveApplications"></div>
-                
-                <button onclick="logout()" class="btn-secondary" style="margin-top: 1rem;">Logout</button>
-            </div>
+                <button type="submit">Add Member</button>
+            </form>
             
-            <div id="memberProfileTab" class="section hidden">
-                <h2 class="section-title">👤 My Profile</h2>
-                <div id="profileInfo"></div>
-                <button onclick="editProfile()" class="btn-secondary">Edit Profile</button>
-                <button onclick="logout()" class="btn-secondary">Logout</button>
-            </div>
+            <div id="member-alert" class="alert" style="display: none;"></div>
             
-            <div id="memberDirectoryTab" class="section hidden">
-                <h2 class="section-title">📞 Choir Member Directory</h2>
-                <div id="publicDirectory"></div>
-                <button onclick="logout()" class="btn-secondary">Logout</button>
-            </div>
+            <h3 class="section-title">Member List</h3>
+            <table id="members-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Voice Part</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="members-list">
+                    <!-- Members will be populated here -->
+                </tbody>
+            </table>
         </div>
         
-        <!-- Admin Dashboard -->
-        <div id="adminDashboard" class="hidden">
-            <div class="tabs">
-                <button class="tab active" onclick="showAdminTab('overview')">📊 Overview</button>
-                <button class="tab" onclick="showAdminTab('members')">👥 Members</button>
-                <button class="tab" onclick="showAdminTab('attendance')">📋 Attendance</button>
-                <button class="tab" onclick="showAdminTab('leave')">🏖️ Leave Management</button>
-                <button class="tab" onclick="showAdminTab('reports')">📈 Reports</button>
-                <button class="tab" onclick="showAdminTab('settings')">⚙️ Settings</button>
-            </div>
-            
-            <!-- Admin Overview Tab -->
-            <div id="adminOverviewTab" class="section">
-                <h2 class="section-title">📊 Choir Overview</h2>
-                
-                <div class="member-stats">
-                    <div class="stat-card">
-                        <div class="stat-number" id="totalMembers">0</div>
-                        <div class="stat-label">Total Members</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number" id="activeMembers">0</div>
-                        <div class="stat-label">Active Members</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number" id="thisWeekAttendance">0</div>
-                        <div class="stat-label">This Week Attendance</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number" id="pendingLeaveRequests">0</div>
-                        <div class="stat-label">Pending Leave Requests</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number" id="averageAttendance">0%</div>
-                        <div class="stat-label">Average Attendance</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number" id="membersOnLeave">0</div>
-                        <div class="stat-label">Members on Leave</div>
-                    </div>
-                </div>
-                
-                <div class="google-sheets-setup">
-                    <h3 style="margin-bottom: 1rem;">🔗 Google Sheets Integration Setup</h3>
-                    <div class="setup-steps">
-                        <div class="setup-step">Create a new Google Sheet called "Kabwe Choir Database"</div>
-                        <div class="setup-step">Share the sheet publicly with "Anyone with the link can edit"</div>
-                        <div class="setup-step">Copy the sheet URL and paste it in Settings tab</div>
-                        <div class="setup-step">Click "Initialize Sheets" to set up the database structure</div>
-                        <div class="setup-step">Your data will now automatically save to Google Sheets!</div>
-                    </div>
-                </div>
-                
-                <button onclick="logout()" class="btn-secondary">Logout</button>
-            </div>
-            
-            <!-- Admin Members Tab -->
-            <div id="adminMembersTab" class="section hidden">
-                <h2 class="section-title">👥 Member Management</h2>
-                
-                <div class="admin-controls">
-                    <button onclick="showAddMemberForm()" class="btn-success">+ Add New Member</button>
-                    <button onclick="exportMembersCSV()" class="btn-secondary">📊 Export CSV</button>
-                    <div class="filter-group">
-                        <select id="voicePartFilter" onchange="filterMembers()">
-                            <option value="">All Voice Parts</option>
-                            <option value="Soprano">Soprano</option>
-                            <option value="Alto">Alto</option>
-                            <option value="Tenor">Tenor</option>
-                            <option value="Bass">Bass</option>
-                        </select>
-                        <select id="statusFilter" onchange="filterMembers()">
-                            <option value="">All Status</option>
-                            <option value="Active">Active</option>
-                            <option value="Inactive">Inactive</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <table class="data-table" id="membersTable">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Phone</th>
-                            <th>Voice Part</th>
-                            <th>Email</th>
-                            <th>Join Date</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="membersTableBody">
-                    </tbody>
-                </table>
-            </div>
-            
-            <!-- Admin Attendance Tab -->
-            <div id="adminAttendanceTab" class="section hidden">
-                <h2 class="section-title">📋 Attendance Management</h2>
-                
-                <div class="admin-controls">
-                    <button onclick="showBulkAttendanceForm()" class="btn-success">+ Mark Bulk Attendance</button>
-                    <button onclick="exportAttendanceCSV()" class="btn-secondary">📊 Export Attendance</button>
-                    <div class="filter-group">
-                        <input type="date" id="attendanceDateFilter" onchange="filterAttendance()">
-                        <select id="serviceTypeFilter" onchange="filterAttendance()">
-                            <option value="">All Services</option>
-                            <option value="Sabbath Morning">Sabbath Morning</option>
-                            <option value="Choir Practice">Choir Practice</option>
-                            <option value="Special Event">Special Event</option>
-                            <option value="Wedding">Wedding</option>
-                            <option value="Funeral">Funeral</option>
-                            <option value="Prayer Meeting">Prayer Meeting</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <div id="attendanceDisplay"></div>
-            </div>
-            
-            <!-- Admin Leave Management Tab -->
-            <div id="adminLeaveTab" class="section hidden">
-                <h2 class="section-title">🏖️ Leave Management</h2>
-                
-                <div class="admin-controls">
-                    <button onclick="exportLeaveCSV()" class="btn-secondary">📊 Export Leave Data</button>
-                    <div class="filter-group">
-                        <select id="leaveStatusFilter" onchange="filterLeaveApplications()">
-                            <option value="">All Status</option>
-                            <option value="Pending">Pending</option>
-                            <option value="Approved">Approved</option>
-                            <option value="Denied">Denied</option>
-                        </select>
-                        <select id="leaveTypeFilter" onchange="filterLeaveApplications()">
-                            <option value="">All Types</option>
-                            <option value="Personal">Personal</option>
-                            <option value="Medical">Medical</option>
-                            <option value="Family">Family Emergency</option>
-                            <option value="Travel">Travel</option>
-                            <option value="Education">Educational</option>
-                            <option value="Other">Other</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <div id="leaveApplicationsDisplay"></div>
-            </div>
-            
-            <!-- Admin Reports Tab -->
-            <div id="adminReportsTab" class="section hidden">
-                <h2 class="section-title">📈 Reports & Analytics</h2>
-                
-                <div class="admin-controls">
-                    <div class="filter-group">
-                        <input type="date" id="reportStartDate">
-                        <input type="date" id="reportEndDate">
-                        <button onclick="generateReport()">Generate Report</button>
-                    </div>
-                </div>
-                
-                <div id="reportsDisplay"></div>
-            </div>
-            
-            <!-- Admin Settings Tab -->
-            <div id="adminSettingsTab" class="section hidden">
-                <h2 class="section-title">⚙️ System Settings</h2>
-                
+        <div id="rehearsals-tab" class="tab-content">
+            <h2 class="section-title">Rehearsals</h2>
+            <form id="rehearsal-form">
                 <div class="form-group">
-                    <label for="googleSheetUrl">Google Sheets URL:</label>
-                    <input type="url" id="googleSheetUrl" placeholder="https://docs.google.com/spreadsheets/d/your-sheet-id/edit">
-                    <small style="color: #7f8c8d; display: block; margin-top: 0.5rem;">
-                        Paste your Google Sheet URL here to enable automatic data saving
-                    </small>
+                    <label for="rehearsal-date">Date</label>
+                    <input type="date" id="rehearsal-date" required>
                 </div>
-                
                 <div class="form-group">
-                    <label for="adminPassword">Admin Password:</label>
-                    <input type="password" id="adminPassword" placeholder="Set admin password">
+                    <label for="rehearsal-time">Time</label>
+                    <input type="time" id="rehearsal-time" required>
                 </div>
-                
                 <div class="form-group">
-                    <label for="churchSettings">Church Settings:</label>
-                    <textarea id="churchSettings" rows="4" placeholder="Additional church-specific settings..."></textarea>
+                    <label for="rehearsal-location">Location</label>
+                    <input type="text" id="rehearsal-location" required>
                 </div>
-                
-                <button onclick="saveSettings()" class="btn-success">Save Settings</button>
-                <button onclick="initializeGoogleSheets()" class="btn-secondary">Initialize Google Sheets</button>
-                <button onclick="logout()" class="btn-secondary">Logout</button>
-                
-                <div class="export-section">
-                    <h3>📊 Data Export Options</h3>
-                    <button onclick="exportAllData()" class="btn-secondary">Export All Data (JSON)</button>
-                    <button onclick="backupData()" class="btn-secondary">Create Data Backup</button>
-                    <button onclick="importData()" class="btn-secondary">Import Data</button>
+                <div class="form-group">
+                    <label for="rehearsal-notes">Notes</label>
+                    <input type="text" id="rehearsal-notes">
                 </div>
-            </div>
+                <button type="submit">Add Rehearsal</button>
+            </form>
+            
+            <div id="rehearsal-alert" class="alert" style="display: none;"></div>
+            
+            <h3 class="section-title">Upcoming Rehearsals</h3>
+            <table id="rehearsals-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Location</th>
+                        <th>Notes</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="rehearsals-list">
+                    <!-- Rehearsals will be populated here -->
+                </tbody>
+            </table>
         </div>
         
-        <div id="messageArea"></div>
+        <div id="performances-tab" class="tab-content">
+            <h2 class="section-title">Performances</h2>
+            <form id="performance-form">
+                <div class="form-group">
+                    <label for="performance-date">Date</label>
+                    <input type="date" id="performance-date" required>
+                </div>
+                <div class="form-group">
+                    <label for="performance-time">Time</label>
+                    <input type="time" id="performance-time" required>
+                </div>
+                <div class="form-group">
+                    <label for="performance-location">Location</label>
+                    <input type="text" id="performance-location" required>
+                </div>
+                <div class="form-group">
+                    <label for="performance-description">Description</label>
+                    <input type="text" id="performance-description" required>
+                </div>
+                <div class="form-group">
+                    <label for="performance-attire">Attire</label>
+                    <input type="text" id="performance-attire">
+                </div>
+                <button type="submit">Add Performance</button>
+            </form>
+            
+            <div id="performance-alert" class="alert" style="display: none;"></div>
+            
+            <h3 class="section-title">Upcoming Performances</h3>
+            <table id="performances-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Location</th>
+                        <th>Description</th>
+                        <th>Attire</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="performances-list">
+                    <!-- Performances will be populated here -->
+                </tbody>
+            </table>
+        </div>
+        
+        <div id="attendance-tab" class="tab-content">
+            <h2 class="section-title">Attendance</h2>
+            <div class="form-group">
+                <label for="attendance-event">Select Event</label>
+                <select id="attendance-event">
+                    <option value="">Select Event</option>
+                    <!-- Events will be populated here -->
+                </select>
+            </div>
+            
+            <div id="attendance-section" style="display: none;">
+                <h3 class="section-title">Mark Attendance</h3>
+                <div id="attendance-list">
+                    <!-- Attendance checkboxes will be populated here -->
+                </div>
+                <button id="save-attendance">Save Attendance</button>
+            </div>
+            
+            <div id="attendance-alert" class="alert" style="display: none;"></div>
+            
+            <h3 class="section-title">Attendance Records</h3>
+            <table id="attendance-table">
+                <thead>
+                    <tr>
+                        <th>Event</th>
+                        <th>Date</th>
+                        <th>Type</th>
+                        <th>Present</th>
+                        <th>Absent</th>
+                    </tr>
+                </thead>
+                <tbody id="attendance-records">
+                    <!-- Attendance records will be populated here -->
+                </tbody>
+            </table>
+        </div>
     </div>
-    
+
     <script>
-        // Enhanced data structure with persistent storage simulation
-        let members = [
-            {
-                id: 1,
-                name: "Grace Mwansa",
-                phone: "0977123456",
-                voicePart: "Soprano",
-                email: "grace@example.com",
-                registeredDate: "2024-01-15",
-                status: "Active"
-            },
-            {
-                id: 2,
-                name: "John Phiri",
-                phone: "0966789012",
-                voicePart: "Tenor",
-                email: "john@example.com",
-                registeredDate: "2024-01-20",
-                status: "Active"
-            },
-            {
-                id: 3,
-                name: "Mary Banda",
-                phone: "0955456789",
-                voicePart: "Alto",
-                email: "mary@example.com",
-                registeredDate: "2024-02-05",
-                status: "Active"
-            },
-            {
-                id: 4,
-                name: "David Tembo",
-                phone: "0944123456",
-                voicePart: "Bass",
-                email: "david@example.com",
-                registeredDate: "2024-02-10",
-                status: "Active"
+        // Initialize the database
+        const db = new Dexie("ChoirManagementDB");
+        
+        // Define database schema
+        db.version(1).stores({
+            members: '++id, name, voicePart, email, phone',
+            rehearsals: '++id, date, time, location, notes',
+            performances: '++id, date, time, location, description, attire',
+            attendance: '++id, eventId, eventType, date, membersPresent'
+        });
+        
+        // Open database
+        db.open().catch(function(err) {
+            console.error("Failed to open db: " + (err.stack || err));
+        });
+        
+        // Tab functionality
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remove active class from all tabs and content
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                // Add active class to clicked tab and corresponding content
+                tab.classList.add('active');
+                document.getElementById(`${tab.dataset.tab}-tab`).classList.add('active');
+            });
+        });
+        
+        // Member form submission
+        document.getElementById('member-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const member = {
+                name: document.getElementById('name').value,
+                voicePart: document.getElementById('voicePart').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value
+            };
+            
+            try {
+                await db.members.add(member);
+                showAlert('member-alert', 'Member added successfully!', 'success');
+                document.getElementById('member-form').reset();
+                loadMembers();
+            } catch (error) {
+                showAlert('member-alert', 'Error adding member: ' + error, 'danger');
             }
-        ];
+        });
         
-        let attendance = [
-            {
-                id: 1,
-                memberId: 1,
-                memberName: "Grace Mwansa",
-                date: "2024-09-01",
-                serviceType: "Sabbath Morning",
-                status: "Present",
-                timestamp: new Date().toISOString()
-            },
-            {
-                id: 2,
-                memberId: 2,
-                memberName: "John Phiri", 
-                date: "2024-09-01",
-                serviceType: "Sabbath Morning",
-                status: "Present",
-                timestamp: new Date().toISOString()
+        // Rehearsal form submission
+        document.getElementById('rehearsal-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const rehearsal = {
+                date: document.getElementById('rehearsal-date').value,
+                time: document.getElementById('rehearsal-time').value,
+                location: document.getElementById('rehearsal-location').value,
+                notes: document.getElementById('rehearsal-notes').value
+            };
+            
+            try {
+                await db.rehearsals.add(rehearsal);
+                showAlert('rehearsal-alert', 'Rehearsal added successfully!', 'success');
+                document.getElementById('rehearsal-form').reset();
+                loadRehearsals();
+            } catch (error) {
+                showAlert('rehearsal-alert', 'Error adding rehearsal: ' + error, 'danger');
             }
-        ];
+        });
         
-        // New leave applications data structure
-        let leaveApplications = [
-            {
-                id: 1,
-                memberId: 1,
-                memberName: "Grace Mwansa",
-                startDate: "2024-09-15",
-                endDate: "2024-09-22",
-                leaveType: "Personal",
-                reason: "Family wedding in rural area",
-                status: "Pending",
-                applicationDate: "2024-09-01",
-                adminComments: "",
-                reviewedBy: "",
-                reviewDate: ""
-            },
-            {
-                id: 2,
-                memberId: 3,
-                memberName: "Mary Banda",
-                startDate: "2024-08-20",
-                endDate: "2024-08-27",
-                leaveType: "Medical",
-                reason: "Medical procedure and recovery",
-                status: "Approved",
-                applicationDate: "2024-08-10",
-                adminComments: "Approved for medical reasons. Please provide medical certificate upon return.",
-                reviewedBy: "Admin",
-                reviewDate: "2024-08-12"
+        // Performance form submission
+        document.getElementById('performance-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const performance = {
+                date: document.getElementById('performance-date').value,
+                time: document.getElementById('performance-time').value,
+                location: document.getElementById('performance-location').value,
+                description: document.getElementById('performance-description').value,
+                attire: document.getElementById('performance-attire').value
+            };
+            
+            try {
+                await db.performances.add(performance);
+                showAlert('performance-alert', 'Performance added successfully!', 'success');
+                document.getElementById('performance-form').reset();
+                loadPerformances();
+            } catch (error) {
+                showAlert('performance-alert', 'Error adding performance: ' + error, 'danger');
             }
-        ];
+        });
         
-        let currentUser = null;
-        let isAdmin = false;
-        let nextMemberId = 5;
-        let nextAttendanceId = 3;
-        let nextLeaveId = 3;
-        let settings = {
-            adminPassword: "admin123", // Default admin password
-            googleSheetUrl: "",
-            churchSettings: ""
-        };
+        // Load members into table
+        async function loadMembers() {
+            try {
+                const members = await db.members.toArray();
+                const membersList = document.getElementById('members-list');
+                membersList.innerHTML = '';
+                
+                members.forEach(member => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${member.name}</td>
+                        <td>${member.voicePart}</td>
+                        <td>${member.email}</td>
+                        <td>${member.phone}</td>
+                        <td class="actions">
+                            <button class="danger" onclick="deleteMember(${member.id})">Delete</button>
+                        </td>
+                    `;
+                    membersList.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Error loading members:', error);
+            }
+        }
         
-        // Initialize the system
-        document.getElementById('attendanceDate').valueAsDate = new Date();
+        // Load rehearsals into table
+        async function loadRehearsals() {
+            try {
+                const rehearsals = await db.rehearsals.toArray();
+                const rehearsalsList = document.getElementById('rehearsals-list');
+                rehearsalsList.innerHTML = '';
+                
+                rehearsals.forEach(rehearsal => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${rehearsal.date}</td>
+                        <td>${rehearsal.time}</td>
+                        <td>${rehearsal.location}</td>
+                        <td>${rehearsal.notes}</td>
+                        <td class="actions">
+                            <button class="danger" onclick="deleteRehearsal(${rehearsal.id})">Delete</button>
+                        </td>
+                    `;
+                    rehearsalsList.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Error loading rehearsals:', error);
+            }
+        }
         
-        function showMessage(message, type = 'success') {
-            const messageArea = document.getElementById('messageArea');
-            messageArea.innerHTML = `<div class="message ${type}">${message}</div>`;
+        // Load performances into table
+        async function loadPerformances() {
+            try {
+                const performances = await db.performances.toArray();
+                const performancesList = document.getElementById('performances-list');
+                performancesList.innerHTML = '';
+                
+                performances.forEach(performance => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${performance.date}</td>
+                        <td>${performance.time}</td>
+                        <td>${performance.location}</td>
+                        <td>${performance.description}</td>
+                        <td>${performance.attire}</td>
+                        <td class="actions">
+                            <button class="danger" onclick="deletePerformance(${performance.id})">Delete</button>
+                        </td>
+                    `;
+                    performancesList.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Error loading performances:', error);
+            }
+        }
+        
+        // Delete a member
+        async function deleteMember(id) {
+            if (confirm('Are you sure you want to delete this member?')) {
+                try {
+                    await db.members.delete(id);
+                    showAlert('member-alert', 'Member deleted successfully!', 'success');
+                    loadMembers();
+                } catch (error) {
+                    showAlert('member-alert', 'Error deleting member: ' + error, 'danger');
+                }
+            }
+        }
+        
+        // Delete a rehearsal
+        async function deleteRehearsal(id) {
+            if (confirm('Are you sure you want to delete this rehearsal?')) {
+                try {
+                    await db.rehearsals.delete(id);
+                    showAlert('rehearsal-alert', 'Rehearsal deleted successfully!', 'success');
+                    loadRehearsals();
+                } catch (error) {
+                    showAlert('rehearsal-alert', 'Error deleting rehearsal: ' + error, 'danger');
+                }
+            }
+        }
+        
+        // Delete a performance
+        async function deletePerformance(id) {
+            if (confirm('Are you sure you want to delete this performance?')) {
+                try {
+                    await db.performances.delete(id);
+                    showAlert('performance-alert', 'Performance deleted successfully!', 'success');
+                    loadPerformances();
+                } catch (error) {
+                    showAlert('performance-alert', 'Error deleting performance: ' + error, 'danger');
+                }
+            }
+        }
+        
+        // Show alert message
+        function showAlert(elementId, message, type) {
+            const alertElement = document.getElementById(elementId);
+            alertElement.textContent = message;
+            alertElement.className = `alert alert-${type}`;
+            alertElement.style.display = 'block';
+            
+            // Hide alert after 3 seconds
             setTimeout(() => {
-                messageArea.innerHTML = '';
-            }, 5000);
+                alertElement.style.display = 'none';
+            }, 3000);
         }
         
-        function loginUser() {
-            const name = document.getElementById('loginName').value.trim();
-            const phone = document.getElementById('loginPhone').value.trim();
-            const password = document.getElementById('loginPassword').value;
-            
-            if (!name || !phone) {
-                showMessage('Please enter both name and phone number.', 'error');
-                return;
-            }
-            
-            // Check for admin login
-            if (password === settings.adminPassword) {
-                isAdmin = true;
-                currentUser = { name: name, role: 'admin' };
-                document.getElementById('loginSection').classList.add('hidden');
-                document.getElementById('adminDashboard').classList.remove('hidden');
-                updateAdminDashboard();
-                showMessage(`Welcome Admin! Full system access granted.`, 'success');
-                return;
-            }
-            
-            // Regular member login
-            const member = members.find(m => 
-                m.name.toLowerCase() === name.toLowerCase() && 
-                m.phone === phone &&
-                m.status === 'Active'
-            );
-            
-            if (member) {
-                currentUser = member;
-                isAdmin = false;
-                document.getElementById('loginSection').classList.add('hidden');
-                document.getElementById('memberDashboard').classList.remove('hidden');
-                updateMemberDashboard();
-                showMessage(`Welcome back, ${member.name}!`);
-            } else {
-                showMessage('Member not found or inactive. Please check your details or register as a new member.', 'error');
-            }
-        }
-        
-        function showRegisterForm() {
-            document.getElementById('loginSection').classList.add('hidden');
-            document.getElementById('registrationSection').classList.remove('hidden');
-        }
-        
-        function showLoginForm() {
-            document.getElementById('registrationSection').classList.add('hidden');
-            document.getElementById('loginSection').classList.remove('hidden');
-        }
-        
-        function registerMember() {
-            const name = document.getElementById('memberName').value.trim();
-            const phone = document.getElementById('memberPhone').value.trim();
-            const voicePart = document.getElementById('voicePart').value;
-            const email = document.getElementById('memberEmail').value.trim();
-            
-            if (!name || !phone || !voicePart) {
-                showMessage('Please fill in all required fields.', 'error');
-                return;
-            }
-            
-            // Check if member already exists
-            const existingMember = members.find(m => 
-                m.name.toLowerCase() === name.toLowerCase() || m.phone === phone
-            );
-            
-            if (existingMember) {
-                showMessage('A member with this name or phone number already exists.', 'error');
-                return;
-            }
-            
-            const newMember = {
-                id: nextMemberId++,
-                name: name,
-                phone: phone,
-                voicePart: voicePart,
-                email: email,
-                registeredDate: new Date().toISOString().split('T')[0],
-                status: 'Active'
-            };
-            
-            members.push(newMember);
-            
-            // Simulate saving to Google Sheets
-            saveToGoogleSheets('members', newMember);
-            
-            showMessage(`Registration successful! Welcome to the choir, ${name}!`);
-            
-            // Clear form
-            document.getElementById('memberName').value = '';
-            document.getElementById('memberPhone').value = '';
-            document.getElementById('voicePart').value = '';
-            document.getElementById('memberEmail').value = '';
-            
-            // Switch to login
-            showLoginForm();
-        }
-        
-        function markMemberAttendance() {
-            if (!currentUser) return;
-            
-            const date = document.getElementById('attendanceDate').value;
-            const serviceType = document.getElementById('attendanceType').value;
-            
-            if (!date) {
-                showMessage('Please select a date.', 'error');
-                return;
-            }
-            
-            // Check if member is on approved leave for this date
-            const memberOnLeave = leaveApplications.find(leave => 
-                leave.memberId === currentUser.id &&
-                leave.status === 'Approved' &&
-                date >= leave.startDate &&
-                date <= leave.endDate
-            );
-            
-            if (memberOnLeave) {
-                showMessage('You are currently on approved leave for this date. Attendance cannot be marked.', 'warning');
-                return;
-            }
-            
-            // Check if already marked attendance for this date and service
-            const existingRecord = attendance.find(a => 
-                a.memberId === currentUser.id && 
-                a.date === date && 
-                a.serviceType === serviceType
-            );
-            
-            if (existingRecord) {
-                showMessage('You have already marked attendance for this date and service type.', 'error');
-                return;
-            }
-            
-            const attendanceRecord = {
-                id: nextAttendanceId++,
-                memberId: currentUser.id,
-                memberName: currentUser.name,
-                date: date,
-                serviceType: serviceType,
-                status: 'Present',
-                timestamp: new Date().toISOString()
-            };
-            
-            attendance.push(attendanceRecord);
-            
-            // Simulate saving to Google Sheets
-            saveToGoogleSheets('attendance', attendanceRecord);
-            
-            updateMemberDashboard();
-            showMessage(`Attendance marked successfully for ${serviceType} on ${date}!`);
-        }
-        
-        // Leave Management Functions
-        function showLeaveApplicationForm() {
-            document.getElementById('leaveApplicationForm').classList.remove('hidden');
-            // Set minimum date to tomorrow
-            const tomorrow = new Date();
-            tomorrow.setDate(tomorrow.getDate() + 1);
-            document.getElementById('leaveStartDate').min = tomorrow.toISOString().split('T')[0];
-        }
-        
-        function hideLeaveApplicationForm() {
-            document.getElementById('leaveApplicationForm').classList.add('hidden');
-            // Clear form
-            document.getElementById('leaveStartDate').value = '';
-            document.getElementById('leaveEndDate').value = '';
-            document.getElementById('leaveType').value = 'Personal';
-            document.getElementById('leaveReason').value = '';
-        }
-        
-        function submitLeaveApplication() {
-            if (!currentUser) return;
-            
-            const startDate = document.getElementById('leaveStartDate').value;
-            const endDate = document.getElementById('leaveEndDate').value;
-            const leaveType = document.getElementById('leaveType').value;
-            const reason = document.getElementById('leaveReason').value.trim();
-            
-            if (!startDate || !endDate || !reason) {
-                showMessage('Please fill in all required fields.', 'error');
-                return;
-            }
-            
-            if (new Date(endDate) < new Date(startDate)) {
-                showMessage('End date cannot be before start date.', 'error');
-                return;
-            }
-            
-            // Check for overlapping leave applications
-            const overlappingLeave = leaveApplications.find(leave => 
-                leave.memberId === currentUser.id &&
-                (leave.status === 'Pending' || leave.status === 'Approved') &&
-                ((startDate >= leave.startDate && startDate <= leave.endDate) ||
-                 (endDate >= leave.startDate && endDate <= leave.endDate) ||
-                 (startDate <= leave.startDate && endDate >= leave.endDate))
-            );
-            
-            if (overlappingLeave) {
-                showMessage('You have an overlapping leave application. Please check your existing applications.', 'error');
-                return;
-            }
-            
-            const leaveApplication = {
-                id: nextLeaveId++,
-                memberId: currentUser.id,
-                memberName: currentUser.name,
-                startDate: startDate,
-                endDate: endDate,
-                leaveType: leaveType,
-                reason: reason,
-                status: 'Pending',
-                applicationDate: new Date().toISOString().split('T')[0],
-                adminComments: '',
-                reviewedBy: '',
-                reviewDate: ''
-            };
-            
-            leaveApplications.push(leaveApplication);
-            
-            // Simulate saving to Google Sheets
-            saveToGoogleSheets('leave_applications', leaveApplication);
-            
-            hideLeaveApplicationForm();
-            updateMemberLeaveApplications();
-            showMessage('Leave application submitted successfully! You will be notified when it is reviewed.');
-        }
-        
-        function updateMemberLeaveApplications() {
-            if (!currentUser || isAdmin) return;
-            
-            const applicationsDiv = document.getElementById('memberLeaveApplications');
-            const memberApplications = leaveApplications
-                .filter(app => app.memberId === currentUser.id)
-                .sort((a, b) => new Date(b.applicationDate) - new Date(a.applicationDate));
-            
-            if (memberApplications.length === 0) {
-                applicationsDiv.innerHTML = '<p>No leave applications found.</p>';
-                return;
-            }
-            
-            applicationsDiv.innerHTML = memberApplications.map(app => `
-                <div class="leave-card">
-                    <div class="leave-header">
-                        <div>
-                            <strong>${app.leaveType} Leave</strong>
-                            <br>
-                            <small>Applied on: ${app.applicationDate}</small>
-                        </div>
-                        <span class="leave-status status-${app.status.toLowerCase()}">${app.status}</span>
-                    </div>
-                    <div class="leave-details">
-                        <p><strong>Period:</strong> ${app.startDate} to ${app.endDate}</p>
-                        <p><strong>Reason:</strong> ${app.reason}</p>
-                        ${app.adminComments ? `<p><strong>Admin Comments:</strong> ${app.adminComments}</p>` : ''}
-                        ${app.reviewDate ? `<p><strong>Reviewed on:</strong> ${app.reviewDate}</p>` : ''}
-                    </div>
-                    ${app.status === 'Pending' ? `
-                        <div class="leave-actions">
-                            <button onclick="cancelLeaveApplication(${app.id})" class="btn-danger">Cancel Application</button>
-                        </div>
-                    ` : ''}
-                </div>
-            `).join('');
-        }
-        
-        function cancelLeaveApplication(applicationId) {
-            if (confirm('Are you sure you want to cancel this leave application?')) {
-                leaveApplications = leaveApplications.filter(app => app.id !== applicationId);
-                updateMemberLeaveApplications();
-                showMessage('Leave application cancelled successfully.');
-            }
-        }
-        
-        // Member Dashboard Functions
-        function showMemberTab(tabName) {
-            // Hide all member tabs
-            document.getElementById('memberAttendanceTab').classList.add('hidden');
-            document.getElementById('memberLeaveTab').classList.add('hidden');
-            document.getElementById('memberProfileTab').classList.add('hidden');
-            document.getElementById('memberDirectoryTab').classList.add('hidden');
-            
-            // Remove active class from all tab buttons
-            document.querySelectorAll('#memberDashboard .tab').forEach(tab => tab.classList.remove('active'));
-            
-            // Show selected tab and set active
-            document.getElementById('member' + tabName.charAt(0).toUpperCase() + tabName.slice(1) + 'Tab').classList.remove('hidden');
-            event.target.classList.add('active');
-            
-            if (tabName === 'profile') {
-                updateMemberProfile();
-            } else if (tabName === 'directory') {
-                updateMemberDirectory();
-            } else if (tabName === 'attendance') {
-                updateMemberAttendanceHistory();
-            } else if (tabName === 'leave') {
-                updateMemberLeaveApplications();
-            }
-        }
-        
-        function updateMemberDashboard() {
-            updateMemberAttendanceHistory();
-            updateMemberProfile();
-            updateMemberDirectory();
-            updateMemberLeaveApplications();
-        }
-        
-        function updateMemberAttendanceHistory() {
-            const recordsDiv = document.getElementById('memberRecords');
-            if (!currentUser || isAdmin) return;
-            
-            const userAttendance = attendance.filter(a => a.memberId === currentUser.id)
-                                            .sort((a, b) => new Date(b.date) - new Date(a.date));
-            
-            if (userAttendance.length === 0) {
-                recordsDiv.innerHTML = '<p>No attendance records found.</p>';
-                return;
-            }
-            
-            const totalServices = userAttendance.length;
-            const presentCount = userAttendance.filter(a => a.status === 'Present').length;
-            const attendanceRate = ((presentCount / totalServices) * 100).toFixed(1);
-            
-            recordsDiv.innerHTML = `
-                <div style="margin-bottom: 1rem; padding: 1rem; background: rgba(102, 126, 234, 0.1); border-radius: 8px;">
-                    <strong>My Attendance Summary:</strong> ${presentCount} out of ${totalServices} services attended (${attendanceRate}% attendance rate)
-                </div>
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Service Type</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${userAttendance.map(record => `
-                            <tr>
-                                <td>${record.date}</td>
-                                <td>${record.serviceType}</td>
-                                <td style="color: ${record.status === 'Present' ? '#27ae60' : '#e74c3c'}; font-weight: bold;">
-                                    ${record.status}
-                                </td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-            `;
-        }
-        
-        function updateMemberProfile() {
-            const profileDiv = document.getElementById('profileInfo');
-            if (!currentUser || isAdmin) return;
-            
-            const member = members.find(m => m.id === currentUser.id);
-            if (!member) return;
-            
-            profileDiv.innerHTML = `
-                <div class="stat-card" style="text-align: left;">
-                    <p><strong>Name:</strong> ${member.name}</p>
-                    <p><strong>Phone:</strong> ${member.phone}</p>
-                    <p><strong>Voice Part:</strong> ${member.voicePart}</p>
-                    <p><strong>Email:</strong> ${member.email || 'Not provided'}</p>
-                    <p><strong>Member Since:</strong> ${member.registeredDate}</p>
-                    <p><strong>Status:</strong> <span style="color: ${member.status === 'Active' ? '#27ae60' : '#e74c3c'}">${member.status}</span></p>
-                </div>
-            `;
-        }
-        
-        function updateMemberDirectory() {
-            const directoryDiv = document.getElementById('publicDirectory');
-            const activeMembers = members.filter(m => m.status === 'Active');
-            
-            if (activeMembers.length === 0) {
-                directoryDiv.innerHTML = '<p>No active members found.</p>';
-                return;
-            }
-            
-            directoryDiv.innerHTML = `
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Voice Part</th>
-                            <th>Phone</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${activeMembers.map(member => `
-                            <tr>
-                                <td>${member.name}</td>
-                                <td>${member.voicePart}</td>
-                                <td>${member.phone}</td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-            `;
-        }
-        
-        // Admin Dashboard Functions
-        function showAdminTab(tabName) {
-            // Hide all admin tabs
-            document.getElementById('adminOverviewTab').classList.add('hidden');
-            document.getElementById('adminMembersTab').classList.add('hidden');
-            document.getElementById('adminAttendanceTab').classList.add('hidden');
-            document.getElementById('adminLeaveTab').classList.add('hidden');
-            document.getElementById('adminReportsTab').classList.add('hidden');
-            document.getElementById('adminSettingsTab').classList.add('hidden');
-            
-            // Remove active class from all tab buttons
-            document.querySelectorAll('#adminDashboard .tab').forEach(tab => tab.classList.remove('active'));
-            
-            // Show selected tab and set active
-            document.getElementById('admin' + tabName.charAt(0).toUpperCase() + tabName.slice(1) + 'Tab').classList.remove('hidden');
-            event.target.classList.add('active');
-            
-            // Update tab-specific content
-            if (tabName === 'members') {
-                updateMembersTable();
-            } else if (tabName === 'attendance') {
-                updateAttendanceDisplay();
-            } else if (tabName === 'leave') {
-                updateLeaveApplicationsDisplay();
-            } else if (tabName === 'reports') {
-                updateReportsDisplay();
-            } else if (tabName === 'overview') {
-                updateOverviewStats();
-            }
-        }
-        
-        function updateAdminDashboard() {
-            updateOverviewStats();
-            updateMembersTable();
-            updateAttendanceDisplay();
-            updateLeaveApplicationsDisplay();
-        }
-        
-        function updateOverviewStats() {
-            const totalMembers = members.length;
-            const activeMembers = members.filter(m => m.status === 'Active').length;
-            
-            // Calculate this week's attendance
-            const oneWeekAgo = new Date();
-            oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-            const thisWeekAttendance = attendance.filter(a => 
-                new Date(a.date) >= oneWeekAgo
-            ).length;
-            
-            // Calculate pending leave requests
-            const pendingLeave = leaveApplications.filter(app => app.status === 'Pending').length;
-            
-            // Calculate members currently on leave
-            const today = new Date().toISOString().split('T')[0];
-            const membersOnLeave = leaveApplications.filter(app => 
-                app.status === 'Approved' &&
-                today >= app.startDate &&
-                today <= app.endDate
-            ).length;
-            
-            // Calculate average attendance rate
-            const totalAttendanceRecords = attendance.length;
-            const presentRecords = attendance.filter(a => a.status === 'Present').length;
-            const averageAttendance = totalAttendanceRecords > 0 
-                ? ((presentRecords / totalAttendanceRecords) * 100).toFixed(0)
-                : 0;
-            
-            document.getElementById('totalMembers').textContent = totalMembers;
-            document.getElementById('activeMembers').textContent = activeMembers;
-            document.getElementById('thisWeekAttendance').textContent = thisWeekAttendance;
-            document.getElementById('pendingLeaveRequests').textContent = pendingLeave;
-            document.getElementById('averageAttendance').textContent = averageAttendance + '%';
-            document.getElementById('membersOnLeave').textContent = membersOnLeave;
-        }
-        
-        function updateLeaveApplicationsDisplay() {
-            const leaveDiv = document.getElementById('leaveApplicationsDisplay');
-            
-            // Apply filters
-            const statusFilter = document.getElementById('leaveStatusFilter').value;
-            const typeFilter = document.getElementById('leaveTypeFilter').value;
-            
-            let filteredApplications = [...leaveApplications];
-            
-            if (statusFilter) {
-                filteredApplications = filteredApplications.filter(app => app.status === statusFilter);
-            }
-            
-            if (typeFilter) {
-                filteredApplications = filteredApplications.filter(app => app.leaveType === typeFilter);
-            }
-            
-            // Sort by application date (newest first)
-            filteredApplications.sort((a, b) => new Date(b.applicationDate) - new Date(a.applicationDate));
-            
-            if (filteredApplications.length === 0) {
-                leaveDiv.innerHTML = '<p>No leave applications found.</p>';
-                return;
-            }
-            
-            leaveDiv.innerHTML = filteredApplications.map(app => `
-                <div class="leave-card">
-                    <div class="leave-header">
-                        <div>
-                            <strong>${app.memberName}</strong> - ${app.leaveType} Leave
-                            <br>
-                            <small>Applied on: ${app.applicationDate}</small>
-                        </div>
-                        <span class="leave-status status-${app.status.toLowerCase()}">${app.status}</span>
-                    </div>
-                    <div class="leave-details">
-                        <p><strong>Period:</strong> ${app.startDate} to ${app.endDate}</p>
-                        <p><strong>Reason:</strong> ${app.reason}</p>
-                        ${app.adminComments ? `<p><strong>Admin Comments:</strong> ${app.adminComments}</p>` : ''}
-                        ${app.reviewDate ? `<p><strong>Reviewed on:</strong> ${app.reviewDate} by ${app.reviewedBy}</p>` : ''}
-                    </div>
-                    ${app.status === 'Pending' ? `
-                        <div class="leave-actions">
-                            <button onclick="approveLeaveApplication(${app.id})" class="btn-success">Approve</button>
-                            <button onclick="denyLeaveApplication(${app.id})" class="btn-danger">Deny</button>
-                            <button onclick="addLeaveComments(${app.id})" class="btn-secondary">Add Comments</button>
-                        </div>
-                    ` : `
-                        <div class="leave-actions">
-                            <button onclick="addLeaveComments(${app.id})" class="btn-secondary">Edit Comments</button>
-                            <button onclick="deleteLeaveApplication(${app.id})" class="btn-danger">Delete</button>
-                        </div>
-                    `}
-                </div>
-            `).join('');
-        }
-        
-        function filterLeaveApplications() {
-            updateLeaveApplicationsDisplay();
-        }
-        
-        function approveLeaveApplication(applicationId) {
-            const application = leaveApplications.find(app => app.id === applicationId);
-            if (!application) return;
-            
-            const comments = prompt('Add approval comments (optional):', '');
-            
-            application.status = 'Approved';
-            application.adminComments = comments || 'Leave approved';
-            application.reviewedBy = 'Admin';
-            application.reviewDate = new Date().toISOString().split('T')[0];
-            
-            // Save to Google Sheets
-            saveToGoogleSheets('leave_applications', application);
-            
-            updateLeaveApplicationsDisplay();
-            updateOverviewStats();
-            showMessage(`Leave application for ${application.memberName} has been approved.`);
-        }
-        
-        function denyLeaveApplication(applicationId) {
-            const application = leaveApplications.find(app => app.id === applicationId);
-            if (!application) return;
-            
-            const comments = prompt('Please provide reason for denial:', '');
-            if (!comments) {
-                showMessage('Please provide a reason for denial.', 'error');
-                return;
-            }
-            
-            application.status = 'Denied';
-            application.adminComments = comments;
-            application.reviewedBy = 'Admin';
-            application.reviewDate = new Date().toISOString().split('T')[0];
-            
-            // Save to Google Sheets
-            saveToGoogleSheets('leave_applications', application);
-            
-            updateLeaveApplicationsDisplay();
-            updateOverviewStats();
-            showMessage(`Leave application for ${application.memberName} has been denied.`);
-        }
-        
-        function addLeaveComments(applicationId) {
-            const application = leaveApplications.find(app => app.id === applicationId);
-            if (!application) return;
-            
-            const comments = prompt('Add/Edit comments:', application.adminComments);
-            if (comments !== null) {
-                application.adminComments = comments;
-                
-                // Save to Google Sheets
-                saveToGoogleSheets('leave_applications', application);
-                
-                updateLeaveApplicationsDisplay();
-                showMessage('Comments updated successfully.');
-            }
-        }
-        
-        function deleteLeaveApplication(applicationId) {
-            if (confirm('Are you sure you want to delete this leave application?')) {
-                leaveApplications = leaveApplications.filter(app => app.id !== applicationId);
-                updateLeaveApplicationsDisplay();
-                updateOverviewStats();
-                showMessage('Leave application deleted successfully.');
-            }
-        }
-        
-        function updateMembersTable() {
-            const tbody = document.getElementById('membersTableBody');
-            let filteredMembers = [...members];
-            
-            // Apply filters
-            const voicePartFilter = document.getElementById('voicePartFilter').value;
-            const statusFilter = document.getElementById('statusFilter').value;
-            
-            if (voicePartFilter) {
-                filteredMembers = filteredMembers.filter(m => m.voicePart === voicePartFilter);
-            }
-            
-            if (statusFilter) {
-                filteredMembers = filteredMembers.filter(m => m.status === statusFilter);
-            }
-            
-            tbody.innerHTML = filteredMembers.map(member => `
-                <tr>
-                    <td>${member.name}</td>
-                    <td>${member.phone}</td>
-                    <td>${member.voicePart}</td>
-                    <td>${member.email || 'N/A'}</td>
-                    <td>${member.registeredDate}</td>
-                    <td><span style="color: ${member.status === 'Active' ? '#27ae60' : '#e74c3c'}">${member.status}</span></td>
-                    <td>
-                        <button onclick="editMember(${member.id})" class="btn-secondary" style="padding: 0.3rem 0.6rem; margin: 0.2rem;">Edit</button>
-                        <button onclick="toggleMemberStatus(${member.id})" class="btn-secondary" style="padding: 0.3rem 0.6rem; margin: 0.2rem;">
-                            ${member.status === 'Active' ? 'Deactivate' : 'Activate'}
-                        </button>
-                    </td>
-                </tr>
-            `).join('');
-        }
-        
-        function filterMembers() {
-            updateMembersTable();
-        }
-        
-        function toggleMemberStatus(memberId) {
-            const member = members.find(m => m.id === memberId);
-            if (member) {
-                member.status = member.status === 'Active' ? 'Inactive' : 'Active';
-                updateMembersTable();
-                updateOverviewStats();
-                showMessage(`${member.name} status updated to ${member.status}`);
-            }
-        }
-        
-        function editMember(memberId) {
-            const member = members.find(m => m.id === memberId);
-            if (!member) return;
-            
-            const newName = prompt('Enter new name:', member.name);
-            if (newName && newName !== member.name) {
-                member.name = newName;
-            }
-            
-            const newPhone = prompt('Enter new phone:', member.phone);
-            if (newPhone && newPhone !== member.phone) {
-                member.phone = newPhone;
-            }
-            
-            const newEmail = prompt('Enter new email:', member.email);
-            if (newEmail !== null) {
-                member.email = newEmail;
-            }
-            
-            updateMembersTable();
-            showMessage(`${member.name} updated successfully`);
-        }
-        
-        function showAddMemberForm() {
-            const name = prompt('Enter member name:');
-            if (!name) return;
-            
-            const phone = prompt('Enter phone number:');
-            if (!phone) return;
-            
-            const voicePart = prompt('Enter voice part (Soprano/Alto/Tenor/Bass):');
-            if (!voicePart) return;
-            
-            const email = prompt('Enter email (optional):') || '';
-            
-            const newMember = {
-                id: nextMemberId++,
-                name: name,
-                phone: phone,
-                voicePart: voicePart,
-                email: email,
-                registeredDate: new Date().toISOString().split('T')[0],
-                status: 'Active'
-            };
-            
-            members.push(newMember);
-            updateMembersTable();
-            updateOverviewStats();
-            showMessage(`${name} added successfully!`);
-        }
-        
-        function updateAttendanceDisplay() {
-            const attendanceDiv = document.getElementById('attendanceDisplay');
-            
-            // Apply filters
-            const dateFilter = document.getElementById('attendanceDateFilter').value;
-            const serviceTypeFilter = document.getElementById('serviceTypeFilter').value;
-            
-            let filteredAttendance = [...attendance];
-            
-            if (dateFilter) {
-                filteredAttendance = filteredAttendance.filter(a => a.date === dateFilter);
-            }
-            
-            if (serviceTypeFilter) {
-                filteredAttendance = filteredAttendance.filter(a => a.serviceType === serviceTypeFilter);
-            }
-            
-            // Sort by date (newest first)
-            filteredAttendance.sort((a, b) => new Date(b.date) - new Date(a.date));
-            
-            if (filteredAttendance.length === 0) {
-                attendanceDiv.innerHTML = '<p>No attendance records found.</p>';
-                return;
-            }
-            
-            attendanceDiv.innerHTML = `
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Member</th>
-                            <th>Service Type</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${filteredAttendance.map(record => `
-                            <tr>
-                                <td>${record.date}</td>
-                                <td>${record.memberName}</td>
-                                <td>${record.serviceType}</td>
-                                <td style="color: ${record.status === 'Present' ? '#27ae60' : '#e74c3c'}; font-weight: bold;">
-                                    ${record.status}
-                                </td>
-                                <td>
-                                    <button onclick="deleteAttendanceRecord(${record.id})" class="btn-danger" style="padding: 0.3rem 0.6rem;">Delete</button>
-                                </td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-            `;
-        }
-        
-        function filterAttendance() {
-            updateAttendanceDisplay();
-        }
-        
-        function deleteAttendanceRecord(recordId) {
-            if (confirm('Are you sure you want to delete this attendance record?')) {
-                attendance = attendance.filter(a => a.id !== recordId);
-                updateAttendanceDisplay();
-                updateOverviewStats();
-                showMessage('Attendance record deleted');
-            }
-        }
-        
-        function showBulkAttendanceForm() {
-            const date = prompt('Enter date (YYYY-MM-DD):', new Date().toISOString().split('T')[0]);
-            if (!date) return;
-            
-            const serviceType = prompt('Enter service type:', 'Sabbath Morning');
-            if (!serviceType) return;
-            
-            const activeMembers = members.filter(m => m.status === 'Active');
-            
-            // Check for members on leave for this date
-            const membersOnLeave = leaveApplications.filter(leave => 
-                leave.status === 'Approved' &&
-                date >= leave.startDate &&
-                date <= leave.endDate
-            ).map(leave => leave.memberId);
-            
-            let attendanceList = '';
-            activeMembers.forEach(member => {
-                if (membersOnLeave.includes(member.id)) {
-                    attendanceList += `${member.name} - On Leave (skipped)\n`;
-                    return;
-                }
-                
-                const present = confirm(`Mark ${member.name} as present for ${serviceType} on ${date}?`);
-                if (present) {
-                    const attendanceRecord = {
-                        id: nextAttendanceId++,
-                        memberId: member.id,
-                        memberName: member.name,
-                        date: date,
-                        serviceType: serviceType,
-                        status: 'Present',
-                        timestamp: new Date().toISOString()
-                    };
-                    attendance.push(attendanceRecord);
-                    attendanceList += `${member.name} - Present\n`;
-                }
-            });
-            
-            updateAttendanceDisplay();
-            updateOverviewStats();
-            showMessage(`Bulk attendance marked for ${date}`);
-        }
-        
-        function generateReport() {
-            const startDate = document.getElementById('reportStartDate').value;
-            const endDate = document.getElementById('reportEndDate').value;
-            
-            if (!startDate || !endDate) {
-                showMessage('Please select both start and end dates', 'error');
-                return;
-            }
-            
-            const filteredAttendance = attendance.filter(a => 
-                a.date >= startDate && a.date <= endDate
-            );
-            
-            const filteredLeave = leaveApplications.filter(app => 
-                app.applicationDate >= startDate && app.applicationDate <= endDate
-            );
-            
-            const reportsDiv = document.getElementById('reportsDisplay');
-            
-            // Generate statistics
-            const totalRecords = filteredAttendance.length;
-            const presentRecords = filteredAttendance.filter(a => a.status === 'Present').length;
-            const attendanceRate = totalRecords > 0 ? ((presentRecords / totalRecords) * 100).toFixed(1) : 0;
-            
-            // Leave statistics
-            const totalLeaveApplications = filteredLeave.length;
-            const approvedLeave = filteredLeave.filter(app => app.status === 'Approved').length;
-            const pendingLeave = filteredLeave.filter(app => app.status === 'Pending').length;
-            const deniedLeave = filteredLeave.filter(app => app.status === 'Denied').length;
-            
-            // Group by service type
-            const serviceTypes = {};
-            filteredAttendance.forEach(record => {
-                if (!serviceTypes[record.serviceType]) {
-                    serviceTypes[record.serviceType] = { total: 0, present: 0 };
-                }
-                serviceTypes[record.serviceType].total++;
-                if (record.status === 'Present') {
-                    serviceTypes[record.serviceType].present++;
-                }
-            });
-            
-            reportsDiv.innerHTML = `
-                <div class="member-stats">
-                    <div class="stat-card">
-                        <div class="stat-number">${totalRecords}</div>
-                        <div class="stat-label">Total Attendance Records</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number">${presentRecords}</div>
-                        <div class="stat-label">Present Records</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number">${attendanceRate}%</div>
-                        <div class="stat-label">Attendance Rate</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number">${totalLeaveApplications}</div>
-                        <div class="stat-label">Leave Applications</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number">${approvedLeave}</div>
-                        <div class="stat-label">Approved Leave</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number">${pendingLeave}</div>
-                        <div class="stat-label">Pending Leave</div>
-                    </div>
-                </div>
-                
-                <h3>Service Type Breakdown</h3>
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>Service Type</th>
-                            <th>Total Records</th>
-                            <th>Present</th>
-                            <th>Rate</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${Object.entries(serviceTypes).map(([serviceType, stats]) => `
-                            <tr>
-                                <td>${serviceType}</td>
-                                <td>${stats.total}</td>
-                                <td>${stats.present}</td>
-                                <td>${((stats.present / stats.total) * 100).toFixed(1)}%</td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-                
-                <h3>Leave Applications Summary</h3>
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>Status</th>
-                            <th>Count</th>
-                            <th>Percentage</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Approved</td>
-                            <td>${approvedLeave}</td>
-                            <td>${totalLeaveApplications > 0 ? ((approvedLeave / totalLeaveApplications) * 100).toFixed(1) : 0}%</td>
-                        </tr>
-                        <tr>
-                            <td>Pending</td>
-                            <td>${pendingLeave}</td>
-                            <td>${totalLeaveApplications > 0 ? ((pendingLeave / totalLeaveApplications) * 100).toFixed(1) : 0}%</td>
-                        </tr>
-                        <tr>
-                            <td>Denied</td>
-                            <td>${deniedLeave}</td>
-                            <td>${totalLeaveApplications > 0 ? ((deniedLeave / totalLeaveApplications) * 100).toFixed(1) : 0}%</td>
-                        </tr>
-                    </tbody>
-                </table>
-            `;
-        }
-        
-        function updateReportsDisplay() {
-            const today = new Date();
-            const lastMonth = new Date();
-            lastMonth.setMonth(lastMonth.getMonth() - 1);
-            
-            document.getElementById('reportStartDate').value = lastMonth.toISOString().split('T')[0];
-            document.getElementById('reportEndDate').value = today.toISOString().split('T')[0];
-            
-            generateReport();
-        }
-        
-        // Export Functions
-        function exportMembersCSV() {
-            const csv = convertToCSV(members, ['id', 'name', 'phone', 'voicePart', 'email', 'registeredDate', 'status']);
-            downloadCSV(csv, 'choir_members.csv');
-            showMessage('Members exported successfully!');
-        }
-        
-        function exportAttendanceCSV() {
-            const csv = convertToCSV(attendance, ['id', 'memberName', 'date', 'serviceType', 'status']);
-            downloadCSV(csv, 'choir_attendance.csv');
-            showMessage('Attendance exported successfully!');
-        }
-        
-        function exportLeaveCSV() {
-            const csv = convertToCSV(leaveApplications, ['id', 'memberName', 'startDate', 'endDate', 'leaveType', 'reason', 'status', 'applicationDate', 'adminComments']);
-            downloadCSV(csv, 'choir_leave_applications.csv');
-            showMessage('Leave applications exported successfully!');
-        }
-        
-        function convertToCSV(data, headers) {
-            const csvHeaders = headers.join(',');
-            const csvData = data.map(row => 
-                headers.map(header => `"${row[header] || ''}"`).join(',')
-            ).join('\n');
-            return csvHeaders + '\n' + csvData;
-        }
-        
-        function downloadCSV(csv, filename) {
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const url = window.URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = filename;
-            link.click();
-            window.URL.revokeObjectURL(url);
-        }
-        
-        function exportAllData() {
-            const data = {
-                members: members,
-                attendance: attendance,
-                leaveApplications: leaveApplications,
-                settings: settings,
-                exportDate: new Date().toISOString()
-            };
-            
-            const json = JSON.stringify(data, null, 2);
-            const blob = new Blob([json], { type: 'application/json' });
-            const url = window.URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = 'choir_data_backup.json';
-            link.click();
-            window.URL.revokeObjectURL(url);
-            
-            showMessage('Data backup created successfully!');
-        }
-        
-        function backupData() {
-            exportAllData();
-        }
-        
-        function importData() {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = '.json';
-            input.onchange = function(event) {
-                const file = event.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        try {
-                            const data = JSON.parse(e.target.result);
-                            if (data.members && data.attendance) {
-                                members = data.members;
-                                attendance = data.attendance;
-                                if (data.leaveApplications) {
-                                    leaveApplications = data.leaveApplications;
-                                }
-                                if (data.settings) {
-                                    settings = { ...settings, ...data.settings };
-                                }
-                                updateAdminDashboard();
-                                showMessage('Data imported successfully!');
-                            } else {
-                                showMessage('Invalid data format', 'error');
-                            }
-                        } catch (error) {
-                            showMessage('Error importing data: ' + error.message, 'error');
-                        }
-                    };
-                    reader.readAsText(file);
-                }
-            };
-            input.click();
-        }
-        
-        // Google Sheets Integration (Simulated)
-        function saveToGoogleSheets(sheetName, data) {
-            if (!settings.googleSheetUrl) {
-                console.log(`Would save to Google Sheets (${sheetName}):`, data);
-                return;
-            }
-            
-            // In a real implementation, this would use Google Sheets API
-            console.log(`Saving to Google Sheets: ${sheetName}`, data);
-            showMessage('Data saved to Google Sheets!');
-        }
-        
-        function initializeGoogleSheets() {
-            const sheetUrl = document.getElementById('googleSheetUrl').value;
-            if (!sheetUrl) {
-                showMessage('Please enter a Google Sheets URL first', 'error');
-                return;
-            }
-            
-            settings.googleSheetUrl = sheetUrl;
-            
-            // Simulate initializing sheets structure
-            showMessage('Google Sheets initialized! Structure created for Members, Attendance, and Leave Applications sheets.');
-        }
-        
-        function saveSettings() {
-            const googleSheetUrl = document.getElementById('googleSheetUrl').value;
-            const adminPassword = document.getElementById('adminPassword').value;
-            const churchSettings = document.getElementById('churchSettings').value;
-            
-            if (adminPassword) {
-                settings.adminPassword = adminPassword;
-            }
-            
-            settings.googleSheetUrl = googleSheetUrl;
-            settings.churchSettings = churchSettings;
-            
-            showMessage('Settings saved successfully!');
-        }
-        
-        function logout() {
-            currentUser = null;
-            isAdmin = false;
-            document.getElementById('memberDashboard').classList.add('hidden');
-            document.getElementById('adminDashboard').classList.add('hidden');
-            document.getElementById('loginSection').classList.remove('hidden');
-            document.getElementById('loginName').value = '';
-            document.getElementById('loginPhone').value = '';
-            document.getElementById('loginPassword').value = '';
-            showMessage('You have been logged out successfully.');
-        }
-        
-        // Initialize with sample data and set up the interface
-        updateOverviewStats();
+        // Initialize the application
+        window.onload = function() {
+            loadMembers();
+            loadRehearsals();
+            loadPerformances();
+        };
     </script>
 </body>
 </html>
-
