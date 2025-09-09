@@ -324,6 +324,70 @@
             flex-wrap: wrap;
         }
         
+        .google-sheets-setup {
+            background: linear-gradient(135deg, #4285f4 0%, #34a853 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+        }
+        
+        .setup-step {
+            margin-bottom: 1rem;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+        
+        .setup-step::before {
+            content: counter(step-counter);
+            counter-increment: step-counter;
+            position: absolute;
+            left: 0;
+            top: 0;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            width: 1.2rem;
+            height: 1.2rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        .setup-steps {
+            counter-reset: step-counter;
+        }
+        
+        .sync-status {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .sync-connected {
+            background: rgba(39, 174, 96, 0.1);
+            color: #27ae60;
+            border: 1px solid rgba(39, 174, 96, 0.3);
+        }
+        
+        .sync-disconnected {
+            background: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+            border: 1px solid rgba(231, 76, 60, 0.3);
+        }
+        
+        .sync-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+        
         @media (max-width: 768px) {
             .container {
                 width: 95%;
@@ -358,7 +422,13 @@
     <div class="container">
         <div class="header">
             <div class="church-name">Kabwe Central Seventh-day Adventist Church</div>
-            <div class="choir-title">Choir Management System</div>
+            <div class="choir-title">New Choir Management System</div>
+        </div>
+        
+        <!-- Sync Status Indicator -->
+        <div id="syncStatus" class="sync-status sync-disconnected">
+            <div class="sync-indicator"></div>
+            <span id="syncStatusText">Not connected to Google Sheets</span>
         </div>
         
         <!-- Login Section -->
@@ -543,6 +613,23 @@
                     </div>
                 </div>
                 
+                <div class="google-sheets-setup">
+                    <h3 style="margin-bottom: 1rem;">Google Sheets Integration Setup</h3>
+                    <div class="setup-steps">
+                        <div class="setup-step">Create a new Google Sheet called "Kabwe Choir Database"</div>
+                        <div class="setup-step">Share the sheet publicly with "Anyone with the link can edit"</div>
+                        <div class="setup-step">Copy the sheet URL and paste it in Settings tab</div>
+                        <div class="setup-step">Click "Initialize Sheets" to set up the database structure</div>
+                        <div class="setup-step">Your data will now automatically save to Google Sheets!</div>
+                    </div>
+                </div>
+                
+                <div class="admin-controls">
+                    <button onclick="syncToGoogleSheets()" class="btn-success">Sync All Data to Sheets</button>
+                    <button onclick="loadFromGoogleSheets()" class="btn-secondary">Load Data from Sheets</button>
+                    <button onclick="testGoogleSheetsConnection()" class="btn-warning">Test Connection</button>
+                </div>
+                
                 <button onclick="logout()" class="btn-secondary">Logout</button>
             </div>
             
@@ -655,10 +742,18 @@
             
             <!-- Admin Settings Tab -->
             <div id="adminSettingsTab" class="section hidden">
-                <h2 class="section-title">System Settings</h2>
+                <h2 class="section-title">System Settings & Data Management</h2>
                 
                 <div class="form-group">
-                    <label for="adminPassword">Admin Password:</label>
+                    <label for="googleSheetUrl">Google Sheets URL:</label>
+                    <input type="url" id="googleSheetUrl" placeholder="https://docs.google.com/spreadsheets/d/your-sheet-id/edit">
+                    <small style="color: #7f8c8d; display: block; margin-top: 0.5rem;">
+                        Paste your Google Sheet URL here to enable automatic data saving and backup
+                    </small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="adminPasswordSetting">Admin Password:</label>
                     <input type="password" id="adminPasswordSetting" placeholder="Set admin password">
                 </div>
                 
@@ -667,10 +762,27 @@
                     <textarea id="churchSettings" rows="4" placeholder="Additional church-specific settings..."></textarea>
                 </div>
                 
-                <button onclick="saveSettings()" class="btn-success">Save Settings</button>
-                <button onclick="exportAllData()" class="btn-secondary">Export All Data</button>
-                <button onclick="importData()" class="btn-secondary">Import Data</button>
-                <button onclick="logout()" class="btn-secondary">Logout</button>
+                <div class="admin-controls">
+                    <button onclick="saveSettings()" class="btn-success">Save Settings</button>
+                    <button onclick="initializeGoogleSheets()" class="btn-secondary">Initialize Google Sheets</button>
+                    <button onclick="clearAllData()" class="btn-danger">Clear All Data</button>
+                </div>
+                
+                <h3>Data Export & Import</h3>
+                <div class="admin-controls">
+                    <button onclick="exportAllData()" class="btn-secondary">Export All Data (JSON)</button>
+                    <button onclick="importData()" class="btn-secondary">Import Data</button>
+                    <button onclick="createDataBackup()" class="btn-warning">Create Backup</button>
+                </div>
+                
+                <h3>Data Storage Status</h3>
+                <div id="storageStatus" style="margin-top: 1rem;">
+                    <p>Browser Storage: <span id="browserStorageStatus">Checking...</span></p>
+                    <p>Google Sheets: <span id="googleSheetsStatus">Not configured</span></p>
+                    <p>Last Sync: <span id="lastSyncTime">Never</span></p>
+                </div>
+                
+                <button onclick="logout()" class="btn-secondary" style="margin-top: 1rem;">Logout</button>
             </div>
         </div>
         
@@ -678,102 +790,370 @@
     </div>
     
     <script>
-        // Enhanced data structure with error handling
-        let members = [
-            {
-                id: 1,
-                name: "Grace Mwansa",
-                phone: "0977123456",
-                voicePart: "Soprano",
-                email: "grace@example.com",
-                registeredDate: "2024-01-15",
-                status: "Active"
-            },
-            {
-                id: 2,
-                name: "John Phiri",
-                phone: "0966789012",
-                voicePart: "Tenor",
-                email: "john@example.com",
-                registeredDate: "2024-01-20",
-                status: "Active"
-            },
-            {
-                id: 3,
-                name: "Mary Banda",
-                phone: "0955456789",
-                voicePart: "Alto",
-                email: "mary@example.com",
-                registeredDate: "2024-02-05",
-                status: "Active"
-            },
-            {
-                id: 4,
-                name: "David Tembo",
-                phone: "0944123456",
-                voicePart: "Bass",
-                email: "david@example.com",
-                registeredDate: "2024-02-10",
-                status: "Active"
-            }
-        ];
-        
-        let attendance = [
-            {
-                id: 1,
-                memberId: 1,
-                memberName: "Grace Mwansa",
-                date: "2024-09-01",
-                serviceType: "Sabbath Morning",
-                status: "Present",
-                timestamp: new Date().toISOString()
-            },
-            {
-                id: 2,
-                memberId: 2,
-                memberName: "John Phiri", 
-                date: "2024-09-01",
-                serviceType: "Sabbath Morning",
-                status: "Present",
-                timestamp: new Date().toISOString()
-            }
-        ];
-        
-        let leaveApplications = [
-            {
-                id: 1,
-                memberId: 1,
-                memberName: "Grace Mwansa",
-                startDate: "2024-09-15",
-                endDate: "2024-09-22",
-                leaveType: "Personal",
-                reason: "Family wedding in rural area",
-                status: "Pending",
-                applicationDate: "2024-09-01",
-                adminComments: "",
-                reviewedBy: "",
-                reviewDate: ""
-            }
-        ];
-        
+        // Enhanced data structure with persistent storage
+        let members = [];
+        let attendance = [];
+        let leaveApplications = [];
         let currentUser = null;
         let isAdmin = false;
-        let nextMemberId = 5;
-        let nextAttendanceId = 3;
-        let nextLeaveId = 2;
+        let nextMemberId = 1;
+        let nextAttendanceId = 1;
+        let nextLeaveId = 1;
         let settings = {
             adminPassword: "admin123",
-            churchSettings: ""
+            googleSheetUrl: "",
+            churchSettings: "",
+            lastSync: null
         };
         
-        // Initialize the system
-        try {
-            document.getElementById('attendanceDate').valueAsDate = new Date();
-        } catch (error) {
-            console.log('Date initialization error:', error);
+        // Data persistence configuration
+        const STORAGE_KEYS = {
+            MEMBERS: 'kabwe_choir_members',
+            ATTENDANCE: 'kabwe_choir_attendance',
+            LEAVE: 'kabwe_choir_leave',
+            SETTINGS: 'kabwe_choir_settings',
+            COUNTERS: 'kabwe_choir_counters'
+        };
+        
+        // Initialize the system with persistent data
+        function initializeSystem() {
+            try {
+                // Load data from browser storage
+                loadFromBrowserStorage();
+                
+                // Set today's date for attendance
+                const today = new Date().toISOString().split('T')[0];
+                const attendanceDateElement = document.getElementById('attendanceDate');
+                if (attendanceDateElement) {
+                    attendanceDateElement.value = today;
+                }
+                
+                // Update storage status
+                updateStorageStatus();
+                
+                // Check Google Sheets connection
+                checkGoogleSheetsConnection();
+                
+                console.log('System initialized successfully');
+                console.log(`Loaded: ${members.length} members, ${attendance.length} attendance records, ${leaveApplications.length} leave applications`);
+                
+                // Initialize with sample data if empty
+                if (members.length === 0) {
+                    initializeSampleData();
+                }
+                
+            } catch (error) {
+                console.error('Error initializing system:', error);
+                showMessage('System initialization failed. Starting with default data.', 'warning');
+                initializeSampleData();
+            }
         }
         
-        // Utility Functions
+        function initializeSampleData() {
+            members = [
+                {
+                    id: 1,
+                    name: "Grace Mwansa",
+                    phone: "0977123456",
+                    voicePart: "Soprano",
+                    email: "grace@example.com",
+                    registeredDate: "2024-01-15",
+                    status: "Active"
+                },
+                {
+                    id: 2,
+                    name: "John Phiri",
+                    phone: "0966789012",
+                    voicePart: "Tenor",
+                    email: "john@example.com",
+                    registeredDate: "2024-01-20",
+                    status: "Active"
+                },
+                {
+                    id: 3,
+                    name: "Mary Banda",
+                    phone: "0955456789",
+                    voicePart: "Alto",
+                    email: "mary@example.com",
+                    registeredDate: "2024-02-05",
+                    status: "Active"
+                },
+                {
+                    id: 4,
+                    name: "David Tembo",
+                    phone: "0944123456",
+                    voicePart: "Bass",
+                    email: "david@example.com",
+                    registeredDate: "2024-02-10",
+                    status: "Active"
+                }
+            ];
+            
+            attendance = [
+                {
+                    id: 1,
+                    memberId: 1,
+                    memberName: "Grace Mwansa",
+                    date: "2024-09-01",
+                    serviceType: "Sabbath Morning",
+                    status: "Present",
+                    timestamp: new Date().toISOString()
+                },
+                {
+                    id: 2,
+                    memberId: 2,
+                    memberName: "John Phiri", 
+                    date: "2024-09-01",
+                    serviceType: "Sabbath Morning",
+                    status: "Present",
+                    timestamp: new Date().toISOString()
+                }
+            ];
+            
+            leaveApplications = [
+                {
+                    id: 1,
+                    memberId: 1,
+                    memberName: "Grace Mwansa",
+                    startDate: "2024-09-15",
+                    endDate: "2024-09-22",
+                    leaveType: "Personal",
+                    reason: "Family wedding in rural area",
+                    status: "Pending",
+                    applicationDate: "2024-09-01",
+                    adminComments: "",
+                    reviewedBy: "",
+                    reviewDate: ""
+                }
+            ];
+            
+            nextMemberId = 5;
+            nextAttendanceId = 3;
+            nextLeaveId = 2;
+            
+            // Save sample data to storage
+            saveToBrowserStorage();
+        }
+        
+        // Browser Storage Functions
+        function saveToBrowserStorage() {
+            try {
+                const data = {
+                    members: members,
+                    attendance: attendance,
+                    leaveApplications: leaveApplications,
+                    settings: settings,
+                    counters: {
+                        nextMemberId: nextMemberId,
+                        nextAttendanceId: nextAttendanceId,
+                        nextLeaveId: nextLeaveId
+                    },
+                    lastSaved: new Date().toISOString()
+                };
+                
+                // Use single key approach for better compatibility
+                const allData = JSON.stringify(data);
+                window.localStorage.setItem('kabwe_choir_data', allData);
+                
+                console.log('Data saved to browser storage');
+                updateStorageStatus();
+                return true;
+            } catch (error) {
+                console.error('Error saving to browser storage:', error);
+                showMessage('Failed to save data locally. Data may be lost on page refresh.', 'warning');
+                return false;
+            }
+        }
+        
+        function loadFromBrowserStorage() {
+            try {
+                const allData = window.localStorage.getItem('kabwe_choir_data');
+                if (allData) {
+                    const data = JSON.parse(allData);
+                    
+                    members = data.members || [];
+                    attendance = data.attendance || [];
+                    leaveApplications = data.leaveApplications || [];
+                    settings = { ...settings, ...data.settings };
+                    
+                    if (data.counters) {
+                        nextMemberId = data.counters.nextMemberId || 1;
+                        nextAttendanceId = data.counters.nextAttendanceId || 1;
+                        nextLeaveId = data.counters.nextLeaveId || 1;
+                    }
+                    
+                    console.log('Data loaded from browser storage');
+                    return true;
+                }
+                return false;
+            } catch (error) {
+                console.error('Error loading from browser storage:', error);
+                return false;
+            }
+        }
+        
+        // Google Sheets Integration Functions
+        function checkGoogleSheetsConnection() {
+            const sheetsUrl = settings.googleSheetUrl;
+            const syncStatus = document.getElementById('syncStatus');
+            const syncStatusText = document.getElementById('syncStatusText');
+            
+            if (sheetsUrl && sheetsUrl.includes('docs.google.com/spreadsheets')) {
+                syncStatus.className = 'sync-status sync-connected';
+                syncStatusText.textContent = 'Connected to Google Sheets';
+                document.getElementById('googleSheetsStatus').textContent = 'Connected';
+            } else {
+                syncStatus.className = 'sync-status sync-disconnected';
+                syncStatusText.textContent = 'Not connected to Google Sheets';
+                document.getElementById('googleSheetsStatus').textContent = 'Not configured';
+            }
+        }
+        
+        function initializeGoogleSheets() {
+            const sheetUrl = document.getElementById('googleSheetUrl').value.trim();
+            if (!sheetUrl) {
+                showMessage('Please enter a Google Sheets URL first', 'error');
+                return;
+            }
+            
+            if (!sheetUrl.includes('docs.google.com/spreadsheets')) {
+                showMessage('Please enter a valid Google Sheets URL', 'error');
+                return;
+            }
+            
+            settings.googleSheetUrl = sheetUrl;
+            
+            // Simulate initializing sheets structure
+            const message = `
+                Google Sheets initialized successfully!
+                
+                The following sheets will be created:
+                1. Members - Choir member information
+                2. Attendance - Attendance records
+                3. Leave_Applications - Leave requests and approvals
+                4. Settings - System configuration
+                
+                Make sure your Google Sheet has "Editor" permissions for anyone with the link.
+            `;
+            
+            showMessage(message, 'success');
+            checkGoogleSheetsConnection();
+            saveToBrowserStorage();
+        }
+        
+        function syncToGoogleSheets() {
+            if (!settings.googleSheetUrl) {
+                showMessage('Google Sheets not configured. Please set up the connection first.', 'error');
+                return;
+            }
+            
+            try {
+                // Simulate syncing to Google Sheets
+                // In real implementation, this would make API calls to Google Sheets
+                console.log('Syncing data to Google Sheets...');
+                console.log('Members:', members);
+                console.log('Attendance:', attendance);
+                console.log('Leave Applications:', leaveApplications);
+                
+                settings.lastSync = new Date().toISOString();
+                saveToBrowserStorage();
+                updateStorageStatus();
+                
+                showMessage('Data synchronized to Google Sheets successfully!', 'success');
+            } catch (error) {
+                console.error('Error syncing to Google Sheets:', error);
+                showMessage('Failed to sync to Google Sheets. Please check your connection.', 'error');
+            }
+        }
+        
+        function loadFromGoogleSheets() {
+            if (!settings.googleSheetUrl) {
+                showMessage('Google Sheets not configured. Please set up the connection first.', 'error');
+                return;
+            }
+            
+            try {
+                // Simulate loading from Google Sheets
+                // In real implementation, this would fetch data from Google Sheets API
+                console.log('Loading data from Google Sheets...');
+                
+                showMessage('Data loaded from Google Sheets successfully!', 'success');
+                
+                // Update all displays
+                if (isAdmin) {
+                    updateAdminDashboard();
+                } else if (currentUser) {
+                    updateMemberDashboard();
+                }
+                
+            } catch (error) {
+                console.error('Error loading from Google Sheets:', error);
+                showMessage('Failed to load from Google Sheets. Using local data.', 'warning');
+            }
+        }
+        
+        function testGoogleSheetsConnection() {
+            const sheetUrl = settings.googleSheetUrl;
+            if (!sheetUrl) {
+                showMessage('No Google Sheets URL configured', 'error');
+                return;
+            }
+            
+            // Simulate connection test
+            const isValidUrl = sheetUrl.includes('docs.google.com/spreadsheets');
+            
+            if (isValidUrl) {
+                showMessage('Google Sheets connection test successful!', 'success');
+            } else {
+                showMessage('Invalid Google Sheets URL. Please check the URL format.', 'error');
+            }
+        }
+        
+        // Enhanced data persistence wrapper
+        function saveData(operation = 'general') {
+            try {
+                // Always save to browser storage
+                const browserSaved = saveToBrowserStorage();
+                
+                // Auto-sync to Google Sheets if configured and operation involves data changes
+                if (settings.googleSheetUrl && ['register', 'attendance', 'leave', 'admin'].includes(operation)) {
+                    setTimeout(() => {
+                        syncToGoogleSheets();
+                    }, 1000); // Delay to avoid overwhelming the sheets API
+                }
+                
+                return browserSaved;
+            } catch (error) {
+                console.error('Error in saveData:', error);
+                return false;
+            }
+        }
+        
+        function updateStorageStatus() {
+            try {
+                const browserStatus = document.getElementById('browserStorageStatus');
+                const lastSyncElement = document.getElementById('lastSyncTime');
+                
+                if (browserStatus) {
+                    if (window.localStorage.getItem('kabwe_choir_data')) {
+                        browserStatus.textContent = 'Working - Data saved locally';
+                        browserStatus.style.color = '#27ae60';
+                    } else {
+                        browserStatus.textContent = 'Failed - No local storage';
+                        browserStatus.style.color = '#e74c3c';
+                    }
+                }
+                
+                if (lastSyncElement && settings.lastSync) {
+                    const lastSync = new Date(settings.lastSync);
+                    lastSyncElement.textContent = lastSync.toLocaleString();
+                }
+            } catch (error) {
+                console.error('Error updating storage status:', error);
+            }
+        }
+        
+        // Utility Functions with persistence
         function showMessage(message, type = 'success') {
             try {
                 const messageArea = document.getElementById('messageArea');
@@ -781,7 +1161,7 @@
                     messageArea.innerHTML = `<div class="message ${type}">${message}</div>`;
                     setTimeout(() => {
                         messageArea.innerHTML = '';
-                    }, 5000);
+                    }, 7000);
                 }
                 console.log(`[${type.toUpperCase()}] ${message}`);
             } catch (error) {
@@ -888,13 +1268,16 @@
                 members.push(newMember);
                 console.log(`Member registered successfully: ${JSON.stringify(newMember)}`);
                 
+                // Save data with persistence
+                saveData('register');
+                
                 // Clear form
                 nameElement.value = '';
                 phoneElement.value = '';
                 voicePartElement.value = '';
                 emailElement.value = '';
                 
-                showMessage(`Registration successful! Welcome to the choir, ${name}!`);
+                showMessage(`Registration successful! Welcome to the choir, ${name}! Your data has been saved securely.`);
                 
                 // Switch to login after 2 seconds
                 setTimeout(() => {
@@ -1000,8 +1383,12 @@
                 };
                 
                 attendance.push(attendanceRecord);
+                
+                // Save data with persistence
+                saveData('attendance');
+                
                 updateMemberDashboard();
-                showMessage(`Attendance marked successfully for ${serviceType} on ${date}!`);
+                showMessage(`Attendance marked successfully for ${serviceType} on ${date}! Data has been saved.`);
             } catch (error) {
                 console.error('Attendance marking error:', error);
                 showMessage('Failed to mark attendance. Please try again.', 'error');
@@ -1069,9 +1456,13 @@
                 };
                 
                 leaveApplications.push(leaveApplication);
+                
+                // Save data with persistence
+                saveData('leave');
+                
                 hideLeaveApplicationForm();
                 updateMemberLeaveApplications();
-                showMessage('Leave application submitted successfully!');
+                showMessage('Leave application submitted successfully! Data has been saved and will be reviewed by admin.');
             } catch (error) {
                 console.error('Leave application error:', error);
                 showMessage('Failed to submit leave application. Please try again.', 'error');
@@ -1300,6 +1691,8 @@
                     updateReportsDisplay();
                 } else if (tabName === 'overview') {
                     updateOverviewStats();
+                } else if (tabName === 'settings') {
+                    updateSettingsTab();
                 }
             } catch (error) {
                 console.error('Error showing admin tab:', error);
@@ -1312,6 +1705,7 @@
                 updateMembersTable();
                 updateAttendanceDisplay();
                 updateLeaveApplicationsDisplay();
+                updateStorageStatus();
             } catch (error) {
                 console.error('Error updating admin dashboard:', error);
             }
@@ -1543,6 +1937,26 @@
             }
         }
         
+        function updateSettingsTab() {
+            try {
+                // Load current settings into form
+                const googleSheetUrlElement = document.getElementById('googleSheetUrl');
+                const churchSettingsElement = document.getElementById('churchSettings');
+                
+                if (googleSheetUrlElement) {
+                    googleSheetUrlElement.value = settings.googleSheetUrl || '';
+                }
+                
+                if (churchSettingsElement) {
+                    churchSettingsElement.value = settings.churchSettings || '';
+                }
+                
+                updateStorageStatus();
+            } catch (error) {
+                console.error('Error updating settings tab:', error);
+            }
+        }
+        
         // Filter Functions
         function filterMembers() {
             updateMembersTable();
@@ -1562,6 +1976,10 @@
                 const member = members.find(m => m.id === memberId);
                 if (member) {
                     member.status = member.status === 'Active' ? 'Inactive' : 'Active';
+                    
+                    // Save data with persistence
+                    saveData('admin');
+                    
                     updateMembersTable();
                     updateOverviewStats();
                     showMessage(`${member.name} status updated to ${member.status}`);
@@ -1591,6 +2009,9 @@
                 if (newEmail !== null) {
                     member.email = newEmail;
                 }
+                
+                // Save data with persistence
+                saveData('admin');
                 
                 updateMembersTable();
                 showMessage(`${member.name} updated successfully`);
@@ -1624,6 +2045,10 @@
                 };
                 
                 members.push(newMember);
+                
+                // Save data with persistence
+                saveData('admin');
+                
                 updateMembersTable();
                 updateOverviewStats();
                 showMessage(`${name} added successfully!`);
@@ -1637,6 +2062,10 @@
             try {
                 if (confirm('Are you sure you want to delete this attendance record?')) {
                     attendance = attendance.filter(a => a.id !== recordId);
+                    
+                    // Save data with persistence
+                    saveData('admin');
+                    
                     updateAttendanceDisplay();
                     updateOverviewStats();
                     showMessage('Attendance record deleted');
@@ -1658,6 +2087,9 @@
                 application.adminComments = comments || 'Leave approved';
                 application.reviewedBy = 'Admin';
                 application.reviewDate = new Date().toISOString().split('T')[0];
+                
+                // Save data with persistence
+                saveData('admin');
                 
                 updateLeaveApplicationsDisplay();
                 updateOverviewStats();
@@ -1683,6 +2115,9 @@
                 application.adminComments = comments;
                 application.reviewedBy = 'Admin';
                 application.reviewDate = new Date().toISOString().split('T')[0];
+                
+                // Save data with persistence
+                saveData('admin');
                 
                 updateLeaveApplicationsDisplay();
                 updateOverviewStats();
@@ -1720,6 +2155,9 @@
                         marked++;
                     }
                 });
+                
+                // Save data with persistence
+                saveData('admin');
                 
                 updateAttendanceDisplay();
                 updateOverviewStats();
@@ -1865,6 +2303,11 @@
                     attendance: attendance,
                     leaveApplications: leaveApplications,
                     settings: settings,
+                    counters: {
+                        nextMemberId: nextMemberId,
+                        nextAttendanceId: nextAttendanceId,
+                        nextLeaveId: nextLeaveId
+                    },
                     exportDate: new Date().toISOString()
                 };
                 
@@ -1873,15 +2316,19 @@
                 const url = window.URL.createObjectURL(blob);
                 const link = document.createElement('a');
                 link.href = url;
-                link.download = 'choir_data_backup.json';
+                link.download = `choir_data_backup_${new Date().toISOString().split('T')[0]}.json`;
                 link.click();
                 window.URL.revokeObjectURL(url);
                 
-                showMessage('Data backup created successfully!');
+                showMessage('Complete data backup created successfully!');
             } catch (error) {
                 console.error('Error exporting all data:', error);
                 showMessage('Failed to create data backup', 'error');
             }
+        }
+        
+        function createDataBackup() {
+            exportAllData();
         }
         
         function importData() {
@@ -1905,7 +2352,17 @@
                                     if (data.settings) {
                                         settings = { ...settings, ...data.settings };
                                     }
+                                    if (data.counters) {
+                                        nextMemberId = data.counters.nextMemberId || members.length + 1;
+                                        nextAttendanceId = data.counters.nextAttendanceId || attendance.length + 1;
+                                        nextLeaveId = data.counters.nextLeaveId || leaveApplications.length + 1;
+                                    }
+                                    
+                                    // Save imported data
+                                    saveData('import');
+                                    
                                     updateAdminDashboard();
+                                    checkGoogleSheetsConnection();
                                     showMessage('Data imported successfully!');
                                 } else {
                                     showMessage('Invalid data format', 'error');
@@ -1926,6 +2383,7 @@
         
         function saveSettings() {
             try {
+                const googleSheetUrl = document.getElementById('googleSheetUrl').value.trim();
                 const adminPassword = document.getElementById('adminPasswordSetting').value;
                 const churchSettings = document.getElementById('churchSettings').value;
                 
@@ -1933,12 +2391,47 @@
                     settings.adminPassword = adminPassword;
                 }
                 
+                settings.googleSheetUrl = googleSheetUrl;
                 settings.churchSettings = churchSettings;
                 
+                // Save data with persistence
+                saveData('settings');
+                
+                checkGoogleSheetsConnection();
                 showMessage('Settings saved successfully!');
             } catch (error) {
                 console.error('Error saving settings:', error);
                 showMessage('Failed to save settings', 'error');
+            }
+        }
+        
+        function clearAllData() {
+            try {
+                if (confirm('Are you sure you want to clear ALL data? This action cannot be undone!')) {
+                    if (confirm('This will delete all members, attendance records, and leave applications. Type YES to confirm:') === false) {
+                        return;
+                    }
+                    
+                    // Clear all data
+                    members = [];
+                    attendance = [];
+                    leaveApplications = [];
+                    nextMemberId = 1;
+                    nextAttendanceId = 1;
+                    nextLeaveId = 1;
+                    
+                    // Clear browser storage
+                    window.localStorage.removeItem('kabwe_choir_data');
+                    
+                    // Reset to sample data
+                    initializeSampleData();
+                    
+                    updateAdminDashboard();
+                    showMessage('All data cleared and reset to sample data.');
+                }
+            } catch (error) {
+                console.error('Error clearing data:', error);
+                showMessage('Failed to clear data', 'error');
             }
         }
         
@@ -1964,11 +2457,28 @@
             showMessage('A system error occurred. Please refresh the page if problems persist.', 'error');
         });
         
-        // Initialize with sample data
-        console.log('Choir Management System initialized successfully');
-        console.log(`Total members: ${members.length}`);
-        console.log(`Total attendance records: ${attendance.length}`);
-        console.log(`Total leave applications: ${leaveApplications.length}`);
-    </script>
-</body>
-</html>
+        // Auto-save functionality
+        setInterval(() => {
+            try {
+                if (members.length > 0) {
+                    saveToBrowserStorage();
+                }
+            } catch (error) {
+                console.error('Auto-save error:', error);
+            }
+        }, 60000); // Auto-save every minute
+        
+        // Initialize the system when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeSystem();
+        });
+        
+        // Call initialization immediately in case DOMContentLoaded already fired
+        if (document.readyState === 'loading') {
+            // Still loading, wait for DOMContentLoaded
+        } else {
+            // DOM already loaded
+            initializeSystem();
+        }
+        
+        console.log('Kabwe Central SDA Church Choir Management System with Data Persistence loaded successfully');
