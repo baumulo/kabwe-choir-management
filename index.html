@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kabwe Central SDA Church Choir - Enhanced Management System</title>
+    <title>Kabwe Central SDA Church Choir Management System</title>
     <style>
         * {
             margin: 0;
@@ -850,8 +850,6 @@
         
         // Initialize the system
         document.getElementById('attendanceDate').valueAsDate = new Date();
-        // Load data from Firebase
-            loadDataFromFirebase();
         
         function showMessage(message, type = 'success') {
             const messageArea = document.getElementById('messageArea');
@@ -945,14 +943,7 @@
             members.push(newMember);
             
             // Simulate saving to Google Sheets
-          // Save to Firebase
-            try {
-              const docRef = await db.collection('members').add(newMember);
-              newMember.id = docRef.id;
-            } catch (error) {
-              showMessage('Error registering member. Please try again.', 'error');
-              return;
-            }
+            saveToGoogleSheets('members', newMember);
             
             showMessage(`Registration successful! Welcome to the choir, ${name}!`);
             
@@ -1015,15 +1006,8 @@
             attendance.push(attendanceRecord);
             
             // Simulate saving to Google Sheets
-            // Save to Firebase
-            try {
-              const docRef = await db.collection('attendance').add(attendanceRecord);
-              attendanceRecord.id = docRef.id;
-            } catch (error) {
-              showMessage('Error marking attendance. Please try again.', 'error');
-              return;
-            }
-                        
+            saveToGoogleSheets('attendance', attendanceRecord);
+            
             updateMemberDashboard();
             showMessage(`Attendance marked successfully for ${serviceType} on ${date}!`);
         }
@@ -1096,14 +1080,7 @@
             leaveApplications.push(leaveApplication);
             
             // Simulate saving to Google Sheets
-            // Save to Firebase
-            try {
-              const docRef = await db.collection('leave_applications').add(leaveApplication);
-              leaveApplication.id = docRef.id;
-            } catch (error) {
-              showMessage('Error submitting leave application. Please try again.', 'error');
-              return;
-            }
+            saveToGoogleSheets('leave_applications', leaveApplication);
             
             hideLeaveApplicationForm();
             updateMemberLeaveApplications();
@@ -1281,40 +1258,7 @@
                 </table>
             `;
         }
-        // Load data from Firebase
-async function loadDataFromFirebase() {
-  try {
-    // Load members
-    const membersSnapshot = await db.collection('members').get();
-    const firebaseMembers = [];
-    membersSnapshot.forEach((doc) => {
-      firebaseMembers.push({ id: doc.id, ...doc.data() });
-    });
-    
-    // Load attendance
-    const attendanceSnapshot = await db.collection('attendance').get();
-    const firebaseAttendance = [];
-    attendanceSnapshot.forEach((doc) => {
-      firebaseAttendance.push({ id: doc.id, ...doc.data() });
-    });
-    
-    // Load leave applications
-    const leaveSnapshot = await db.collection('leave_applications').get();
-    const firebaseLeave = [];
-    leaveSnapshot.forEach((doc) => {
-      firebaseLeave.push({ id: doc.id, ...doc.data() });
-    });
-    
-    // Only replace local data if Firebase has data
-    if (firebaseMembers.length > 0) members = firebaseMembers;
-    if (firebaseAttendance.length > 0) attendance = firebaseAttendance;
-    if (firebaseLeave.length > 0) leaveApplications = firebaseLeave;
-    
-    console.log('Data loaded from Firebase');
-  } catch (error) {
-    console.error('Error loading data:', error);
-  }
-}
+        
         // Admin Dashboard Functions
         function showAdminTab(tabName) {
             // Hide all admin tabs
@@ -1960,41 +1904,11 @@ async function loadDataFromFirebase() {
         }
         
         // Google Sheets Integration (Simulated)
-        // Firebase Configuration - REPLACE WITH YOUR CONFIG
-           
-            // Import the functions you need from the SDKs you need
-            import { initializeApp } from "firebase/app";
-            // TODO: Add SDKs for Firebase products that you want to use
-            // https://firebase.google.com/docs/web/setup#available-libraries
-            
-            // Your web app's Firebase configuration
-            const firebaseConfig = {
-              apiKey: "AIzaSyBC5TmONGQGV3LDKC8veGk6PqCLwO_HrN4",
-              authDomain: "kabwe-choir-system.firebaseapp.com",
-              projectId: "kabwe-choir-system",
-              storageBucket: "kabwe-choir-system.firebasestorage.app",
-              messagingSenderId: "912367036057",
-              appId: "1:912367036057:web:a8971bdb7af8aeef413a08"
-            };
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-        
-// Initialize Firebase
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-
-// Save to database function
-async function saveToDatabase(collection, data) {
-  try {
-    const docRef = await db.collection(collection).add(data);
-    console.log('Data saved with ID:', docRef.id);
-    return docRef.id;
-  } catch (error) {
-    console.error('Error saving data:', error);
-    showMessage('Error saving data to database', 'error');
-  }
-}
+        function saveToGoogleSheets(sheetName, data) {
+            if (!settings.googleSheetUrl) {
+                console.log(`Would save to Google Sheets (${sheetName}):`, data);
+                return;
+            }
             
             // In a real implementation, this would use Google Sheets API
             console.log(`Saving to Google Sheets: ${sheetName}`, data);
@@ -2044,10 +1958,5 @@ async function saveToDatabase(collection, data) {
         // Initialize with sample data and set up the interface
         updateOverviewStats();
     </script>
-    <!-- Firebase SDKs -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 </body>
 </html>
-
-
