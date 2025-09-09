@@ -13,6 +13,8 @@
             --dark: #343a40;
             --success: #28a745;
             --danger: #dc3545;
+            --warning: #ffc107;
+            --info: #17a2b8;
         }
         
         * {
@@ -41,12 +43,21 @@
             text-align: center;
             margin-bottom: 2rem;
             border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .auth-buttons {
+            display: flex;
+            gap: 10px;
         }
         
         .tabs {
             display: flex;
             margin-bottom: 1rem;
             border-bottom: 1px solid #ddd;
+            flex-wrap: wrap;
         }
         
         .tab {
@@ -87,7 +98,7 @@
             font-weight: bold;
         }
         
-        input, select {
+        input, select, textarea {
             width: 100%;
             padding: 0.5rem;
             border: 1px solid #ddd;
@@ -114,6 +125,23 @@
         
         button.danger:hover {
             background-color: #bd2130;
+        }
+        
+        button.success {
+            background-color: var(--success);
+        }
+        
+        button.success:hover {
+            background-color: #218838;
+        }
+        
+        button.warning {
+            background-color: var(--warning);
+            color: var(--dark);
+        }
+        
+        button.warning:hover {
+            background-color: #e0a800;
         }
         
         table {
@@ -155,6 +183,12 @@
             border: 1px solid #f5c6cb;
         }
         
+        .alert-info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
         .actions {
             display: flex;
             gap: 5px;
@@ -164,6 +198,41 @@
             margin-bottom: 1rem;
             padding-bottom: 0.5rem;
             border-bottom: 2px solid var(--secondary);
+        }
+        
+        .card {
+            background: white;
+            border-radius: 5px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .status-badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+        
+        .status-pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-approved {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .status-rejected {
+            background-color: #f8d7da;
+            color: #721c24;
         }
         
         @media (max-width: 768px) {
@@ -179,6 +248,10 @@
             .tab.active {
                 border-radius: 5px 5px 0 0;
             }
+            
+            .actions {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
@@ -186,184 +259,307 @@
     <div class="container">
         <header>
             <h1>Choir Management System</h1>
+            <div class="auth-buttons">
+                <button id="login-btn" style="display: none;">Login</button>
+                <button id="register-btn" style="display: none;">Register</button>
+                <button id="logout-btn" style="display: none;">Logout</button>
+            </div>
         </header>
         
-        <div class="tabs">
-            <div class="tab active" data-tab="members">Members</div>
-            <div class="tab" data-tab="rehearsals">Rehearsals</div>
-            <div class="tab" data-tab="performances">Performances</div>
-            <div class="tab" data-tab="attendance">Attendance</div>
-        </div>
-        
-        <div id="members-tab" class="tab-content active">
-            <h2 class="section-title">Choir Members</h2>
-            <form id="member-form">
-                <div class="form-group">
-                    <label for="name">Full Name</label>
-                    <input type="text" id="name" required>
-                </div>
-                <div class="form-group">
-                    <label for="voicePart">Voice Part</label>
-                    <select id="voicePart" required>
-                        <option value="">Select Voice Part</option>
-                        <option value="Soprano">Soprano</option>
-                        <option value="Alto">Alto</option>
-                        <option value="Tenor">Tenor</option>
-                        <option value="Bass">Bass</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" id="email">
-                </div>
-                <div class="form-group">
-                    <label for="phone">Phone</label>
-                    <input type="tel" id="phone">
-                </div>
-                <button type="submit">Add Member</button>
-            </form>
-            
-            <div id="member-alert" class="alert" style="display: none;"></div>
-            
-            <h3 class="section-title">Member List</h3>
-            <table id="members-table">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Voice Part</th>
-                        <th>Email</th>
-                        <th>Phone</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="members-list">
-                    <!-- Members will be populated here -->
-                </tbody>
-            </table>
-        </div>
-        
-        <div id="rehearsals-tab" class="tab-content">
-            <h2 class="section-title">Rehearsals</h2>
-            <form id="rehearsal-form">
-                <div class="form-group">
-                    <label for="rehearsal-date">Date</label>
-                    <input type="date" id="rehearsal-date" required>
-                </div>
-                <div class="form-group">
-                    <label for="rehearsal-time">Time</label>
-                    <input type="time" id="rehearsal-time" required>
-                </div>
-                <div class="form-group">
-                    <label for="rehearsal-location">Location</label>
-                    <input type="text" id="rehearsal-location" required>
-                </div>
-                <div class="form-group">
-                    <label for="rehearsal-notes">Notes</label>
-                    <input type="text" id="rehearsal-notes">
-                </div>
-                <button type="submit">Add Rehearsal</button>
-            </form>
-            
-            <div id="rehearsal-alert" class="alert" style="display: none;"></div>
-            
-            <h3 class="section-title">Upcoming Rehearsals</h3>
-            <table id="rehearsals-table">
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Time</th>
-                        <th>Location</th>
-                        <th>Notes</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="rehearsals-list">
-                    <!-- Rehearsals will be populated here -->
-                </tbody>
-            </table>
-        </div>
-        
-        <div id="performances-tab" class="tab-content">
-            <h2 class="section-title">Performances</h2>
-            <form id="performance-form">
-                <div class="form-group">
-                    <label for="performance-date">Date</label>
-                    <input type="date" id="performance-date" required>
-                </div>
-                <div class="form-group">
-                    <label for="performance-time">Time</label>
-                    <input type="time" id="performance-time" required>
-                </div>
-                <div class="form-group">
-                    <label for="performance-location">Location</label>
-                    <input type="text" id="performance-location" required>
-                </div>
-                <div class="form-group">
-                    <label for="performance-description">Description</label>
-                    <input type="text" id="performance-description" required>
-                </div>
-                <div class="form-group">
-                    <label for="performance-attire">Attire</label>
-                    <input type="text" id="performance-attire">
-                </div>
-                <button type="submit">Add Performance</button>
-            </form>
-            
-            <div id="performance-alert" class="alert" style="display: none;"></div>
-            
-            <h3 class="section-title">Upcoming Performances</h3>
-            <table id="performances-table">
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Time</th>
-                        <th>Location</th>
-                        <th>Description</th>
-                        <th>Attire</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="performances-list">
-                    <!-- Performances will be populated here -->
-                </tbody>
-            </table>
-        </div>
-        
-        <div id="attendance-tab" class="tab-content">
-            <h2 class="section-title">Attendance</h2>
-            <div class="form-group">
-                <label for="attendance-event">Select Event</label>
-                <select id="attendance-event">
-                    <option value="">Select Event</option>
-                    <!-- Events will be populated here -->
-                </select>
+        <div id="auth-forms">
+            <div class="card">
+                <h2 class="section-title">Login</h2>
+                <form id="login-form">
+                    <div class="form-group">
+                        <label for="login-email">Email</label>
+                        <input type="email" id="login-email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password">Password</label>
+                        <input type="password" id="login-password" required>
+                    </div>
+                    <button type="submit">Login</button>
+                </form>
             </div>
             
-            <div id="attendance-section" style="display: none;">
-                <h3 class="section-title">Mark Attendance</h3>
-                <div id="attendance-list">
-                    <!-- Attendance checkboxes will be populated here -->
-                </div>
-                <button id="save-attendance">Save Attendance</button>
+            <div class="card">
+                <h2 class="section-title">Register</h2>
+                <form id="register-form">
+                    <div class="form-group">
+                        <label for="register-name">Full Name</label>
+                        <input type="text" id="register-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-email">Email</label>
+                        <input type="email" id="register-email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-password">Password</label>
+                        <input type="password" id="register-password" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-voicePart">Voice Part</label>
+                        <select id="register-voicePart" required>
+                            <option value="">Select Voice Part</option>
+                            <option value="Soprano">Soprano</option>
+                            <option value="Alto">Alto</option>
+                            <option value="Tenor">Tenor</option>
+                            <option value="Bass">Bass</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-phone">Phone</label>
+                        <input type="tel" id="register-phone">
+                    </div>
+                    <button type="submit">Register</button>
+                </form>
+            </div>
+        </div>
+        
+        <div id="main-app" style="display: none;">
+            <div class="user-info">
+                <span>Welcome, <span id="user-name"></span>!</span>
+                <span id="user-role" class="status-badge"></span>
             </div>
             
-            <div id="attendance-alert" class="alert" style="display: none;"></div>
+            <div class="tabs">
+                <div class="tab active" data-tab="dashboard">Dashboard</div>
+                <div class="tab" data-tab="attendance">Attendance</div>
+                <div class="tab" data-tab="leave">Leave Requests</div>
+                <div class="tab" data-tab="members" id="members-tab-btn" style="display: none;">Members</div>
+                <div class="tab" data-tab="events" id="events-tab-btn" style="display: none;">Events</div>
+                <div class="tab" data-tab="admin" id="admin-tab-btn" style="display: none;">Admin</div>
+            </div>
             
-            <h3 class="section-title">Attendance Records</h3>
-            <table id="attendance-table">
-                <thead>
-                    <tr>
-                        <th>Event</th>
-                        <th>Date</th>
-                        <th>Type</th>
-                        <th>Present</th>
-                        <th>Absent</th>
-                    </tr>
-                </thead>
-                <tbody id="attendance-records">
-                    <!-- Attendance records will be populated here -->
-                </tbody>
-            </table>
+            <div id="dashboard-tab" class="tab-content active">
+                <h2 class="section-title">Dashboard</h2>
+                <div class="card">
+                    <h3>Upcoming Events</h3>
+                    <table id="upcoming-events-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Event</th>
+                                <th>Location</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="upcoming-events-list">
+                            <!-- Events will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="card">
+                    <h3>My Leave Requests</h3>
+                    <table id="my-leave-requests-table">
+                        <thead>
+                            <tr>
+                                <th>Date Submitted</th>
+                                <th>Start Date</th>
+                                <th>End Date</th>
+                                <th>Reason</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="my-leave-requests-list">
+                            <!-- Leave requests will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div id="attendance-tab" class="tab-content">
+                <h2 class="section-title">Mark Attendance</h2>
+                <div class="card">
+                    <div class="form-group">
+                        <label for="attendance-event">Select Event</label>
+                        <select id="attendance-event">
+                            <option value="">Select Event</option>
+                            <!-- Events will be populated here -->
+                        </select>
+                    </div>
+                    
+                    <div id="attendance-section">
+                        <button id="mark-present-btn">I Am Present</button>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3>My Attendance Record</h3>
+                    <table id="my-attendance-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Event</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="my-attendance-list">
+                            <!-- Attendance records will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div id="leave-tab" class="tab-content">
+                <h2 class="section-title">Request Leave</h2>
+                <div class="card">
+                    <form id="leave-request-form">
+                        <div class="form-group">
+                            <label for="leave-start-date">Start Date</label>
+                            <input type="date" id="leave-start-date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="leave-end-date">End Date</label>
+                            <input type="date" id="leave-end-date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="leave-reason">Reason</label>
+                            <textarea id="leave-reason" rows="3" required></textarea>
+                        </div>
+                        <button type="submit">Submit Request</button>
+                    </form>
+                </div>
+                
+                <div class="card">
+                    <h3>My Leave History</h3>
+                    <table id="leave-history-table">
+                        <thead>
+                            <tr>
+                                <th>Date Submitted</th>
+                                <th>Start Date</th>
+                                <th>End Date</th>
+                                <th>Reason</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leave-history-list">
+                            <!-- Leave history will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div id="members-tab" class="tab-content">
+                <h2 class="section-title">Choir Members</h2>
+                <div class="card">
+                    <table id="members-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Voice Part</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Role</th>
+                            </tr>
+                        </thead>
+                        <tbody id="members-list">
+                            <!-- Members will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div id="events-tab" class="tab-content">
+                <h2 class="section-title">Manage Events</h2>
+                <div class="card">
+                    <form id="event-form">
+                        <div class="form-group">
+                            <label for="event-date">Date</label>
+                            <input type="date" id="event-date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="event-time">Time</label>
+                            <input type="time" id="event-time" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="event-type">Event Type</label>
+                            <select id="event-type" required>
+                                <option value="Rehearsal">Rehearsal</option>
+                                <option value="Performance">Performance</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="event-location">Location</label>
+                            <input type="text" id="event-location" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="event-description">Description</label>
+                            <input type="text" id="event-description" required>
+                        </div>
+                        <button type="submit">Add Event</button>
+                    </form>
+                </div>
+                
+                <div class="card">
+                    <h3>All Events</h3>
+                    <table id="events-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Type</th>
+                                <th>Location</th>
+                                <th>Description</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="events-list">
+                            <!-- Events will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div id="admin-tab" class="tab-content">
+                <h2 class="section-title">Admin Panel</h2>
+                
+                <div class="card">
+                    <h3>Pending Leave Requests</h3>
+                    <table id="pending-leave-table">
+                        <thead>
+                            <tr>
+                                <th>Member</th>
+                                <th>Start Date</th>
+                                <th>End Date</th>
+                                <th>Reason</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pending-leave-list">
+                            <!-- Pending leave requests will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="card">
+                    <h3>Attendance Approval</h3>
+                    <div class="form-group">
+                        <label for="admin-attendance-event">Select Event</label>
+                        <select id="admin-attendance-event">
+                            <option value="">Select Event</option>
+                            <!-- Events will be populated here -->
+                        </select>
+                    </div>
+                    
+                    <div id="admin-attendance-section">
+                        <table id="attendance-approval-table">
+                            <thead>
+                                <tr>
+                                    <th>Member</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="attendance-approval-list">
+                                <!-- Attendance for approval will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -372,16 +568,132 @@
         const db = new Dexie("ChoirManagementDB");
         
         // Define database schema
-        db.version(1).stores({
-            members: '++id, name, voicePart, email, phone',
-            rehearsals: '++id, date, time, location, notes',
-            performances: '++id, date, time, location, description, attire',
-            attendance: '++id, eventId, eventType, date, membersPresent'
+        db.version(2).stores({
+            users: '++id, email, password, name, voicePart, phone, role',
+            events: '++id, date, time, type, location, description',
+            attendance: '++id, userId, eventId, status', // status: present, absent, pending
+            leaveRequests: '++id, userId, startDate, endDate, reason, status' // status: pending, approved, rejected
         });
         
         // Open database
         db.open().catch(function(err) {
             console.error("Failed to open db: " + (err.stack || err));
+        });
+        
+        // Current user
+        let currentUser = null;
+        
+        // Check if user is logged in
+        function checkAuth() {
+            const userData = localStorage.getItem('currentUser');
+            if (userData) {
+                currentUser = JSON.parse(userData);
+                showApp();
+            } else {
+                showAuth();
+            }
+        }
+        
+        // Show authentication forms
+        function showAuth() {
+            document.getElementById('auth-forms').style.display = 'block';
+            document.getElementById('main-app').style.display = 'none';
+            document.getElementById('login-btn').style.display = 'block';
+            document.getElementById('register-btn').style.display = 'block';
+            document.getElementById('logout-btn').style.display = 'none';
+        }
+        
+        // Show main application
+        function showApp() {
+            document.getElementById('auth-forms').style.display = 'none';
+            document.getElementById('main-app').style.display = 'block';
+            document.getElementById('login-btn').style.display = 'none';
+            document.getElementById('register-btn').style.display = 'none';
+            document.getElementById('logout-btn').style.display = 'block';
+            
+            document.getElementById('user-name').textContent = currentUser.name;
+            document.getElementById('user-role').textContent = currentUser.role;
+            document.getElementById('user-role').className = `status-badge ${currentUser.role === 'admin' ? 'status-approved' : 'status-pending'}`;
+            
+            // Show/hide admin tabs based on role
+            if (currentUser.role === 'admin') {
+                document.getElementById('members-tab-btn').style.display = 'block';
+                document.getElementById('events-tab-btn').style.display = 'block';
+                document.getElementById('admin-tab-btn').style.display = 'block';
+            } else {
+                document.getElementById('members-tab-btn').style.display = 'none';
+                document.getElementById('events-tab-btn').style.display = 'none';
+                document.getElementById('admin-tab-btn').style.display = 'none';
+            }
+            
+            // Load data
+            loadDashboard();
+            loadAttendanceTab();
+            loadLeaveTab();
+            
+            if (currentUser.role === 'admin') {
+                loadMembersTab();
+                loadEventsTab();
+                loadAdminTab();
+            }
+        }
+        
+        // Login form submission
+        document.getElementById('login-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            
+            try {
+                const user = await db.users.where('email').equals(email).first();
+                
+                if (user && user.password === password) {
+                    currentUser = user;
+                    localStorage.setItem('currentUser', JSON.stringify(user));
+                    showApp();
+                } else {
+                    alert('Invalid email or password');
+                }
+            } catch (error) {
+                alert('Error logging in: ' + error);
+            }
+        });
+        
+        // Register form submission
+        document.getElementById('register-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const user = {
+                name: document.getElementById('register-name').value,
+                email: document.getElementById('register-email').value,
+                password: document.getElementById('register-password').value,
+                voicePart: document.getElementById('register-voicePart').value,
+                phone: document.getElementById('register-phone').value,
+                role: 'member' // Default role
+            };
+            
+            try {
+                // Check if user already exists
+                const existingUser = await db.users.where('email').equals(user.email).first();
+                if (existingUser) {
+                    alert('User with this email already exists');
+                    return;
+                }
+                
+                await db.users.add(user);
+                alert('Registration successful! Please login.');
+                document.getElementById('register-form').reset();
+            } catch (error) {
+                alert('Error registering: ' + error);
+            }
+        });
+        
+        // Logout button
+        document.getElementById('logout-btn').addEventListener('click', function() {
+            currentUser = null;
+            localStorage.removeItem('currentUser');
+            showAuth();
         });
         
         // Tab functionality
@@ -394,206 +706,421 @@
                 // Add active class to clicked tab and corresponding content
                 tab.classList.add('active');
                 document.getElementById(`${tab.dataset.tab}-tab`).classList.add('active');
+                
+                // Load tab-specific data
+                if (tab.dataset.tab === 'dashboard') {
+                    loadDashboard();
+                } else if (tab.dataset.tab === 'attendance') {
+                    loadAttendanceTab();
+                } else if (tab.dataset.tab === 'leave') {
+                    loadLeaveTab();
+                } else if (tab.dataset.tab === 'members' && currentUser.role === 'admin') {
+                    loadMembersTab();
+                } else if (tab.dataset.tab === 'events' && currentUser.role === 'admin') {
+                    loadEventsTab();
+                } else if (tab.dataset.tab === 'admin' && currentUser.role === 'admin') {
+                    loadAdminTab();
+                }
             });
         });
         
-        // Member form submission
-        document.getElementById('member-form').addEventListener('submit', async function(e) {
-            e.preventDefault();
+        // Load dashboard data
+        async function loadDashboard() {
+            try {
+                // Load upcoming events
+                const today = new Date().toISOString().split('T')[0];
+                const events = await db.events.where('date').aboveOrEqual(today).toArray();
+                
+                const eventsList = document.getElementById('upcoming-events-list');
+                eventsList.innerHTML = '';
+                
+                events.forEach(event => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${event.date}</td>
+                        <td>${event.time}</td>
+                        <td>${event.type}</td>
+                        <td>${event.location}</td>
+                        <td>${event.description}</td>
+                    `;
+                    eventsList.appendChild(row);
+                });
+                
+                // Load user's leave requests
+                const leaveRequests = await db.leaveRequests.where('userId').equals(currentUser.id).toArray();
+                
+                const leaveList = document.getElementById('my-leave-requests-list');
+                leaveList.innerHTML = '';
+                
+                leaveRequests.forEach(request => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${new Date().toLocaleDateString()}</td>
+                        <td>${request.startDate}</td>
+                        <td>${request.endDate}</td>
+                        <td>${request.reason}</td>
+                        <td><span class="status-badge status-${request.status}">${request.status}</span></td>
+                    `;
+                    leaveList.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+            }
+        }
+        
+        // Load attendance tab
+        async function loadAttendanceTab() {
+            try {
+                // Load events for dropdown
+                const today = new Date().toISOString().split('T')[0];
+                const events = await db.events.where('date').aboveOrEqual(today).toArray();
+                
+                const eventDropdown = document.getElementById('attendance-event');
+                eventDropdown.innerHTML = '<option value="">Select Event</option>';
+                
+                events.forEach(event => {
+                    const option = document.createElement('option');
+                    option.value = event.id;
+                    option.textContent = `${event.date} - ${event.type} - ${event.description}`;
+                    eventDropdown.appendChild(option);
+                });
+                
+                // Load user's attendance records
+                const attendanceRecords = await db.attendance.where('userId').equals(currentUser.id).toArray();
+                
+                const attendanceList = document.getElementById('my-attendance-list');
+                attendanceList.innerHTML = '';
+                
+                for (const record of attendanceRecords) {
+                    const event = await db.events.get(record.eventId);
+                    if (event) {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${event.date}</td>
+                            <td>${event.type} - ${event.description}</td>
+                            <td><span class="status-badge status-${record.status}">${record.status}</span></td>
+                        `;
+                        attendanceList.appendChild(row);
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading attendance tab:', error);
+            }
+        }
+        
+        // Mark present button
+        document.getElementById('mark-present-btn').addEventListener('click', async function() {
+            const eventId = parseInt(document.getElementById('attendance-event').value);
             
-            const member = {
-                name: document.getElementById('name').value,
-                voicePart: document.getElementById('voicePart').value,
-                email: document.getElementById('email').value,
-                phone: document.getElementById('phone').value
-            };
+            if (!eventId) {
+                alert('Please select an event');
+                return;
+            }
             
             try {
-                await db.members.add(member);
-                showAlert('member-alert', 'Member added successfully!', 'success');
-                document.getElementById('member-form').reset();
-                loadMembers();
+                // Check if attendance already marked
+                const existingRecord = await db.attendance.where({'userId': currentUser.id, 'eventId': eventId}).first();
+                
+                if (existingRecord) {
+                    alert('You have already marked your attendance for this event');
+                    return;
+                }
+                
+                // Add attendance record (pending approval for non-admin users)
+                const status = currentUser.role === 'admin' ? 'present' : 'pending';
+                
+                await db.attendance.add({
+                    userId: currentUser.id,
+                    eventId: eventId,
+                    status: status
+                });
+                
+                alert(currentUser.role === 'admin' 
+                    ? 'Attendance marked successfully' 
+                    : 'Attendance submitted for approval');
+                
+                loadAttendanceTab();
             } catch (error) {
-                showAlert('member-alert', 'Error adding member: ' + error, 'danger');
+                alert('Error marking attendance: ' + error);
             }
         });
         
-        // Rehearsal form submission
-        document.getElementById('rehearsal-form').addEventListener('submit', async function(e) {
+        // Leave request form submission
+        document.getElementById('leave-request-form').addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            const rehearsal = {
-                date: document.getElementById('rehearsal-date').value,
-                time: document.getElementById('rehearsal-time').value,
-                location: document.getElementById('rehearsal-location').value,
-                notes: document.getElementById('rehearsal-notes').value
+            const leaveRequest = {
+                userId: currentUser.id,
+                startDate: document.getElementById('leave-start-date').value,
+                endDate: document.getElementById('leave-end-date').value,
+                reason: document.getElementById('leave-reason').value,
+                status: 'pending'
             };
             
             try {
-                await db.rehearsals.add(rehearsal);
-                showAlert('rehearsal-alert', 'Rehearsal added successfully!', 'success');
-                document.getElementById('rehearsal-form').reset();
-                loadRehearsals();
+                await db.leaveRequests.add(leaveRequest);
+                alert('Leave request submitted successfully');
+                document.getElementById('leave-request-form').reset();
+                loadLeaveTab();
+                loadDashboard();
             } catch (error) {
-                showAlert('rehearsal-alert', 'Error adding rehearsal: ' + error, 'danger');
+                alert('Error submitting leave request: ' + error);
             }
         });
         
-        // Performance form submission
-        document.getElementById('performance-form').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const performance = {
-                date: document.getElementById('performance-date').value,
-                time: document.getElementById('performance-time').value,
-                location: document.getElementById('performance-location').value,
-                description: document.getElementById('performance-description').value,
-                attire: document.getElementById('performance-attire').value
-            };
-            
+        // Load leave tab
+        async function loadLeaveTab() {
             try {
-                await db.performances.add(performance);
-                showAlert('performance-alert', 'Performance added successfully!', 'success');
-                document.getElementById('performance-form').reset();
-                loadPerformances();
+                // Load user's leave history
+                const leaveRequests = await db.leaveRequests.where('userId').equals(currentUser.id).toArray();
+                
+                const leaveList = document.getElementById('leave-history-list');
+                leaveList.innerHTML = '';
+                
+                leaveRequests.forEach(request => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${new Date().toLocaleDateString()}</td>
+                        <td>${request.startDate}</td>
+                        <td>${request.endDate}</td>
+                        <td>${request.reason}</td>
+                        <td><span class="status-badge status-${request.status}">${request.status}</span></td>
+                    `;
+                    leaveList.appendChild(row);
+                });
             } catch (error) {
-                showAlert('performance-alert', 'Error adding performance: ' + error, 'danger');
+                console.error('Error loading leave tab:', error);
             }
-        });
+        }
         
-        // Load members into table
-        async function loadMembers() {
+        // Load members tab (admin only)
+        async function loadMembersTab() {
             try {
-                const members = await db.members.toArray();
+                const users = await db.users.toArray();
+                
                 const membersList = document.getElementById('members-list');
                 membersList.innerHTML = '';
                 
-                members.forEach(member => {
+                users.forEach(user => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
-                        <td>${member.name}</td>
-                        <td>${member.voicePart}</td>
-                        <td>${member.email}</td>
-                        <td>${member.phone}</td>
-                        <td class="actions">
-                            <button class="danger" onclick="deleteMember(${member.id})">Delete</button>
-                        </td>
+                        <td>${user.name}</td>
+                        <td>${user.voicePart}</td>
+                        <td>${user.email}</td>
+                        <td>${user.phone}</td>
+                        <td><span class="status-badge status-${user.role === 'admin' ? 'approved' : 'pending'}">${user.role}</span></td>
                     `;
                     membersList.appendChild(row);
                 });
             } catch (error) {
-                console.error('Error loading members:', error);
+                console.error('Error loading members tab:', error);
             }
         }
         
-        // Load rehearsals into table
-        async function loadRehearsals() {
-            try {
-                const rehearsals = await db.rehearsals.toArray();
-                const rehearsalsList = document.getElementById('rehearsals-list');
-                rehearsalsList.innerHTML = '';
-                
-                rehearsals.forEach(rehearsal => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${rehearsal.date}</td>
-                        <td>${rehearsal.time}</td>
-                        <td>${rehearsal.location}</td>
-                        <td>${rehearsal.notes}</td>
-                        <td class="actions">
-                            <button class="danger" onclick="deleteRehearsal(${rehearsal.id})">Delete</button>
-                        </td>
-                    `;
-                    rehearsalsList.appendChild(row);
-                });
-            } catch (error) {
-                console.error('Error loading rehearsals:', error);
-            }
-        }
-        
-        // Load performances into table
-        async function loadPerformances() {
-            try {
-                const performances = await db.performances.toArray();
-                const performancesList = document.getElementById('performances-list');
-                performancesList.innerHTML = '';
-                
-                performances.forEach(performance => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${performance.date}</td>
-                        <td>${performance.time}</td>
-                        <td>${performance.location}</td>
-                        <td>${performance.description}</td>
-                        <td>${performance.attire}</td>
-                        <td class="actions">
-                            <button class="danger" onclick="deletePerformance(${performance.id})">Delete</button>
-                        </td>
-                    `;
-                    performancesList.appendChild(row);
-                });
-            } catch (error) {
-                console.error('Error loading performances:', error);
-            }
-        }
-        
-        // Delete a member
-        async function deleteMember(id) {
-            if (confirm('Are you sure you want to delete this member?')) {
-                try {
-                    await db.members.delete(id);
-                    showAlert('member-alert', 'Member deleted successfully!', 'success');
-                    loadMembers();
-                } catch (error) {
-                    showAlert('member-alert', 'Error deleting member: ' + error, 'danger');
-                }
-            }
-        }
-        
-        // Delete a rehearsal
-        async function deleteRehearsal(id) {
-            if (confirm('Are you sure you want to delete this rehearsal?')) {
-                try {
-                    await db.rehearsals.delete(id);
-                    showAlert('rehearsal-alert', 'Rehearsal deleted successfully!', 'success');
-                    loadRehearsals();
-                } catch (error) {
-                    showAlert('rehearsal-alert', 'Error deleting rehearsal: ' + error, 'danger');
-                }
-            }
-        }
-        
-        // Delete a performance
-        async function deletePerformance(id) {
-            if (confirm('Are you sure you want to delete this performance?')) {
-                try {
-                    await db.performances.delete(id);
-                    showAlert('performance-alert', 'Performance deleted successfully!', 'success');
-                    loadPerformances();
-                } catch (error) {
-                    showAlert('performance-alert', 'Error deleting performance: ' + error, 'danger');
-                }
-            }
-        }
-        
-        // Show alert message
-        function showAlert(elementId, message, type) {
-            const alertElement = document.getElementById(elementId);
-            alertElement.textContent = message;
-            alertElement.className = `alert alert-${type}`;
-            alertElement.style.display = 'block';
+        // Event form submission (admin only)
+        document.getElementById('event-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
             
-            // Hide alert after 3 seconds
-            setTimeout(() => {
-                alertElement.style.display = 'none';
-            }, 3000);
+            const event = {
+                date: document.getElementById('event-date').value,
+                time: document.getElementById('event-time').value,
+                type: document.getElementById('event-type').value,
+                location: document.getElementById('event-location').value,
+                description: document.getElementById('event-description').value
+            };
+            
+            try {
+                await db.events.add(event);
+                alert('Event added successfully');
+                document.getElementById('event-form').reset();
+                loadEventsTab();
+                loadDashboard();
+            } catch (error) {
+                alert('Error adding event: ' + error);
+            }
+        });
+        
+        // Load events tab (admin only)
+        async function loadEventsTab() {
+            try {
+                const events = await db.events.toArray();
+                
+                const eventsList = document.getElementById('events-list');
+                eventsList.innerHTML = '';
+                
+                events.forEach(event => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${event.date}</td>
+                        <td>${event.time}</td>
+                        <td>${event.type}</td>
+                        <td>${event.location}</td>
+                        <td>${event.description}</td>
+                        <td class="actions">
+                            <button class="danger" onclick="deleteEvent(${event.id})">Delete</button>
+                        </td>
+                    `;
+                    eventsList.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Error loading events tab:', error);
+            }
+        }
+        
+        // Load admin tab (admin only)
+        async function loadAdminTab() {
+            try {
+                // Load pending leave requests
+                const pendingRequests = await db.leaveRequests.where('status').equals('pending').toArray();
+                
+                const pendingList = document.getElementById('pending-leave-list');
+                pendingList.innerHTML = '';
+                
+                for (const request of pendingRequests) {
+                    const user = await db.users.get(request.userId);
+                    if (user) {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${user.name}</td>
+                            <td>${request.startDate}</td>
+                            <td>${request.endDate}</td>
+                            <td>${request.reason}</td>
+                            <td class="actions">
+                                <button class="success" onclick="approveLeaveRequest(${request.id})">Approve</button>
+                                <button class="danger" onclick="rejectLeaveRequest(${request.id})">Reject</button>
+                            </td>
+                        `;
+                        pendingList.appendChild(row);
+                    }
+                }
+                
+                // Load events for attendance approval dropdown
+                const events = await db.events.toArray();
+                
+                const eventDropdown = document.getElementById('admin-attendance-event');
+                eventDropdown.innerHTML = '<option value="">Select Event</option>';
+                
+                events.forEach(event => {
+                    const option = document.createElement('option');
+                    option.value = event.id;
+                    option.textContent = `${event.date} - ${event.type} - ${event.description}`;
+                    eventDropdown.appendChild(option);
+                });
+                
+                // Event listener for attendance event selection
+                eventDropdown.addEventListener('change', loadAttendanceForApproval);
+            } catch (error) {
+                console.error('Error loading admin tab:', error);
+            }
+        }
+        
+        // Load attendance for approval
+        async function loadAttendanceForApproval() {
+            const eventId = parseInt(document.getElementById('admin-attendance-event').value);
+            
+            if (!eventId) {
+                document.getElementById('attendance-approval-list').innerHTML = '';
+                return;
+            }
+            
+            try {
+                const attendanceRecords = await db.attendance.where('eventId').equals(eventId).toArray();
+                
+                const approvalList = document.getElementById('attendance-approval-list');
+                approvalList.innerHTML = '';
+                
+                for (const record of attendanceRecords) {
+                    const user = await db.users.get(record.userId);
+                    if (user) {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${user.name}</td>
+                            <td><span class="status-badge status-${record.status}">${record.status}</span></td>
+                            <td class="actions">
+                                ${record.status === 'pending' ? `
+                                    <button class="success" onclick="approveAttendance(${record.id})">Approve</button>
+                                    <button class="danger" onclick="rejectAttendance(${record.id})">Reject</button>
+                                ` : 'Already processed'}
+                            </td>
+                        `;
+                        approvalList.appendChild(row);
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading attendance for approval:', error);
+            }
+        }
+        
+        // Approve leave request
+        async function approveLeaveRequest(requestId) {
+            try {
+                await db.leaveRequests.update(requestId, { status: 'approved' });
+                loadAdminTab();
+            } catch (error) {
+                alert('Error approving leave request: ' + error);
+            }
+        }
+        
+        // Reject leave request
+        async function rejectLeaveRequest(requestId) {
+            try {
+                await db.leaveRequests.update(requestId, { status: 'rejected' });
+                loadAdminTab();
+            } catch (error) {
+                alert('Error rejecting leave request: ' + error);
+            }
+        }
+        
+        // Approve attendance
+        async function approveAttendance(attendanceId) {
+            try {
+                await db.attendance.update(attendanceId, { status: 'present' });
+                loadAttendanceForApproval();
+            } catch (error) {
+                alert('Error approving attendance: ' + error);
+            }
+        }
+        
+        // Reject attendance
+        async function rejectAttendance(attendanceId) {
+            try {
+                await db.attendance.update(attendanceId, { status: 'absent' });
+                loadAttendanceForApproval();
+            } catch (error) {
+                alert('Error rejecting attendance: ' + error);
+            }
+        }
+        
+        // Delete event
+        async function deleteEvent(eventId) {
+            if (confirm('Are you sure you want to delete this event?')) {
+                try {
+                    await db.events.delete(eventId);
+                    loadEventsTab();
+                    loadDashboard();
+                } catch (error) {
+                    alert('Error deleting event: ' + error);
+                }
+            }
         }
         
         // Initialize the application
         window.onload = function() {
-            loadMembers();
-            loadRehearsals();
-            loadPerformances();
+            checkAuth();
+            
+            // Add a default admin user if none exists
+            db.users.count(function(count) {
+                if (count === 0) {
+                    db.users.add({
+                        name: 'Choir Administrator',
+                        email: 'admin@choir.com',
+                        password: 'admin123',
+                        voicePart: 'N/A',
+                        phone: '',
+                        role: 'admin'
+                    });
+                }
+            });
         };
     </script>
 </body>
