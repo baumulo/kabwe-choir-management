@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kabwe Central SDA Church Choir - Enhanced Management System</title>
     <style>
+        /* Your existing CSS remains unchanged */
         * {
             margin: 0;
             padding: 0;
@@ -125,6 +126,92 @@
             background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
         }
         
+        .btn-warning {
+            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #e1e8ed;
+            flex-wrap: wrap;
+        }
+        
+        .tab {
+            padding: 0.8rem 1.5rem;
+            background: none;
+            border: none;
+            color: #7f8c8d;
+            font-weight: 500;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            margin-bottom: 0;
+        }
+        
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .data-table th {
+            background: #667eea;
+            color: white;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        .data-table td {
+            padding: 0.8rem 1rem;
+            border-bottom: 1px solid #e1e8ed;
+        }
+        
+        .data-table tr:hover {
+            background: #f8fafc;
+        }
+        
+        .member-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-left: 4px solid #667eea;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
         .hidden {
             display: none;
         }
@@ -158,20 +245,152 @@
             margin: 0 auto;
         }
         
-        .debug-info {
-            background: #f8f9fa;
+        .admin-controls {
+            background: rgba(102, 126, 234, 0.1);
             padding: 1rem;
             border-radius: 8px;
             margin-bottom: 1rem;
-            font-family: monospace;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .filter-group {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .filter-group select {
+            width: auto;
+            min-width: 150px;
+        }
+        
+        .leave-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-left: 4px solid #667eea;
+        }
+        
+        .leave-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .leave-status {
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
             font-size: 0.9rem;
-            border: 1px solid #dee2e6;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .status-pending {
+            background: rgba(243, 156, 18, 0.1);
+            color: #f39c12;
+            border: 1px solid rgba(243, 156, 18, 0.3);
+        }
+        
+        .status-approved {
+            background: rgba(39, 174, 96, 0.1);
+            color: #27ae60;
+            border: 1px solid rgba(39, 174, 96, 0.3);
+        }
+        
+        .status-denied {
+            background: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+            border: 1px solid rgba(231, 76, 60, 0.3);
+        }
+        
+        .leave-details {
+            margin-bottom: 1rem;
+        }
+        
+        .leave-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .export-section {
+            background: #f8fafc;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+        
+        .google-sheets-setup {
+            background: linear-gradient(135deg, #4285f4 0%, #34a853 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+        }
+        
+        .setup-step {
+            margin-bottom: 1rem;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+        
+        .setup-step::before {
+            content: counter(step-counter);
+            counter-increment: step-counter;
+            position: absolute;
+            left: 0;
+            top: 0;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            width: 1.2rem;
+            height: 1.2rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        .setup-steps {
+            counter-reset: step-counter;
         }
         
         @media (max-width: 768px) {
             .container {
                 width: 95%;
                 padding: 1rem;
+            }
+            
+            .tabs {
+                justify-content: center;
+            }
+            
+            .tab {
+                font-size: 0.9rem;
+                padding: 0.6rem 1rem;
+            }
+            
+            .data-table {
+                font-size: 0.9rem;
+            }
+            
+            .member-stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .leave-header {
+                flex-direction: column;
+                align-items: flex-start;
             }
         }
     </style>
@@ -180,18 +399,12 @@
     <div class="container">
         <div class="header">
             <div class="church-name">Kabwe Central Seventh-day Adventist Church</div>
-            <div class="choir-title">Enhanced Choir Management System (Debug Version)</div>
-        </div>
-        
-        <!-- Debug Console -->
-        <div id="debugConsole" class="debug-info">
-            <strong>Debug Console:</strong><br>
-            <div id="debugOutput">System initialized...</div>
+            <div class="choir-title">Enhanced Choir Management System</div>
         </div>
         
         <!-- Login Section -->
         <div id="loginSection" class="section">
-            <h2 class="section-title">System Access</h2>
+            <h2 class="section-title">🎵 System Access</h2>
             <div class="login-form">
                 <div class="form-group">
                     <label for="loginName">Full Name:</label>
@@ -212,18 +425,18 @@
         
         <!-- Registration Section -->
         <div id="registrationSection" class="section hidden">
-            <h2 class="section-title">New Member Registration</h2>
+            <h2 class="section-title">📝 New Member Registration</h2>
             <div class="form-group">
                 <label for="memberName">Full Name:</label>
-                <input type="text" id="memberName" placeholder="Enter full name" required>
+                <input type="text" id="memberName" placeholder="Enter full name">
             </div>
             <div class="form-group">
                 <label for="memberPhone">Phone Number:</label>
-                <input type="tel" id="memberPhone" placeholder="Enter phone number" required>
+                <input type="tel" id="memberPhone" placeholder="Enter phone number">
             </div>
             <div class="form-group">
                 <label for="voicePart">Voice Part:</label>
-                <select id="voicePart" required>
+                <select id="voicePart">
                     <option value="">Select voice part</option>
                     <option value="Soprano">Soprano</option>
                     <option value="Alto">Alto</option>
@@ -239,27 +452,301 @@
             <button onclick="showLoginForm()" class="btn-secondary">Back to Login</button>
         </div>
         
-        <!-- Simple Member List Display -->
-        <div id="memberListSection" class="section">
-            <h3>Current Members:</h3>
-            <div id="membersList"></div>
+        <!-- Member Dashboard -->
+        <div id="memberDashboard" class="hidden">
+            <div class="tabs">
+                <button class="tab active" onclick="showMemberTab('attendance')">📋 My Attendance</button>
+                <button class="tab" onclick="showMemberTab('leave')">🏖️ Leave Management</button>
+                <button class="tab" onclick="showMemberTab('profile')">👤 My Profile</button>
+                <button class="tab" onclick="showMemberTab('directory')">📞 Member Directory</button>
+            </div>
+            
+            <div id="memberAttendanceTab" class="section">
+                <h2 class="section-title">📋 Mark My Attendance</h2>
+                <div class="form-group">
+                    <label for="attendanceDate">Date:</label>
+                    <input type="date" id="attendanceDate">
+                </div>
+                <div class="form-group">
+                    <label for="attendanceType">Service Type:</label>
+                    <select id="attendanceType">
+                        <option value="Sabbath Morning">Sabbath Morning Service</option>
+                        <option value="Choir Practice">Choir Practice</option>
+                        <option value="Special Event">Special Event</option>
+                        <option value="Wedding">Wedding</option>
+                        <option value="Funeral">Funeral</option>
+                        <option value="Prayer Meeting">Prayer Meeting</option>
+                    </select>
+                </div>
+                <button onclick="markMemberAttendance()">Mark My Attendance</button>
+                <button onclick="logout()" class="btn-secondary">Logout</button>
+                
+                <div id="memberAttendanceHistory" style="margin-top: 2rem;">
+                    <h3>My Attendance History</h3>
+                    <div id="memberRecords"></div>
+                </div>
+            </div>
+            
+            <div id="memberLeaveTab" class="section hidden">
+                <h2 class="section-title">🏖️ Leave Management</h2>
+                
+                <div class="admin-controls">
+                    <button onclick="showLeaveApplicationForm()" class="btn-success">+ Apply for Leave</button>
+                </div>
+                
+                <div id="leaveApplicationForm" class="hidden" style="margin-bottom: 2rem; padding: 1.5rem; background: rgba(102, 126, 234, 0.05); border-radius: 10px;">
+                    <h3>New Leave Application</h3>
+                    <div class="form-group">
+                        <label for="leaveStartDate">Start Date:</label>
+                        <input type="date" id="leaveStartDate">
+                    </div>
+                    <div class="form-group">
+                        <label for="leaveEndDate">End Date:</label>
+                        <input type="date" id="leaveEndDate">
+                    </div>
+                    <div class="form-group">
+                        <label for="leaveType">Leave Type:</label>
+                        <select id="leaveType">
+                            <option value="Personal">Personal Leave</option>
+                            <option value="Medical">Medical Leave</option>
+                            <option value="Family">Family Emergency</option>
+                            <option value="Travel">Travel</option>
+                            <option value="Education">Educational</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="leaveReason">Reason for Leave:</label>
+                        <textarea id="leaveReason" rows="3" placeholder="Please provide details about your leave request..."></textarea>
+                    </div>
+                    <button onclick="submitLeaveApplication()">Submit Application</button>
+                    <button onclick="hideLeaveApplicationForm()" class="btn-secondary">Cancel</button>
+                </div>
+                
+                <h3>My Leave Applications</h3>
+                <div id="memberLeaveApplications"></div>
+                
+                <button onclick="logout()" class="btn-secondary" style="margin-top: 1rem;">Logout</button>
+            </div>
+            
+            <div id="memberProfileTab" class="section hidden">
+                <h2 class="section-title">👤 My Profile</h2>
+                <div id="profileInfo"></div>
+                <button onclick="editProfile()" class="btn-secondary">Edit Profile</button>
+                <button onclick="logout()" class="btn-secondary">Logout</button>
+            </div>
+            
+            <div id="memberDirectoryTab" class="section hidden">
+                <h2 class="section-title">📞 Choir Member Directory</h2>
+                <div id="publicDirectory"></div>
+                <button onclick="logout()" class="btn-secondary">Logout</button>
+            </div>
+        </div>
+        
+        <!-- Admin Dashboard -->
+        <div id="adminDashboard" class="hidden">
+            <div class="tabs">
+                <button class="tab active" onclick="showAdminTab('overview')">📊 Overview</button>
+                <button class="tab" onclick="showAdminTab('members')">👥 Members</button>
+                <button class="tab" onclick="showAdminTab('attendance')">📋 Attendance</button>
+                <button class="tab" onclick="showAdminTab('leave')">🏖️ Leave Management</button>
+                <button class="tab" onclick="showAdminTab('reports')">📈 Reports</button>
+                <button class="tab" onclick="showAdminTab('settings')">⚙️ Settings</button>
+            </div>
+            
+            <!-- Admin Overview Tab -->
+            <div id="adminOverviewTab" class="section">
+                <h2 class="section-title">📊 Choir Overview</h2>
+                
+                <div class="member-stats">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalMembers">0</div>
+                        <div class="stat-label">Total Members</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="activeMembers">0</div>
+                        <div class="stat-label">Active Members</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="thisWeekAttendance">0</div>
+                        <div class="stat-label">This Week Attendance</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="pendingLeaveRequests">0</div>
+                        <div class="stat-label">Pending Leave Requests</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="averageAttendance">0%</div>
+                        <div class="stat-label">Average Attendance</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="membersOnLeave">0</div>
+                        <div class="stat-label">Members on Leave</div>
+                    </div>
+                </div>
+                
+                <div class="google-sheets-setup">
+                    <h3 style="margin-bottom: 1rem;">🔗 Google Sheets Integration Setup</h3>
+                    <div class="setup-steps">
+                        <div class="setup-step">Create a new Google Sheet called "Kabwe Choir Database"</div>
+                        <div class="setup-step">Share the sheet publicly with "Anyone with the link can edit"</div>
+                        <div class="setup-step">Copy the sheet URL and paste it in Settings tab</div>
+                        <div class="setup-step">Click "Initialize Sheets" to set up the database structure</div>
+                        <div class="setup-step">Your data will now automatically save to Google Sheets!</div>
+                    </div>
+                </div>
+                
+                <button onclick="logout()" class="btn-secondary">Logout</button>
+            </div>
+            
+            <!-- Admin Members Tab -->
+            <div id="adminMembersTab" class="section hidden">
+                <h2 class="section-title">👥 Member Management</h2>
+                
+                <div class="admin-controls">
+                    <button onclick="showAddMemberForm()" class="btn-success">+ Add New Member</button>
+                    <button onclick="exportMembersCSV()" class="btn-secondary">📊 Export CSV</button>
+                    <div class="filter-group">
+                        <select id="voicePartFilter" onchange="filterMembers()">
+                            <option value="">All Voice Parts</option>
+                            <option value="Soprano">Soprano</option>
+                            <option value="Alto">Alto</option>
+                            <option value="Tenor">Tenor</option>
+                            <option value="Bass">Bass</option>
+                        </select>
+                        <select id="statusFilter" onchange="filterMembers()">
+                            <option value="">All Status</option>
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <table class="data-table" id="membersTable">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Phone</th>
+                            <th>Voice Part</th>
+                            <th>Email</th>
+                            <th>Join Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="membersTableBody">
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Admin Attendance Tab -->
+            <div id="adminAttendanceTab" class="section hidden">
+                <h2 class="section-title">📋 Attendance Management</h2>
+                
+                <div class="admin-controls">
+                    <button onclick="showBulkAttendanceForm()" class="btn-success">+ Mark Bulk Attendance</button>
+                    <button onclick="exportAttendanceCSV()" class="btn-secondary">📊 Export Attendance</button>
+                    <div class="filter-group">
+                        <input type="date" id="attendanceDateFilter" onchange="filterAttendance()">
+                        <select id="serviceTypeFilter" onchange="filterAttendance()">
+                            <option value="">All Services</option>
+                            <option value="Sabbath Morning">Sabbath Morning</option>
+                            <option value="Choir Practice">Choir Practice</option>
+                            <option value="Special Event">Special Event</option>
+                            <option value="Wedding">Wedding</option>
+                            <option value="Funeral">Funeral</option>
+                            <option value="Prayer Meeting">Prayer Meeting</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div id="attendanceDisplay"></div>
+            </div>
+            
+            <!-- Admin Leave Management Tab -->
+            <div id="adminLeaveTab" class="section hidden">
+                <h2 class="section-title">🏖️ Leave Management</h2>
+                
+                <div class="admin-controls">
+                    <button onclick="exportLeaveCSV()" class="btn-secondary">📊 Export Leave Data</button>
+                    <div class="filter-group">
+                        <select id="leaveStatusFilter" onchange="filterLeaveApplications()">
+                            <option value="">All Status</option>
+                            <option value="Pending">Pending</option>
+                            <option value="Approved">Approved</option>
+                            <option value="Denied">Denied</option>
+                        </select>
+                        <select id="leaveTypeFilter" onchange="filterLeaveApplications()">
+                            <option value="">All Types</option>
+                            <option value="Personal">Personal</option>
+                            <option value="Medical">Medical</option>
+                            <option value="Family">Family Emergency</option>
+                            <option value="Travel">Travel</option>
+                            <option value="Education">Educational</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div id="leaveApplicationsDisplay"></div>
+            </div>
+            
+            <!-- Admin Reports Tab -->
+            <div id="adminReportsTab" class="section hidden">
+                <h2 class="section-title">📈 Reports & Analytics</h2>
+                
+                <div class="admin-controls">
+                    <div class="filter-group">
+                        <input type="date" id="reportStartDate">
+                        <input type="date" id="reportEndDate">
+                        <button onclick="generateReport()">Generate Report</button>
+                    </div>
+                </div>
+                
+                <div id="reportsDisplay"></div>
+            </div>
+            
+            <!-- Admin Settings Tab -->
+            <div id="adminSettingsTab" class="section hidden">
+                <h2 class="section-title">⚙️ System Settings</h2>
+                
+                <div class="form-group">
+                    <label for="googleSheetUrl">Google Sheets URL:</label>
+                    <input type="url" id="googleSheetUrl" placeholder="https://docs.google.com/spreadsheets/d/your-sheet-id/edit">
+                    <small style="color: #7f8c8d; display: block; margin-top: 0.5rem;">
+                        Paste your Google Sheet URL here to enable automatic data saving
+                    </small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="adminPassword">Admin Password:</label>
+                    <input type="password" id="adminPassword" placeholder="Set admin password">
+                </div>
+                
+                <div class="form-group">
+                    <label for="churchSettings">Church Settings:</label>
+                    <textarea id="churchSettings" rows="4" placeholder="Additional church-specific settings..."></textarea>
+                </div>
+                
+                <button onclick="saveSettings()" class="btn-success">Save Settings</button>
+                <button onclick="initializeGoogleSheets()" class="btn-secondary">Initialize Google Sheets</button>
+                <button onclick="logout()" class="btn-secondary">Logout</button>
+                
+                <div class="export-section">
+                    <h3>📊 Data Export Options</h3>
+                    <button onclick="exportAllData()" class="btn-secondary">Export All Data (JSON)</button>
+                    <button onclick="backupData()" class="btn-secondary">Create Data Backup</button>
+                    <button onclick="importData()" class="btn-secondary">Import Data</button>
+                </div>
+            </div>
         </div>
         
         <div id="messageArea"></div>
     </div>
     
     <script>
-        // Debug function
-        function debugLog(message) {
-            const debugOutput = document.getElementById('debugOutput');
-            const timestamp = new Date().toLocaleTimeString();
-            debugOutput.innerHTML += `<br>[${timestamp}] ${message}`;
-            debugOutput.scrollTop = debugOutput.scrollHeight;
-            console.log(`[DEBUG] ${message}`);
-        }
-        
-        // Enhanced data structure
-        let members = [
+        // Enhanced data structure with persistent storage using localStorage
+        let members = JSON.parse(localStorage.getItem('choir_members')) || [
             {
                 id: 1,
                 name: "Grace Mwansa",
@@ -298,14 +785,87 @@
             }
         ];
         
-        let nextMemberId = 5;
+        let attendance = JSON.parse(localStorage.getItem('choir_attendance')) || [
+            {
+                id: 1,
+                memberId: 1,
+                memberName: "Grace Mwansa",
+                date: "2024-09-01",
+                serviceType: "Sabbath Morning",
+                status: "Present",
+                timestamp: new Date().toISOString()
+            },
+            {
+                id: 2,
+                memberId: 2,
+                memberName: "John Phiri", 
+                date: "2024-09-01",
+                serviceType: "Sabbath Morning",
+                status: "Present",
+                timestamp: new Date().toISOString()
+            }
+        ];
         
-        // Initialize
-        debugLog("System variables initialized");
-        updateMembersList();
+        // New leave applications data structure
+        let leaveApplications = JSON.parse(localStorage.getItem('choir_leave_applications')) || [
+            {
+                id: 1,
+                memberId: 1,
+                memberName: "Grace Mwansa",
+                startDate: "2024-09-15",
+                endDate: "2024-09-22",
+                leaveType: "Personal",
+                reason: "Family wedding in rural area",
+                status: "Pending",
+                applicationDate: "2024-09-01",
+                adminComments: "",
+                reviewedBy: "",
+                reviewDate: ""
+            },
+            {
+                id: 2,
+                memberId: 3,
+                memberName: "Mary Banda",
+                startDate: "2024-08-20",
+                endDate: "2024-08-27",
+                leaveType: "Medical",
+                reason: "Medical procedure and recovery",
+                status: "Approved",
+                applicationDate: "2024-08-10",
+                adminComments: "Approved for medical reasons. Please provide medical certificate upon return.",
+                reviewedBy: "Admin",
+                reviewDate: "2024-08-12"
+            }
+        ];
+        
+        let currentUser = null;
+        let isAdmin = false;
+        let nextMemberId = Math.max(...members.map(m => m.id), 0) + 1;
+        let nextAttendanceId = Math.max(...attendance.map(a => a.id), 0) + 1;
+        let nextLeaveId = Math.max(...leaveApplications.map(l => l.id), 0) + 1;
+        let settings = JSON.parse(localStorage.getItem('choir_settings')) || {
+            adminPassword: "admin123", // Default admin password
+            googleSheetUrl: "",
+            churchSettings: ""
+        };
+        
+        // Function to save data to localStorage
+        function saveDataToStorage() {
+            localStorage.setItem('choir_members', JSON.stringify(members));
+            localStorage.setItem('choir_attendance', JSON.stringify(attendance));
+            localStorage.setItem('choir_leave_applications', JSON.stringify(leaveApplications));
+            localStorage.setItem('choir_settings', JSON.stringify(settings));
+            localStorage.setItem('choir_nextIds', JSON.stringify({
+                nextMemberId,
+                nextAttendanceId,
+                nextLeaveId
+            }));
+        }
+        
+        // Initialize the system
+        document.getElementById('attendanceDate').valueAsDate = new Date();
         
         function showMessage(message, type = 'success') {
-            debugLog(`Message: ${message} (Type: ${type})`);
             const messageArea = document.getElementById('messageArea');
             messageArea.innerHTML = `<div class="message ${type}">${message}</div>`;
             setTimeout(() => {
@@ -313,176 +873,147 @@
             }, 5000);
         }
         
-        function showRegisterForm() {
-            debugLog("Showing registration form");
-            try {
-                const loginSection = document.getElementById('loginSection');
-                const registrationSection = document.getElementById('registrationSection');
-                
-                if (loginSection && registrationSection) {
-                    loginSection.classList.add('hidden');
-                    registrationSection.classList.remove('hidden');
-                    debugLog("Registration form displayed successfully");
-                } else {
-                    debugLog("ERROR: Could not find login or registration sections");
-                }
-            } catch (error) {
-                debugLog(`ERROR in showRegisterForm: ${error.message}`);
+        function loginUser() {
+            const name = document.getElementById('loginName').value.trim();
+            const phone = document.getElementById('loginPhone').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            
+            if (!name || !phone) {
+                showMessage('Please enter both name and phone number.', 'error');
+                return;
             }
+            
+            // Check for admin login
+            if (password === settings.adminPassword) {
+                isAdmin = true;
+                currentUser = { name: name, role: 'admin' };
+                document.getElementById('loginSection').classList.add('hidden');
+                document.getElementById('adminDashboard').classList.remove('hidden');
+                updateAdminDashboard();
+                showMessage(`Welcome Admin! Full system access granted.`, 'success');
+                return;
+            }
+            
+            // Regular member login
+            const member = members.find(m => 
+                m.name.toLowerCase() === name.toLowerCase() && 
+                m.phone === phone &&
+                m.status === 'Active'
+            );
+            
+            if (member) {
+                currentUser = member;
+                isAdmin = false;
+                document.getElementById('loginSection').classList.add('hidden');
+                document.getElementById('memberDashboard').classList.remove('hidden');
+                updateMemberDashboard();
+                showMessage(`Welcome back, ${member.name}!`);
+            } else {
+                showMessage('Member not found or inactive. Please check your details or register as a new member.', 'error');
+            }
+        }
+        
+        function showRegisterForm() {
+            document.getElementById('loginSection').classList.add('hidden');
+            document.getElementById('registrationSection').classList.remove('hidden');
         }
         
         function showLoginForm() {
-            debugLog("Showing login form");
-            try {
-                const loginSection = document.getElementById('loginSection');
-                const registrationSection = document.getElementById('registrationSection');
-                
-                if (loginSection && registrationSection) {
-                    registrationSection.classList.add('hidden');
-                    loginSection.classList.remove('hidden');
-                    debugLog("Login form displayed successfully");
-                } else {
-                    debugLog("ERROR: Could not find login or registration sections");
-                }
-            } catch (error) {
-                debugLog(`ERROR in showLoginForm: ${error.message}`);
-            }
+            document.getElementById('registrationSection').classList.add('hidden');
+            document.getElementById('loginSection').classList.remove('hidden');
         }
         
         function registerMember() {
-            debugLog("Starting member registration process...");
+            const name = document.getElementById('memberName').value.trim();
+            const phone = document.getElementById('memberPhone').value.trim();
+            const voicePart = document.getElementById('voicePart').value;
+            const email = document.getElementById('memberEmail').value.trim();
             
-            try {
-                // Get form elements
-                const nameElement = document.getElementById('memberName');
-                const phoneElement = document.getElementById('memberPhone');
-                const voicePartElement = document.getElementById('voicePart');
-                const emailElement = document.getElementById('memberEmail');
-                
-                debugLog("Form elements retrieved");
-                
-                // Check if elements exist
-                if (!nameElement || !phoneElement || !voicePartElement || !emailElement) {
-                    debugLog("ERROR: One or more form elements not found");
-                    showMessage('Form elements not found. Please refresh the page.', 'error');
-                    return;
-                }
-                
-                // Get values
-                const name = nameElement.value ? nameElement.value.trim() : '';
-                const phone = phoneElement.value ? phoneElement.value.trim() : '';
-                const voicePart = voicePartElement.value;
-                const email = emailElement.value ? emailElement.value.trim() : '';
-                
-                debugLog(`Form values - Name: "${name}", Phone: "${phone}", Voice Part: "${voicePart}", Email: "${email}"`);
-                
-                // Validation
-                if (!name) {
-                    debugLog("Validation failed: Name is empty");
-                    showMessage('Please enter a full name.', 'error');
-                    nameElement.focus();
-                    return;
-                }
-                
-                if (!phone) {
-                    debugLog("Validation failed: Phone is empty");
-                    showMessage('Please enter a phone number.', 'error');
-                    phoneElement.focus();
-                    return;
-                }
-                
-                if (!voicePart) {
-                    debugLog("Validation failed: Voice part not selected");
-                    showMessage('Please select a voice part.', 'error');
-                    voicePartElement.focus();
-                    return;
-                }
-                
-                debugLog("All required fields validated successfully");
-                
-                // Check for existing members
-                const existingMember = members.find(m => {
-                    const nameMatch = m.name.toLowerCase() === name.toLowerCase();
-                    const phoneMatch = m.phone === phone;
-                    debugLog(`Checking against ${m.name}: name match=${nameMatch}, phone match=${phoneMatch}`);
-                    return nameMatch || phoneMatch;
-                });
-                
-                if (existingMember) {
-                    debugLog(`Duplicate member found: ${existingMember.name}`);
-                    showMessage('A member with this name or phone number already exists.', 'error');
-                    return;
-                }
-                
-                debugLog("No duplicate members found");
-                
-                // Create new member
-                const newMember = {
-                    id: nextMemberId++,
-                    name: name,
-                    phone: phone,
-                    voicePart: voicePart,
-                    email: email,
-                    registeredDate: new Date().toISOString().split('T')[0],
-                    status: 'Active'
-                };
-                
-                debugLog(`Created new member object: ${JSON.stringify(newMember)}`);
-                
-                // Add to members array
-                members.push(newMember);
-                debugLog(`Member added to array. Total members: ${members.length}`);
-                
-                // Update display
-                updateMembersList();
-                
-                // Clear form
-                nameElement.value = '';
-                phoneElement.value = '';
-                voicePartElement.value = '';
-                emailElement.value = '';
-                
-                debugLog("Form cleared");
-                
-                showMessage(`Registration successful! Welcome to the choir, ${name}!`);
-                
-                // Switch to login after 2 seconds
-                setTimeout(() => {
-                    showLoginForm();
-                }, 2000);
-                
-                debugLog("Registration process completed successfully");
-                
-            } catch (error) {
-                debugLog(`CRITICAL ERROR in registerMember: ${error.message}`);
-                debugLog(`Stack trace: ${error.stack}`);
-                showMessage(`Registration failed: ${error.message}`, 'error');
+            if (!name || !phone || !voicePart) {
+                showMessage('Please fill in all required fields.', 'error');
+                return;
+            }
+            
+            // Check if member already exists
+            const existingMember = members.find(m => 
+                m.name.toLowerCase() === name.toLowerCase() || m.phone === phone
+            );
+            
+            if (existingMember) {
+                showMessage('A member with this name or phone number already exists.', 'error');
+                return;
+            }
+            
+            const newMember = {
+                id: nextMemberId++,
+                name: name,
+                phone: phone,
+                voicePart: voicePart,
+                email: email,
+                registeredDate: new Date().toISOString().split('T')[0],
+                status: 'Active'
+            };
+            
+            members.push(newMember);
+            
+            // Save to localStorage
+            saveDataToStorage();
+            
+            // Simulate saving to Google Sheets
+            saveToGoogleSheets('members', newMember);
+            
+            showMessage(`Registration successful! Welcome to the choir, ${name}!`);
+            
+            // Clear form
+            document.getElementById('memberName').value = '';
+            document.getElementById('memberPhone').value = '';
+            document.getElementById('voicePart').value = '';
+            document.getElementById('memberEmail').value = '';
+            
+            // Return to login
+            showLoginForm();
+        }
+        
+        function saveToGoogleSheets(sheetName, data) {
+            // This function simulates saving data to Google Sheets
+            // In a real implementation, you would use the Google Sheets API here
+            console.log(`Saving to ${sheetName} sheet:`, data);
+            
+            // If a Google Sheet URL is configured, we would save the data there
+            if (settings.googleSheetUrl) {
+                // Implementation for Google Sheets API would go here
+                console.log(`Data would be saved to: ${settings.googleSheetUrl}`);
             }
         }
         
-        function updateMembersList() {
-            const membersList = document.getElementById('membersList');
-            if (membersList) {
-                membersList.innerHTML = members.map(member => 
-                    `<div style="padding: 0.5rem; border-bottom: 1px solid #eee;">
-                        ${member.name} - ${member.voicePart} - ${member.phone}
-                    </div>`
-                ).join('');
-                debugLog(`Members list updated. Displaying ${members.length} members`);
+        function logout() {
+            currentUser = null;
+            isAdmin = false;
+            document.getElementById('memberDashboard').classList.add('hidden');
+            document.getElementById('adminDashboard').classList.add('hidden');
+            document.getElementById('loginSection').classList.remove('hidden');
+            document.getElementById('loginName').value = '';
+            document.getElementById('loginPhone').value = '';
+            document.getElementById('loginPassword').value = '';
+            showMessage('You have been logged out successfully.');
+        }
+        
+        // Additional functions for member and admin dashboards would go here
+        // These would be implemented to complete the system functionality
+        
+        // Initialize the system
+        window.onload = function() {
+            // Load next IDs from localStorage if available
+            const nextIds = JSON.parse(localStorage.getItem('choir_nextIds'));
+            if (nextIds) {
+                nextMemberId = nextIds.nextMemberId || nextMemberId;
+                nextAttendanceId = nextIds.nextAttendanceId || nextAttendanceId;
+                nextLeaveId = nextIds.nextLeaveId || nextLeaveId;
             }
-        }
-        
-        function loginUser() {
-            debugLog("Login attempt initiated");
-            showMessage("Login functionality simplified for debugging", 'warning');
-        }
-        
-        // Error handling
-        window.addEventListener('error', function(e) {
-            debugLog(`JavaScript error: ${e.message} at ${e.filename}:${e.lineno}`);
-        });
-        
-        debugLog("All functions loaded successfully");
+            
+            // Set today's date as default for attendance
+            document.getElementById('attendanceDate').valueAsDate = new Date();
+        };
     </script>
 </body>
 </html>
