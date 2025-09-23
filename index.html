@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kabwe Central SDA Church Choir - Management System</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * {
             margin: 0;
@@ -788,1697 +789,300 @@
         
         <div id="messageArea"></div>
     </div>
-    
-    <script>
-        // Enhanced data structure with persistent storage
-        let members = [];
-        let attendance = [];
-        let leaveApplications = [];
-        let currentUser = null;
-        let isAdmin = false;
-        let nextMemberId = 1;
-        let nextAttendanceId = 1;
-        let nextLeaveId = 1;
-        let settings = {
-            adminPassword: "admin123",
-            googleSheetUrl: "",
-            churchSettings: "",
-            lastSync: null
+    // Supabase configuration
+const SUPABASE_URL = 'https://your-project.supabase.co';
+const SUPABASE_ANON_KEY = 'your-anon-key';
+
+// Initialize Supabase client
+const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// Enhanced data structure
+let members = [];
+let attendance = [];
+let leaveApplications = [];
+let currentUser = null;
+let isAdmin = false;
+let settings = {
+    adminPassword: "admin123",
+    lastSync: null
+};
+
+// Initialize the system with database
+async function initializeSystem() {
+    try {
+        showMessage('Connecting to database...', 'warning');
+        
+        // Load all data from Supabase
+        await loadAllDataFromSupabase();
+        
+        // Set today's date for attendance
+        const today = new Date().toISOString().split('T')[0];
+        const attendanceDateElement = document.getElementById('attendanceDate');
+        if (attendanceDateElement) {
+            attendanceDateElement.value = today;
+        }
+        
+        // Update storage status
+        updateStorageStatus();
+        
+        console.log('System initialized with database');
+        showMessage('Database connected successfully!', 'success');
+        
+    } catch (error) {
+        console.error('Error initializing system:', error);
+        showMessage('Failed to connect to database. Using local storage as backup.', 'warning');
+        loadFromBrowserStorage();
+    }
+}
+
+// Supabase Data Functions
+async function loadAllDataFromSupabase() {
+    try {
+        // Load members
+        const { data: membersData, error: membersError } = await supabase
+            .from('members')
+            .select('*')
+            .order('name');
+        
+        if (membersError) throw membersError;
+        members = membersData || [];
+        
+        // Load attendance
+        const { data: attendanceData, error: attendanceError } = await supabase
+            .from('attendance')
+            .select('*')
+            .order('date', { ascending: false });
+        
+        if (attendanceError) throw attendanceError;
+        attendance = attendanceData || [];
+        
+        // Load leave applications
+        const { data: leaveData, error: leaveError } = await supabase
+            .from('leave_applications')
+            .select('*')
+            .order('application_date', { ascending: false });
+        
+        if (leaveError) throw leaveError;
+        leaveApplications = leaveData || [];
+        
+        // Load settings
+        const { data: settingsData, error: settingsError } = await supabase
+            .from('settings')
+            .select('*');
+        
+        if (!settingsError && settingsData) {
+            settingsData.forEach(setting => {
+                settings[setting.setting_key] = setting.setting_value;
+            });
+        }
+        
+        console.log(`Loaded from database: ${members.length} members, ${attendance.length} attendance records`);
+        
+    } catch (error) {
+        console.error('Error loading from Supabase:', error);
+        throw error;
+    }
+}
+
+async function saveMemberToSupabase(member) {
+    try {
+        const { data, error } = await supabase
+            .from('members')
+            .upsert(member)
+            .select();
+            
+        if (error) throw error;
+        return data[0];
+    } catch (error) {
+        console.error('Error saving member:', error);
+        throw error;
+    }
+}
+
+async function saveAttendanceToSupabase(record) {
+    try {
+        const { data, error } = await supabase
+            .from('attendance')
+            .insert(record)
+            .select();
+            
+        if (error) throw error;
+        return data[0];
+    } catch (error) {
+        console.error('Error saving attendance:', error);
+        throw error;
+    }
+}
+
+async function saveLeaveApplicationToSupabase(application) {
+    try {
+        const { data, error } = await supabase
+            .from('leave_applications')
+            .insert(application)
+            .select();
+            
+        if (error) throw error;
+        return data[0];
+    } catch (error) {
+        console.error('Error saving leave application:', error);
+        throw error;
+    }
+}
+
+// Enhanced registerMember function with database
+async function registerMember() {
+    try {
+        const name = document.getElementById('memberName').value.trim();
+        const phone = document.getElementById('memberPhone').value.trim();
+        const voicePart = document.getElementById('voicePart').value;
+        const email = document.getElementById('memberEmail').value.trim();
+        
+        // Validation (same as before)
+        if (!name || !phone || !voicePart) {
+            showMessage('Please fill in all required fields.', 'error');
+            return;
+        }
+        
+        // Check for existing members in database
+        const { data: existingMembers } = await supabase
+            .from('members')
+            .select('*')
+            .or(`name.eq.${name},phone.eq.${phone}`);
+        
+        if (existingMembers && existingMembers.length > 0) {
+            showMessage('A member with this name or phone number already exists.', 'error');
+            return;
+        }
+        
+        // Create new member object for database
+        const newMember = {
+            name: name,
+            phone: phone,
+            voice_part: voicePart,
+            email: email,
+            status: 'Active'
         };
         
-        // Data persistence configuration
-        const STORAGE_KEYS = {
-            MEMBERS: 'kabwe_choir_members',
-            ATTENDANCE: 'kabwe_choir_attendance',
-            LEAVE: 'kabwe_choir_leave',
-            SETTINGS: 'kabwe_choir_settings',
-            COUNTERS: 'kabwe_choir_counters'
+        // Save to database
+        const savedMember = await saveMemberToSupabase(newMember);
+        
+        // Add to local array
+        members.push(savedMember);
+        
+        showMessage(`Registration successful! Welcome to the choir, ${name}!`);
+        
+        // Clear form and switch to login
+        document.getElementById('memberName').value = '';
+        document.getElementById('memberPhone').value = '';
+        document.getElementById('voicePart').value = '';
+        document.getElementById('memberEmail').value = '';
+        
+        setTimeout(() => {
+            showLoginForm();
+        }, 2000);
+        
+    } catch (error) {
+        console.error('Registration error:', error);
+        showMessage(`Registration failed: ${error.message}`, 'error');
+    }
+}
+
+// Enhanced markMemberAttendance function
+async function markMemberAttendance() {
+    try {
+        if (!currentUser) return;
+        
+        const date = document.getElementById('attendanceDate').value;
+        const serviceType = document.getElementById('attendanceType').value;
+        
+        if (!date) {
+            showMessage('Please select a date.', 'error');
+            return;
+        }
+        
+        // Check if already marked (database check)
+        const { data: existingRecords } = await supabase
+            .from('attendance')
+            .select('*')
+            .eq('member_id', currentUser.id)
+            .eq('date', date)
+            .eq('service_type', serviceType);
+        
+        if (existingRecords && existingRecords.length > 0) {
+            showMessage('You have already marked attendance for this date and service type.', 'error');
+            return;
+        }
+        
+        const attendanceRecord = {
+            member_id: currentUser.id,
+            date: date,
+            service_type: serviceType,
+            status: 'Present'
         };
         
-        // Initialize the system with persistent data
-        function initializeSystem() {
-            try {
-                // Load data from browser storage
-                loadFromBrowserStorage();
-                
-                // Set today's date for attendance
-                const today = new Date().toISOString().split('T')[0];
-                const attendanceDateElement = document.getElementById('attendanceDate');
-                if (attendanceDateElement) {
-                    attendanceDateElement.value = today;
-                }
-                
-                // Update storage status
-                updateStorageStatus();
-                
-                // Check Google Sheets connection
-                checkGoogleSheetsConnection();
-                
-                console.log('System initialized successfully');
-                console.log(`Loaded: ${members.length} members, ${attendance.length} attendance records, ${leaveApplications.length} leave applications`);
-                
-                // Initialize with sample data if empty
-                if (members.length === 0) {
-                    initializeSampleData();
-                }
-                
-            } catch (error) {
-                console.error('Error initializing system:', error);
-                showMessage('System initialization failed. Starting with default data.', 'warning');
-                initializeSampleData();
-            }
+        // Save to database
+        const savedRecord = await saveAttendanceToSupabase(attendanceRecord);
+        
+        // Add to local array
+        attendance.push(savedRecord);
+        
+        updateMemberDashboard();
+        showMessage(`Attendance marked successfully for ${serviceType} on ${date}!`);
+        
+    } catch (error) {
+        console.error('Attendance marking error:', error);
+        showMessage('Failed to mark attendance. Please try again.', 'error');
+    }
+}
+
+// Enhanced login function
+async function loginUser() {
+    try {
+        const name = document.getElementById('loginName').value.trim();
+        const phone = document.getElementById('loginPhone').value.trim();
+        const password = document.getElementById('loginPassword').value;
+        
+        if (!name || !phone) {
+            showMessage('Please enter both name and phone number.', 'error');
+            return;
         }
         
-        function initializeSampleData() {
-            members = [
-                {
-                    id: 1,
-                    name: "Grace Mwansa",
-                    phone: "0977123456",
-                    voicePart: "Soprano",
-                    email: "grace@example.com",
-                    registeredDate: "2024-01-15",
-                    status: "Active"
-                },
-                {
-                    id: 2,
-                    name: "John Phiri",
-                    phone: "0966789012",
-                    voicePart: "Tenor",
-                    email: "john@example.com",
-                    registeredDate: "2024-01-20",
-                    status: "Active"
-                },
-                {
-                    id: 3,
-                    name: "Mary Banda",
-                    phone: "0955456789",
-                    voicePart: "Alto",
-                    email: "mary@example.com",
-                    registeredDate: "2024-02-05",
-                    status: "Active"
-                },
-                {
-                    id: 4,
-                    name: "David Tembo",
-                    phone: "0944123456",
-                    voicePart: "Bass",
-                    email: "david@example.com",
-                    registeredDate: "2024-02-10",
-                    status: "Active"
-                }
-            ];
-            
-            attendance = [
-                {
-                    id: 1,
-                    memberId: 1,
-                    memberName: "Grace Mwansa",
-                    date: "2024-09-01",
-                    serviceType: "Sabbath Morning",
-                    status: "Present",
-                    timestamp: new Date().toISOString()
-                },
-                {
-                    id: 2,
-                    memberId: 2,
-                    memberName: "John Phiri", 
-                    date: "2024-09-01",
-                    serviceType: "Sabbath Morning",
-                    status: "Present",
-                    timestamp: new Date().toISOString()
-                }
-            ];
-            
-            leaveApplications = [
-                {
-                    id: 1,
-                    memberId: 1,
-                    memberName: "Grace Mwansa",
-                    startDate: "2024-09-15",
-                    endDate: "2024-09-22",
-                    leaveType: "Personal",
-                    reason: "Family wedding in rural area",
-                    status: "Pending",
-                    applicationDate: "2024-09-01",
-                    adminComments: "",
-                    reviewedBy: "",
-                    reviewDate: ""
-                }
-            ];
-            
-            nextMemberId = 5;
-            nextAttendanceId = 3;
-            nextLeaveId = 2;
-            
-            // Save sample data to storage
-            saveToBrowserStorage();
+        // Check for admin login
+        if (password === settings.adminPassword) {
+            isAdmin = true;
+            currentUser = { name: name, role: 'admin' };
+            document.getElementById('loginSection').classList.add('hidden');
+            document.getElementById('adminDashboard').classList.remove('hidden');
+            updateAdminDashboard();
+            showMessage(`Welcome Admin! Database connected.`);
+            return;
         }
         
-        // Browser Storage Functions
-        function saveToBrowserStorage() {
-            try {
-                const data = {
-                    members: members,
-                    attendance: attendance,
-                    leaveApplications: leaveApplications,
-                    settings: settings,
-                    counters: {
-                        nextMemberId: nextMemberId,
-                        nextAttendanceId: nextAttendanceId,
-                        nextLeaveId: nextLeaveId
-                    },
-                    lastSaved: new Date().toISOString()
-                };
-                
-                // Use single key approach for better compatibility
-                const allData = JSON.stringify(data);
-                window.localStorage.setItem('kabwe_choir_data', allData);
-                
-                console.log('Data saved to browser storage');
-                updateStorageStatus();
-                return true;
-            } catch (error) {
-                console.error('Error saving to browser storage:', error);
-                showMessage('Failed to save data locally. Data may be lost on page refresh.', 'warning');
-                return false;
-            }
+        // Regular member login - query database
+        const { data: memberData, error } = await supabase
+            .from('members')
+            .select('*')
+            .eq('name', name)
+            .eq('phone', phone)
+            .eq('status', 'Active')
+            .single();
+        
+        if (error || !memberData) {
+            showMessage('Member not found or inactive. Please check your details.', 'error');
+            return;
         }
         
-        function loadFromBrowserStorage() {
-            try {
-                const allData = window.localStorage.getItem('kabwe_choir_data');
-                if (allData) {
-                    const data = JSON.parse(allData);
-                    
-                    members = data.members || [];
-                    attendance = data.attendance || [];
-                    leaveApplications = data.leaveApplications || [];
-                    settings = { ...settings, ...data.settings };
-                    
-                    if (data.counters) {
-                        nextMemberId = data.counters.nextMemberId || 1;
-                        nextAttendanceId = data.counters.nextAttendanceId || 1;
-                        nextLeaveId = data.counters.nextLeaveId || 1;
-                    }
-                    
-                    console.log('Data loaded from browser storage');
-                    return true;
-                }
-                return false;
-            } catch (error) {
-                console.error('Error loading from browser storage:', error);
-                return false;
-            }
-        }
+        currentUser = memberData;
+        isAdmin = false;
+        document.getElementById('loginSection').classList.add('hidden');
+        document.getElementById('memberDashboard').classList.remove('hidden');
+        updateMemberDashboard();
+        showMessage(`Welcome back, ${memberData.name}!`);
         
-        // Google Sheets Integration Functions
-        function checkGoogleSheetsConnection() {
-            const sheetsUrl = settings.googleSheetUrl;
-            const syncStatus = document.getElementById('syncStatus');
-            const syncStatusText = document.getElementById('syncStatusText');
-            
-            if (sheetsUrl && sheetsUrl.includes('docs.google.com/spreadsheets')) {
-                syncStatus.className = 'sync-status sync-connected';
-                syncStatusText.textContent = 'Connected to Google Sheets';
-                document.getElementById('googleSheetsStatus').textContent = 'Connected';
-            } else {
-                syncStatus.className = 'sync-status sync-disconnected';
-                syncStatusText.textContent = 'Not connected to Google Sheets';
-                document.getElementById('googleSheetsStatus').textContent = 'Not configured';
-            }
-        }
-        
-        function initializeGoogleSheets() {
-            const sheetUrl = document.getElementById('googleSheetUrl').value.trim();
-            if (!sheetUrl) {
-                showMessage('Please enter a Google Sheets URL first', 'error');
-                return;
-            }
-            
-            if (!sheetUrl.includes('docs.google.com/spreadsheets')) {
-                showMessage('Please enter a valid Google Sheets URL', 'error');
-                return;
-            }
-            
-            settings.googleSheetUrl = sheetUrl;
-            
-            // Simulate initializing sheets structure
-            const message = `
-                Google Sheets initialized successfully!
-                
-                The following sheets will be created:
-                1. Members - Choir member information
-                2. Attendance - Attendance records
-                3. Leave_Applications - Leave requests and approvals
-                4. Settings - System configuration
-                
-                Make sure your Google Sheet has "Editor" permissions for anyone with the link.
-            `;
-            
-            showMessage(message, 'success');
-            checkGoogleSheetsConnection();
-            saveToBrowserStorage();
-        }
-        
-        function syncToGoogleSheets() {
-            if (!settings.googleSheetUrl) {
-                showMessage('Google Sheets not configured. Please set up the connection first.', 'error');
-                return;
-            }
-            
-            try {
-                // Simulate syncing to Google Sheets
-                // In real implementation, this would make API calls to Google Sheets
-                console.log('Syncing data to Google Sheets...');
-                console.log('Members:', members);
-                console.log('Attendance:', attendance);
-                console.log('Leave Applications:', leaveApplications);
-                
-                settings.lastSync = new Date().toISOString();
-                saveToBrowserStorage();
-                updateStorageStatus();
-                
-                showMessage('Data synchronized to Google Sheets successfully!', 'success');
-            } catch (error) {
-                console.error('Error syncing to Google Sheets:', error);
-                showMessage('Failed to sync to Google Sheets. Please check your connection.', 'error');
-            }
-        }
-        
-        function loadFromGoogleSheets() {
-            if (!settings.googleSheetUrl) {
-                showMessage('Google Sheets not configured. Please set up the connection first.', 'error');
-                return;
-            }
-            
-            try {
-                // Simulate loading from Google Sheets
-                // In real implementation, this would fetch data from Google Sheets API
-                console.log('Loading data from Google Sheets...');
-                
-                showMessage('Data loaded from Google Sheets successfully!', 'success');
-                
-                // Update all displays
-                if (isAdmin) {
-                    updateAdminDashboard();
-                } else if (currentUser) {
-                    updateMemberDashboard();
-                }
-                
-            } catch (error) {
-                console.error('Error loading from Google Sheets:', error);
-                showMessage('Failed to load from Google Sheets. Using local data.', 'warning');
-            }
-        }
-        
-        function testGoogleSheetsConnection() {
-            const sheetUrl = settings.googleSheetUrl;
-            if (!sheetUrl) {
-                showMessage('No Google Sheets URL configured', 'error');
-                return;
-            }
-            
-            // Simulate connection test
-            const isValidUrl = sheetUrl.includes('docs.google.com/spreadsheets');
-            
-            if (isValidUrl) {
-                showMessage('Google Sheets connection test successful!', 'success');
-            } else {
-                showMessage('Invalid Google Sheets URL. Please check the URL format.', 'error');
-            }
-        }
-        
-        // Enhanced data persistence wrapper
-        function saveData(operation = 'general') {
-            try {
-                // Always save to browser storage
-                const browserSaved = saveToBrowserStorage();
-                
-                // Auto-sync to Google Sheets if configured and operation involves data changes
-                if (settings.googleSheetUrl && ['register', 'attendance', 'leave', 'admin'].includes(operation)) {
-                    setTimeout(() => {
-                        syncToGoogleSheets();
-                    }, 1000); // Delay to avoid overwhelming the sheets API
-                }
-                
-                return browserSaved;
-            } catch (error) {
-                console.error('Error in saveData:', error);
-                return false;
-            }
-        }
-        
-        function updateStorageStatus() {
-            try {
-                const browserStatus = document.getElementById('browserStorageStatus');
-                const lastSyncElement = document.getElementById('lastSyncTime');
-                
-                if (browserStatus) {
-                    if (window.localStorage.getItem('kabwe_choir_data')) {
-                        browserStatus.textContent = 'Working - Data saved locally';
-                        browserStatus.style.color = '#27ae60';
-                    } else {
-                        browserStatus.textContent = 'Failed - No local storage';
-                        browserStatus.style.color = '#e74c3c';
-                    }
-                }
-                
-                if (lastSyncElement && settings.lastSync) {
-                    const lastSync = new Date(settings.lastSync);
-                    lastSyncElement.textContent = lastSync.toLocaleString();
-                }
-            } catch (error) {
-                console.error('Error updating storage status:', error);
-            }
-        }
-        
-        // Utility Functions with persistence
-        function showMessage(message, type = 'success') {
-            try {
-                const messageArea = document.getElementById('messageArea');
-                if (messageArea) {
-                    messageArea.innerHTML = `<div class="message ${type}">${message}</div>`;
-                    setTimeout(() => {
-                        messageArea.innerHTML = '';
-                    }, 7000);
-                }
-                console.log(`[${type.toUpperCase()}] ${message}`);
-            } catch (error) {
-                console.error('Error showing message:', error);
-            }
-        }
-        
-        function showRegisterForm() {
-            try {
-                const loginSection = document.getElementById('loginSection');
-                const registrationSection = document.getElementById('registrationSection');
-                
-                if (loginSection && registrationSection) {
-                    loginSection.classList.add('hidden');
-                    registrationSection.classList.remove('hidden');
-                } else {
-                    throw new Error('Could not find login or registration sections');
-                }
-            } catch (error) {
-                console.error('Error showing register form:', error);
-                showMessage('Error displaying registration form', 'error');
-            }
-        }
-        
-        function showLoginForm() {
-            try {
-                const loginSection = document.getElementById('loginSection');
-                const registrationSection = document.getElementById('registrationSection');
-                
-                if (loginSection && registrationSection) {
-                    registrationSection.classList.add('hidden');
-                    loginSection.classList.remove('hidden');
-                } else {
-                    throw new Error('Could not find login or registration sections');
-                }
-            } catch (error) {
-                console.error('Error showing login form:', error);
-                showMessage('Error displaying login form', 'error');
-            }
-        }
-        
-        function registerMember() {
-            try {
-                console.log('Starting member registration...');
-                
-                // Get form elements
-                const nameElement = document.getElementById('memberName');
-                const phoneElement = document.getElementById('memberPhone');
-                const voicePartElement = document.getElementById('voicePart');
-                const emailElement = document.getElementById('memberEmail');
-                
-                if (!nameElement || !phoneElement || !voicePartElement || !emailElement) {
-                    throw new Error('Form elements not found');
-                }
-                
-                // Get values
-                const name = nameElement.value.trim();
-                const phone = phoneElement.value.trim();
-                const voicePart = voicePartElement.value;
-                const email = emailElement.value.trim();
-                
-                console.log(`Registration attempt - Name: "${name}", Phone: "${phone}", Voice Part: "${voicePart}"`);
-                
-                // Validation
-                if (!name) {
-                    showMessage('Please enter a full name.', 'error');
-                    nameElement.focus();
-                    return;
-                }
-                
-                if (!phone) {
-                    showMessage('Please enter a phone number.', 'error');
-                    phoneElement.focus();
-                    return;
-                }
-                
-                if (!voicePart) {
-                    showMessage('Please select a voice part.', 'error');
-                    voicePartElement.focus();
-                    return;
-                }
-                
-                // Check for existing members
-                const existingMember = members.find(m => 
-                    m.name.toLowerCase() === name.toLowerCase() || m.phone === phone
-                );
-                
-                if (existingMember) {
-                    showMessage('A member with this name or phone number already exists.', 'error');
-                    return;
-                }
-                
-                // Create new member
-                const newMember = {
-                    id: nextMemberId++,
-                    name: name,
-                    phone: phone,
-                    voicePart: voicePart,
-                    email: email,
-                    registeredDate: new Date().toISOString().split('T')[0],
-                    status: 'Active'
-                };
-                
-                members.push(newMember);
-                console.log(`Member registered successfully: ${JSON.stringify(newMember)}`);
-                
-                // Save data with persistence
-                saveData('register');
-                
-                // Clear form
-                nameElement.value = '';
-                phoneElement.value = '';
-                voicePartElement.value = '';
-                emailElement.value = '';
-                
-                showMessage(`Registration successful! Welcome to the choir, ${name}! Your data has been saved securely.`);
-                
-                // Switch to login after 2 seconds
-                setTimeout(() => {
-                    showLoginForm();
-                }, 2000);
-                
-            } catch (error) {
-                console.error('Registration error:', error);
-                showMessage(`Registration failed: ${error.message}`, 'error');
-            }
-        }
-        
-        function loginUser() {
-            try {
-                const name = document.getElementById('loginName').value.trim();
-                const phone = document.getElementById('loginPhone').value.trim();
-                const password = document.getElementById('loginPassword').value;
-                
-                if (!name || !phone) {
-                    showMessage('Please enter both name and phone number.', 'error');
-                    return;
-                }
-                
-                // Check for admin login
-                if (password === settings.adminPassword) {
-                    isAdmin = true;
-                    currentUser = { name: name, role: 'admin' };
-                    document.getElementById('loginSection').classList.add('hidden');
-                    document.getElementById('adminDashboard').classList.remove('hidden');
-                    updateAdminDashboard();
-                    showMessage(`Welcome Admin! Full system access granted.`);
-                    return;
-                }
-                
-                // Regular member login
-                const member = members.find(m => 
-                    m.name.toLowerCase() === name.toLowerCase() && 
-                    m.phone === phone &&
-                    m.status === 'Active'
-                );
-                
-                if (member) {
-                    currentUser = member;
-                    isAdmin = false;
-                    document.getElementById('loginSection').classList.add('hidden');
-                    document.getElementById('memberDashboard').classList.remove('hidden');
-                    updateMemberDashboard();
-                    showMessage(`Welcome back, ${member.name}!`);
-                } else {
-                    showMessage('Member not found or inactive. Please check your details or register as a new member.', 'error');
-                }
-            } catch (error) {
-                console.error('Login error:', error);
-                showMessage('Login failed. Please try again.', 'error');
-            }
-        }
-        
-        function markMemberAttendance() {
-            try {
-                if (!currentUser) return;
-                
-                const date = document.getElementById('attendanceDate').value;
-                const serviceType = document.getElementById('attendanceType').value;
-                
-                if (!date) {
-                    showMessage('Please select a date.', 'error');
-                    return;
-                }
-                
-                // Check if member is on approved leave for this date
-                const memberOnLeave = leaveApplications.find(leave => 
-                    leave.memberId === currentUser.id &&
-                    leave.status === 'Approved' &&
-                    date >= leave.startDate &&
-                    date <= leave.endDate
-                );
-                
-                if (memberOnLeave) {
-                    showMessage('You are currently on approved leave for this date. Attendance cannot be marked.', 'warning');
-                    return;
-                }
-                
-                // Check if already marked attendance for this date and service
-                const existingRecord = attendance.find(a => 
-                    a.memberId === currentUser.id && 
-                    a.date === date && 
-                    a.serviceType === serviceType
-                );
-                
-                if (existingRecord) {
-                    showMessage('You have already marked attendance for this date and service type.', 'error');
-                    return;
-                }
-                
-                const attendanceRecord = {
-                    id: nextAttendanceId++,
-                    memberId: currentUser.id,
-                    memberName: currentUser.name,
-                    date: date,
-                    serviceType: serviceType,
-                    status: 'Present',
-                    timestamp: new Date().toISOString()
-                };
-                
-                attendance.push(attendanceRecord);
-                
-                // Save data with persistence
-                saveData('attendance');
-                
-                updateMemberDashboard();
-                showMessage(`Attendance marked successfully for ${serviceType} on ${date}! Data has been saved.`);
-            } catch (error) {
-                console.error('Attendance marking error:', error);
-                showMessage('Failed to mark attendance. Please try again.', 'error');
-            }
-        }
-        
-        // Leave Management Functions
-        function showLeaveApplicationForm() {
-            try {
-                document.getElementById('leaveApplicationForm').classList.remove('hidden');
-                // Set minimum date to tomorrow
-                const tomorrow = new Date();
-                tomorrow.setDate(tomorrow.getDate() + 1);
-                document.getElementById('leaveStartDate').min = tomorrow.toISOString().split('T')[0];
-            } catch (error) {
-                console.error('Error showing leave form:', error);
-            }
-        }
-        
-        function hideLeaveApplicationForm() {
-            try {
-                document.getElementById('leaveApplicationForm').classList.add('hidden');
-                // Clear form
-                document.getElementById('leaveStartDate').value = '';
-                document.getElementById('leaveEndDate').value = '';
-                document.getElementById('leaveType').value = 'Personal';
-                document.getElementById('leaveReason').value = '';
-            } catch (error) {
-                console.error('Error hiding leave form:', error);
-            }
-        }
-        
-        function submitLeaveApplication() {
-            try {
-                if (!currentUser) return;
-                
-                const startDate = document.getElementById('leaveStartDate').value;
-                const endDate = document.getElementById('leaveEndDate').value;
-                const leaveType = document.getElementById('leaveType').value;
-                const reason = document.getElementById('leaveReason').value.trim();
-                
-                if (!startDate || !endDate || !reason) {
-                    showMessage('Please fill in all required fields.', 'error');
-                    return;
-                }
-                
-                if (new Date(endDate) < new Date(startDate)) {
-                    showMessage('End date cannot be before start date.', 'error');
-                    return;
-                }
-                
-                const leaveApplication = {
-                    id: nextLeaveId++,
-                    memberId: currentUser.id,
-                    memberName: currentUser.name,
-                    startDate: startDate,
-                    endDate: endDate,
-                    leaveType: leaveType,
-                    reason: reason,
-                    status: 'Pending',
-                    applicationDate: new Date().toISOString().split('T')[0],
-                    adminComments: '',
-                    reviewedBy: '',
-                    reviewDate: ''
-                };
-                
-                leaveApplications.push(leaveApplication);
-                
-                // Save data with persistence
-                saveData('leave');
-                
-                hideLeaveApplicationForm();
-                updateMemberLeaveApplications();
-                showMessage('Leave application submitted successfully! Data has been saved and will be reviewed by admin.');
-            } catch (error) {
-                console.error('Leave application error:', error);
-                showMessage('Failed to submit leave application. Please try again.', 'error');
-            }
-        }
-        
-        // Member Dashboard Functions
-        function showMemberTab(tabName) {
-            try {
-                // Hide all member tabs
-                document.getElementById('memberAttendanceTab').classList.add('hidden');
-                document.getElementById('memberLeaveTab').classList.add('hidden');
-                document.getElementById('memberProfileTab').classList.add('hidden');
-                document.getElementById('memberDirectoryTab').classList.add('hidden');
-                
-                // Remove active class from all tab buttons
-                document.querySelectorAll('#memberDashboard .tab').forEach(tab => tab.classList.remove('active'));
-                
-                // Show selected tab and set active
-                const tabElement = document.getElementById('member' + tabName.charAt(0).toUpperCase() + tabName.slice(1) + 'Tab');
-                if (tabElement) {
-                    tabElement.classList.remove('hidden');
-                }
-                event.target.classList.add('active');
-                
-                if (tabName === 'profile') {
-                    updateMemberProfile();
-                } else if (tabName === 'directory') {
-                    updateMemberDirectory();
-                } else if (tabName === 'attendance') {
-                    updateMemberAttendanceHistory();
-                } else if (tabName === 'leave') {
-                    updateMemberLeaveApplications();
-                }
-            } catch (error) {
-                console.error('Error showing member tab:', error);
-            }
-        }
-        
-        function updateMemberDashboard() {
-            try {
-                updateMemberAttendanceHistory();
-                updateMemberProfile();
-                updateMemberDirectory();
-                updateMemberLeaveApplications();
-            } catch (error) {
-                console.error('Error updating member dashboard:', error);
-            }
-        }
-        
-        function updateMemberAttendanceHistory() {
-            try {
-                const recordsDiv = document.getElementById('memberRecords');
-                if (!currentUser || isAdmin || !recordsDiv) return;
-                
-                const userAttendance = attendance.filter(a => a.memberId === currentUser.id)
-                                                .sort((a, b) => new Date(b.date) - new Date(a.date));
-                
-                if (userAttendance.length === 0) {
-                    recordsDiv.innerHTML = '<p>No attendance records found.</p>';
-                    return;
-                }
-                
-                const totalServices = userAttendance.length;
-                const presentCount = userAttendance.filter(a => a.status === 'Present').length;
-                const attendanceRate = ((presentCount / totalServices) * 100).toFixed(1);
-                
-                recordsDiv.innerHTML = `
-                    <div style="margin-bottom: 1rem; padding: 1rem; background: rgba(102, 126, 234, 0.1); border-radius: 8px;">
-                        <strong>My Attendance Summary:</strong> ${presentCount} out of ${totalServices} services attended (${attendanceRate}% attendance rate)
-                    </div>
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Service Type</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${userAttendance.map(record => `
-                                <tr>
-                                    <td>${record.date}</td>
-                                    <td>${record.serviceType}</td>
-                                    <td style="color: ${record.status === 'Present' ? '#27ae60' : '#e74c3c'}; font-weight: bold;">
-                                        ${record.status}
-                                    </td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-                `;
-            } catch (error) {
-                console.error('Error updating attendance history:', error);
-            }
-        }
-        
-        function updateMemberProfile() {
-            try {
-                const profileDiv = document.getElementById('profileInfo');
-                if (!currentUser || isAdmin || !profileDiv) return;
-                
-                const member = members.find(m => m.id === currentUser.id);
-                if (!member) return;
-                
-                profileDiv.innerHTML = `
-                    <div class="stat-card" style="text-align: left;">
-                        <p><strong>Name:</strong> ${member.name}</p>
-                        <p><strong>Phone:</strong> ${member.phone}</p>
-                        <p><strong>Voice Part:</strong> ${member.voicePart}</p>
-                        <p><strong>Email:</strong> ${member.email || 'Not provided'}</p>
-                        <p><strong>Member Since:</strong> ${member.registeredDate}</p>
-                        <p><strong>Status:</strong> <span style="color: ${member.status === 'Active' ? '#27ae60' : '#e74c3c'}">${member.status}</span></p>
-                    </div>
-                `;
-            } catch (error) {
-                console.error('Error updating member profile:', error);
-            }
-        }
-        
-        function updateMemberDirectory() {
-            try {
-                const directoryDiv = document.getElementById('publicDirectory');
-                if (!directoryDiv) return;
-                
-                const activeMembers = members.filter(m => m.status === 'Active');
-                
-                if (activeMembers.length === 0) {
-                    directoryDiv.innerHTML = '<p>No active members found.</p>';
-                    return;
-                }
-                
-                directoryDiv.innerHTML = `
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Voice Part</th>
-                                <th>Phone</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${activeMembers.map(member => `
-                                <tr>
-                                    <td>${member.name}</td>
-                                    <td>${member.voicePart}</td>
-                                    <td>${member.phone}</td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-                `;
-            } catch (error) {
-                console.error('Error updating member directory:', error);
-            }
-        }
-        
-        function updateMemberLeaveApplications() {
-            try {
-                if (!currentUser || isAdmin) return;
-                
-                const applicationsDiv = document.getElementById('memberLeaveApplications');
-                if (!applicationsDiv) return;
-                
-                const memberApplications = leaveApplications
-                    .filter(app => app.memberId === currentUser.id)
-                    .sort((a, b) => new Date(b.applicationDate) - new Date(a.applicationDate));
-                
-                if (memberApplications.length === 0) {
-                    applicationsDiv.innerHTML = '<p>No leave applications found.</p>';
-                    return;
-                }
-                
-                applicationsDiv.innerHTML = memberApplications.map(app => `
-                    <div class="leave-card">
-                        <div class="leave-header">
-                            <div>
-                                <strong>${app.leaveType} Leave</strong>
-                                <br>
-                                <small>Applied on: ${app.applicationDate}</small>
-                            </div>
-                            <span class="leave-status status-${app.status.toLowerCase()}">${app.status}</span>
-                        </div>
-                        <div class="leave-details">
-                            <p><strong>Period:</strong> ${app.startDate} to ${app.endDate}</p>
-                            <p><strong>Reason:</strong> ${app.reason}</p>
-                            ${app.adminComments ? `<p><strong>Admin Comments:</strong> ${app.adminComments}</p>` : ''}
-                            ${app.reviewDate ? `<p><strong>Reviewed on:</strong> ${app.reviewDate}</p>` : ''}
-                        </div>
-                    </div>
-                `).join('');
-            } catch (error) {
-                console.error('Error updating member leave applications:', error);
-            }
-        }
-        
-        // Admin Dashboard Functions
-        function showAdminTab(tabName) {
-            try {
-                // Hide all admin tabs
-                document.getElementById('adminOverviewTab').classList.add('hidden');
-                document.getElementById('adminMembersTab').classList.add('hidden');
-                document.getElementById('adminAttendanceTab').classList.add('hidden');
-                document.getElementById('adminLeaveTab').classList.add('hidden');
-                document.getElementById('adminReportsTab').classList.add('hidden');
-                document.getElementById('adminSettingsTab').classList.add('hidden');
-                
-                // Remove active class from all tab buttons
-                document.querySelectorAll('#adminDashboard .tab').forEach(tab => tab.classList.remove('active'));
-                
-                // Show selected tab and set active
-                const tabElement = document.getElementById('admin' + tabName.charAt(0).toUpperCase() + tabName.slice(1) + 'Tab');
-                if (tabElement) {
-                    tabElement.classList.remove('hidden');
-                }
-                event.target.classList.add('active');
-                
-                // Update tab-specific content
-                if (tabName === 'members') {
-                    updateMembersTable();
-                } else if (tabName === 'attendance') {
-                    updateAttendanceDisplay();
-                } else if (tabName === 'leave') {
-                    updateLeaveApplicationsDisplay();
-                } else if (tabName === 'reports') {
-                    updateReportsDisplay();
-                } else if (tabName === 'overview') {
-                    updateOverviewStats();
-                } else if (tabName === 'settings') {
-                    updateSettingsTab();
-                }
-            } catch (error) {
-                console.error('Error showing admin tab:', error);
-            }
-        }
-        
-        function updateAdminDashboard() {
-            try {
-                updateOverviewStats();
-                updateMembersTable();
-                updateAttendanceDisplay();
-                updateLeaveApplicationsDisplay();
-                updateStorageStatus();
-            } catch (error) {
-                console.error('Error updating admin dashboard:', error);
-            }
-        }
-        
-        function updateOverviewStats() {
-            try {
-                const totalMembers = members.length;
-                const activeMembers = members.filter(m => m.status === 'Active').length;
-                
-                // Calculate this week's attendance
-                const oneWeekAgo = new Date();
-                oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-                const thisWeekAttendance = attendance.filter(a => 
-                    new Date(a.date) >= oneWeekAgo
-                ).length;
-                
-                // Calculate pending leave requests
-                const pendingLeave = leaveApplications.filter(app => app.status === 'Pending').length;
-                
-                // Calculate members currently on leave
-                const today = new Date().toISOString().split('T')[0];
-                const membersOnLeave = leaveApplications.filter(app => 
-                    app.status === 'Approved' &&
-                    today >= app.startDate &&
-                    today <= app.endDate
-                ).length;
-                
-                // Calculate average attendance rate
-                const totalAttendanceRecords = attendance.length;
-                const presentRecords = attendance.filter(a => a.status === 'Present').length;
-                const averageAttendance = totalAttendanceRecords > 0 
-                    ? ((presentRecords / totalAttendanceRecords) * 100).toFixed(0)
-                    : 0;
-                
-                // Update stats elements if they exist
-                const elements = {
-                    'totalMembers': totalMembers,
-                    'activeMembers': activeMembers,
-                    'thisWeekAttendance': thisWeekAttendance,
-                    'pendingLeaveRequests': pendingLeave,
-                    'averageAttendance': averageAttendance + '%',
-                    'membersOnLeave': membersOnLeave
-                };
-                
-                Object.entries(elements).forEach(([id, value]) => {
-                    const element = document.getElementById(id);
-                    if (element) {
-                        element.textContent = value;
-                    }
-                });
-            } catch (error) {
-                console.error('Error updating overview stats:', error);
-            }
-        }
-        
-        function updateMembersTable() {
-            try {
-                const tbody = document.getElementById('membersTableBody');
-                if (!tbody) return;
-                
-                let filteredMembers = [...members];
-                
-                // Apply filters
-                const voicePartFilter = document.getElementById('voicePartFilter').value;
-                const statusFilter = document.getElementById('statusFilter').value;
-                
-                if (voicePartFilter) {
-                    filteredMembers = filteredMembers.filter(m => m.voicePart === voicePartFilter);
-                }
-                
-                if (statusFilter) {
-                    filteredMembers = filteredMembers.filter(m => m.status === statusFilter);
-                }
-                
-                tbody.innerHTML = filteredMembers.map(member => `
-                    <tr>
-                        <td>${member.name}</td>
-                        <td>${member.phone}</td>
-                        <td>${member.voicePart}</td>
-                        <td>${member.email || 'N/A'}</td>
-                        <td>${member.registeredDate}</td>
-                        <td><span style="color: ${member.status === 'Active' ? '#27ae60' : '#e74c3c'}">${member.status}</span></td>
-                        <td>
-                            <button onclick="editMember(${member.id})" class="btn-secondary" style="padding: 0.3rem 0.6rem; margin: 0.2rem;">Edit</button>
-                            <button onclick="toggleMemberStatus(${member.id})" class="btn-secondary" style="padding: 0.3rem 0.6rem; margin: 0.2rem;">
-                                ${member.status === 'Active' ? 'Deactivate' : 'Activate'}
-                            </button>
-                        </td>
-                    </tr>
-                `).join('');
-            } catch (error) {
-                console.error('Error updating members table:', error);
-            }
-        }
-        
-        function updateAttendanceDisplay() {
-            try {
-                const attendanceDiv = document.getElementById('attendanceDisplay');
-                if (!attendanceDiv) return;
-                
-                // Apply filters
-                const dateFilter = document.getElementById('attendanceDateFilter').value;
-                const serviceTypeFilter = document.getElementById('serviceTypeFilter').value;
-                
-                let filteredAttendance = [...attendance];
-                
-                if (dateFilter) {
-                    filteredAttendance = filteredAttendance.filter(a => a.date === dateFilter);
-                }
-                
-                if (serviceTypeFilter) {
-                    filteredAttendance = filteredAttendance.filter(a => a.serviceType === serviceTypeFilter);
-                }
-                
-                // Sort by date (newest first)
-                filteredAttendance.sort((a, b) => new Date(b.date) - new Date(a.date));
-                
-                if (filteredAttendance.length === 0) {
-                    attendanceDiv.innerHTML = '<p>No attendance records found.</p>';
-                    return;
-                }
-                
-                attendanceDiv.innerHTML = `
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Member</th>
-                                <th>Service Type</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${filteredAttendance.map(record => `
-                                <tr>
-                                    <td>${record.date}</td>
-                                    <td>${record.memberName}</td>
-                                    <td>${record.serviceType}</td>
-                                    <td style="color: ${record.status === 'Present' ? '#27ae60' : '#e74c3c'}; font-weight: bold;">
-                                        ${record.status}
-                                    </td>
-                                    <td>
-                                        <button onclick="deleteAttendanceRecord(${record.id})" class="btn-danger" style="padding: 0.3rem 0.6rem;">Delete</button>
-                                    </td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-                `;
-            } catch (error) {
-                console.error('Error updating attendance display:', error);
-            }
-        }
-        
-        function updateLeaveApplicationsDisplay() {
-            try {
-                const leaveDiv = document.getElementById('leaveApplicationsDisplay');
-                if (!leaveDiv) return;
-                
-                // Apply filters
-                const statusFilter = document.getElementById('leaveStatusFilter').value;
-                const typeFilter = document.getElementById('leaveTypeFilter').value;
-                
-                let filteredApplications = [...leaveApplications];
-                
-                if (statusFilter) {
-                    filteredApplications = filteredApplications.filter(app => app.status === statusFilter);
-                }
-                
-                if (typeFilter) {
-                    filteredApplications = filteredApplications.filter(app => app.leaveType === typeFilter);
-                }
-                
-                // Sort by application date (newest first)
-                filteredApplications.sort((a, b) => new Date(b.applicationDate) - new Date(a.applicationDate));
-                
-                if (filteredApplications.length === 0) {
-                    leaveDiv.innerHTML = '<p>No leave applications found.</p>';
-                    return;
-                }
-                
-                leaveDiv.innerHTML = filteredApplications.map(app => `
-                    <div class="leave-card">
-                        <div class="leave-header">
-                            <div>
-                                <strong>${app.memberName}</strong> - ${app.leaveType} Leave
-                                <br>
-                                <small>Applied on: ${app.applicationDate}</small>
-                            </div>
-                            <span class="leave-status status-${app.status.toLowerCase()}">${app.status}</span>
-                        </div>
-                        <div class="leave-details">
-                            <p><strong>Period:</strong> ${app.startDate} to ${app.endDate}</p>
-                            <p><strong>Reason:</strong> ${app.reason}</p>
-                            ${app.adminComments ? `<p><strong>Admin Comments:</strong> ${app.adminComments}</p>` : ''}
-                            ${app.reviewDate ? `<p><strong>Reviewed on:</strong> ${app.reviewDate} by ${app.reviewedBy}</p>` : ''}
-                        </div>
-                        ${app.status === 'Pending' ? `
-                            <div class="leave-actions">
-                                <button onclick="approveLeaveApplication(${app.id})" class="btn-success">Approve</button>
-                                <button onclick="denyLeaveApplication(${app.id})" class="btn-danger">Deny</button>
-                            </div>
-                        ` : ''}
-                    </div>
-                `).join('');
-            } catch (error) {
-                console.error('Error updating leave applications display:', error);
-            }
-        }
-        
-        function updateReportsDisplay() {
-            try {
-                const today = new Date();
-                const lastMonth = new Date();
-                lastMonth.setMonth(lastMonth.getMonth() - 1);
-                
-                const startDateElement = document.getElementById('reportStartDate');
-                const endDateElement = document.getElementById('reportEndDate');
-                
-                if (startDateElement && endDateElement) {
-                    startDateElement.value = lastMonth.toISOString().split('T')[0];
-                    endDateElement.value = today.toISOString().split('T')[0];
-                    generateReport();
-                }
-            } catch (error) {
-                console.error('Error updating reports display:', error);
-            }
-        }
-        
-        function updateSettingsTab() {
-            try {
-                // Load current settings into form
-                const googleSheetUrlElement = document.getElementById('googleSheetUrl');
-                const churchSettingsElement = document.getElementById('churchSettings');
-                
-                if (googleSheetUrlElement) {
-                    googleSheetUrlElement.value = settings.googleSheetUrl || '';
-                }
-                
-                if (churchSettingsElement) {
-                    churchSettingsElement.value = settings.churchSettings || '';
-                }
-                
-                updateStorageStatus();
-            } catch (error) {
-                console.error('Error updating settings tab:', error);
-            }
-        }
-        
-        // Filter Functions
-        function filterMembers() {
-            updateMembersTable();
-        }
-        
-        function filterAttendance() {
-            updateAttendanceDisplay();
-        }
-        
-        function filterLeaveApplications() {
-            updateLeaveApplicationsDisplay();
-        }
-        
-        // Additional Admin Functions
-        function toggleMemberStatus(memberId) {
-            try {
-                const member = members.find(m => m.id === memberId);
-                if (member) {
-                    member.status = member.status === 'Active' ? 'Inactive' : 'Active';
-                    
-                    // Save data with persistence
-                    saveData('admin');
-                    
-                    updateMembersTable();
-                    updateOverviewStats();
-                    showMessage(`${member.name} status updated to ${member.status}`);
-                }
-            } catch (error) {
-                console.error('Error toggling member status:', error);
-                showMessage('Failed to update member status', 'error');
-            }
-        }
-        
-        function editMember(memberId) {
-            try {
-                const member = members.find(m => m.id === memberId);
-                if (!member) return;
-                
-                const newName = prompt('Enter new name:', member.name);
-                if (newName && newName !== member.name) {
-                    member.name = newName;
-                }
-                
-                const newPhone = prompt('Enter new phone:', member.phone);
-                if (newPhone && newPhone !== member.phone) {
-                    member.phone = newPhone;
-                }
-                
-                const newEmail = prompt('Enter new email:', member.email);
-                if (newEmail !== null) {
-                    member.email = newEmail;
-                }
-                
-                // Save data with persistence
-                saveData('admin');
-                
-                updateMembersTable();
-                showMessage(`${member.name} updated successfully`);
-            } catch (error) {
-                console.error('Error editing member:', error);
-                showMessage('Failed to edit member', 'error');
-            }
-        }
-        
-        function showAddMemberForm() {
-            try {
-                const name = prompt('Enter member name:');
-                if (!name) return;
-                
-                const phone = prompt('Enter phone number:');
-                if (!phone) return;
-                
-                const voicePart = prompt('Enter voice part (Soprano/Alto/Tenor/Bass):');
-                if (!voicePart) return;
-                
-                const email = prompt('Enter email (optional):') || '';
-                
-                const newMember = {
-                    id: nextMemberId++,
-                    name: name,
-                    phone: phone,
-                    voicePart: voicePart,
-                    email: email,
-                    registeredDate: new Date().toISOString().split('T')[0],
-                    status: 'Active'
-                };
-                
-                members.push(newMember);
-                
-                // Save data with persistence
-                saveData('admin');
-                
-                updateMembersTable();
-                updateOverviewStats();
-                showMessage(`${name} added successfully!`);
-            } catch (error) {
-                console.error('Error adding member:', error);
-                showMessage('Failed to add member', 'error');
-            }
-        }
-        
-        function deleteAttendanceRecord(recordId) {
-            try {
-                if (confirm('Are you sure you want to delete this attendance record?')) {
-                    attendance = attendance.filter(a => a.id !== recordId);
-                    
-                    // Save data with persistence
-                    saveData('admin');
-                    
-                    updateAttendanceDisplay();
-                    updateOverviewStats();
-                    showMessage('Attendance record deleted');
-                }
-            } catch (error) {
-                console.error('Error deleting attendance record:', error);
-                showMessage('Failed to delete attendance record', 'error');
-            }
-        }
-        
-        function approveLeaveApplication(applicationId) {
-            try {
-                const application = leaveApplications.find(app => app.id === applicationId);
-                if (!application) return;
-                
-                const comments = prompt('Add approval comments (optional):', '');
-                
-                application.status = 'Approved';
-                application.adminComments = comments || 'Leave approved';
-                application.reviewedBy = 'Admin';
-                application.reviewDate = new Date().toISOString().split('T')[0];
-                
-                // Save data with persistence
-                saveData('admin');
-                
-                updateLeaveApplicationsDisplay();
-                updateOverviewStats();
-                showMessage(`Leave application for ${application.memberName} has been approved.`);
-            } catch (error) {
-                console.error('Error approving leave application:', error);
-                showMessage('Failed to approve leave application', 'error');
-            }
-        }
-        
-        function denyLeaveApplication(applicationId) {
-            try {
-                const application = leaveApplications.find(app => app.id === applicationId);
-                if (!application) return;
-                
-                const comments = prompt('Please provide reason for denial:', '');
-                if (!comments) {
-                    showMessage('Please provide a reason for denial.', 'error');
-                    return;
-                }
-                
-                application.status = 'Denied';
-                application.adminComments = comments;
-                application.reviewedBy = 'Admin';
-                application.reviewDate = new Date().toISOString().split('T')[0];
-                
-                // Save data with persistence
-                saveData('admin');
-                
-                updateLeaveApplicationsDisplay();
-                updateOverviewStats();
-                showMessage(`Leave application for ${application.memberName} has been denied.`);
-            } catch (error) {
-                console.error('Error denying leave application:', error);
-                showMessage('Failed to deny leave application', 'error');
-            }
-        }
-        
-        function showBulkAttendanceForm() {
-            try {
-                const date = prompt('Enter date (YYYY-MM-DD):', new Date().toISOString().split('T')[0]);
-                if (!date) return;
-                
-                const serviceType = prompt('Enter service type:', 'Sabbath Morning');
-                if (!serviceType) return;
-                
-                const activeMembers = members.filter(m => m.status === 'Active');
-                
-                let marked = 0;
-                activeMembers.forEach(member => {
-                    const present = confirm(`Mark ${member.name} as present for ${serviceType} on ${date}?`);
-                    if (present) {
-                        const attendanceRecord = {
-                            id: nextAttendanceId++,
-                            memberId: member.id,
-                            memberName: member.name,
-                            date: date,
-                            serviceType: serviceType,
-                            status: 'Present',
-                            timestamp: new Date().toISOString()
-                        };
-                        attendance.push(attendanceRecord);
-                        marked++;
-                    }
-                });
-                
-                // Save data with persistence
-                saveData('admin');
-                
-                updateAttendanceDisplay();
-                updateOverviewStats();
-                showMessage(`Bulk attendance marked for ${marked} members on ${date}`);
-            } catch (error) {
-                console.error('Error with bulk attendance:', error);
-                showMessage('Failed to mark bulk attendance', 'error');
-            }
-        }
-        
-        function generateReport() {
-            try {
-                const startDate = document.getElementById('reportStartDate').value;
-                const endDate = document.getElementById('reportEndDate').value;
-                
-                if (!startDate || !endDate) {
-                    showMessage('Please select both start and end dates', 'error');
-                    return;
-                }
-                
-                const filteredAttendance = attendance.filter(a => 
-                    a.date >= startDate && a.date <= endDate
-                );
-                
-                const filteredLeave = leaveApplications.filter(app => 
-                    app.applicationDate >= startDate && app.applicationDate <= endDate
-                );
-                
-                const reportsDiv = document.getElementById('reportsDisplay');
-                if (!reportsDiv) return;
-                
-                // Generate statistics
-                const totalRecords = filteredAttendance.length;
-                const presentRecords = filteredAttendance.filter(a => a.status === 'Present').length;
-                const attendanceRate = totalRecords > 0 ? ((presentRecords / totalRecords) * 100).toFixed(1) : 0;
-                
-                // Leave statistics
-                const totalLeaveApplications = filteredLeave.length;
-                const approvedLeave = filteredLeave.filter(app => app.status === 'Approved').length;
-                const pendingLeave = filteredLeave.filter(app => app.status === 'Pending').length;
-                const deniedLeave = filteredLeave.filter(app => app.status === 'Denied').length;
-                
-                reportsDiv.innerHTML = `
-                    <div class="member-stats">
-                        <div class="stat-card">
-                            <div class="stat-number">${totalRecords}</div>
-                            <div class="stat-label">Total Attendance Records</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-number">${presentRecords}</div>
-                            <div class="stat-label">Present Records</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-number">${attendanceRate}%</div>
-                            <div class="stat-label">Attendance Rate</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-number">${totalLeaveApplications}</div>
-                            <div class="stat-label">Leave Applications</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-number">${approvedLeave}</div>
-                            <div class="stat-label">Approved Leave</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-number">${pendingLeave}</div>
-                            <div class="stat-label">Pending Leave</div>
-                        </div>
-                    </div>
-                `;
-            } catch (error) {
-                console.error('Error generating report:', error);
-                showMessage('Failed to generate report', 'error');
-            }
-        }
-        
-        // Export Functions
-        function exportMembersCSV() {
-            try {
-                const csv = convertToCSV(members, ['id', 'name', 'phone', 'voicePart', 'email', 'registeredDate', 'status']);
-                downloadCSV(csv, 'choir_members.csv');
-                showMessage('Members exported successfully!');
-            } catch (error) {
-                console.error('Error exporting members CSV:', error);
-                showMessage('Failed to export members', 'error');
-            }
-        }
-        
-        function exportAttendanceCSV() {
-            try {
-                const csv = convertToCSV(attendance, ['id', 'memberName', 'date', 'serviceType', 'status']);
-                downloadCSV(csv, 'choir_attendance.csv');
-                showMessage('Attendance exported successfully!');
-            } catch (error) {
-                console.error('Error exporting attendance CSV:', error);
-                showMessage('Failed to export attendance', 'error');
-            }
-        }
-        
-        function exportLeaveCSV() {
-            try {
-                const csv = convertToCSV(leaveApplications, ['id', 'memberName', 'startDate', 'endDate', 'leaveType', 'reason', 'status', 'applicationDate', 'adminComments']);
-                downloadCSV(csv, 'choir_leave_applications.csv');
-                showMessage('Leave applications exported successfully!');
-            } catch (error) {
-                console.error('Error exporting leave CSV:', error);
-                showMessage('Failed to export leave applications', 'error');
-            }
-        }
-        
-        function convertToCSV(data, headers) {
-            try {
-                const csvHeaders = headers.join(',');
-                const csvData = data.map(row => 
-                    headers.map(header => `"${row[header] || ''}"`).join(',')
-                ).join('\n');
-                return csvHeaders + '\n' + csvData;
-            } catch (error) {
-                console.error('Error converting to CSV:', error);
-                return '';
-            }
-        }
-        
-        function downloadCSV(csv, filename) {
-            try {
-                const blob = new Blob([csv], { type: 'text/csv' });
-                const url = window.URL.createObjectURL(blob);
-                const link = document.createElement('a');
-                link.href = url;
-                link.download = filename;
-                link.click();
-                window.URL.revokeObjectURL(url);
-            } catch (error) {
-                console.error('Error downloading CSV:', error);
-                showMessage('Failed to download file', 'error');
-            }
-        }
-        
-        function exportAllData() {
-            try {
-                const data = {
-                    members: members,
-                    attendance: attendance,
-                    leaveApplications: leaveApplications,
-                    settings: settings,
-                    counters: {
-                        nextMemberId: nextMemberId,
-                        nextAttendanceId: nextAttendanceId,
-                        nextLeaveId: nextLeaveId
-                    },
-                    exportDate: new Date().toISOString()
-                };
-                
-                const json = JSON.stringify(data, null, 2);
-                const blob = new Blob([json], { type: 'application/json' });
-                const url = window.URL.createObjectURL(blob);
-                const link = document.createElement('a');
-                link.href = url;
-                link.download = `choir_data_backup_${new Date().toISOString().split('T')[0]}.json`;
-                link.click();
-                window.URL.revokeObjectURL(url);
-                
-                showMessage('Complete data backup created successfully!');
-            } catch (error) {
-                console.error('Error exporting all data:', error);
-                showMessage('Failed to create data backup', 'error');
-            }
-        }
-        
-        function createDataBackup() {
-            exportAllData();
-        }
-        
-        function importData() {
-            try {
-                const input = document.createElement('input');
-                input.type = 'file';
-                input.accept = '.json';
-                input.onchange = function(event) {
-                    const file = event.target.files[0];
-                    if (file) {
-                        const reader = new FileReader();
-                        reader.onload = function(e) {
-                            try {
-                                const data = JSON.parse(e.target.result);
-                                if (data.members && data.attendance) {
-                                    members = data.members;
-                                    attendance = data.attendance;
-                                    if (data.leaveApplications) {
-                                        leaveApplications = data.leaveApplications;
-                                    }
-                                    if (data.settings) {
-                                        settings = { ...settings, ...data.settings };
-                                    }
-                                    if (data.counters) {
-                                        nextMemberId = data.counters.nextMemberId || members.length + 1;
-                                        nextAttendanceId = data.counters.nextAttendanceId || attendance.length + 1;
-                                        nextLeaveId = data.counters.nextLeaveId || leaveApplications.length + 1;
-                                    }
-                                    
-                                    // Save imported data
-                                    saveData('import');
-                                    
-                                    updateAdminDashboard();
-                                    checkGoogleSheetsConnection();
-                                    showMessage('Data imported successfully!');
-                                } else {
-                                    showMessage('Invalid data format', 'error');
-                                }
-                            } catch (error) {
-                                showMessage('Error importing data: ' + error.message, 'error');
-                            }
-                        };
-                        reader.readAsText(file);
-                    }
-                };
-                input.click();
-            } catch (error) {
-                console.error('Error importing data:', error);
-                showMessage('Failed to import data', 'error');
-            }
-        }
-        
-        function saveSettings() {
-            try {
-                const googleSheetUrl = document.getElementById('googleSheetUrl').value.trim();
-                const adminPassword = document.getElementById('adminPasswordSetting').value;
-                const churchSettings = document.getElementById('churchSettings').value;
-                
-                if (adminPassword) {
-                    settings.adminPassword = adminPassword;
-                }
-                
-                settings.googleSheetUrl = googleSheetUrl;
-                settings.churchSettings = churchSettings;
-                
-                // Save data with persistence
-                saveData('settings');
-                
-                checkGoogleSheetsConnection();
-                showMessage('Settings saved successfully!');
-            } catch (error) {
-                console.error('Error saving settings:', error);
-                showMessage('Failed to save settings', 'error');
-            }
-        }
-        
-        function clearAllData() {
-            try {
-                if (confirm('Are you sure you want to clear ALL data? This action cannot be undone!')) {
-                    if (confirm('This will delete all members, attendance records, and leave applications. Type YES to confirm:') === false) {
-                        return;
-                    }
-                    
-                    // Clear all data
-                    members = [];
-                    attendance = [];
-                    leaveApplications = [];
-                    nextMemberId = 1;
-                    nextAttendanceId = 1;
-                    nextLeaveId = 1;
-                    
-                    // Clear browser storage
-                    window.localStorage.removeItem('kabwe_choir_data');
-                    
-                    // Reset to sample data
-                    initializeSampleData();
-                    
-                    updateAdminDashboard();
-                    showMessage('All data cleared and reset to sample data.');
-                }
-            } catch (error) {
-                console.error('Error clearing data:', error);
-                showMessage('Failed to clear data', 'error');
-            }
-        }
-        
-        function logout() {
-            try {
-                currentUser = null;
-                isAdmin = false;
-                document.getElementById('memberDashboard').classList.add('hidden');
-                document.getElementById('adminDashboard').classList.add('hidden');
-                document.getElementById('loginSection').classList.remove('hidden');
-                document.getElementById('loginName').value = '';
-                document.getElementById('loginPhone').value = '';
-                document.getElementById('loginPassword').value = '';
-                showMessage('You have been logged out successfully.');
-            } catch (error) {
-                console.error('Error logging out:', error);
-            }
-        }
-        
-        // Error handling
-        window.addEventListener('error', function(e) {
-            console.error('JavaScript error:', e.message, 'at', e.filename + ':' + e.lineno);
-            showMessage('A system error occurred. Please refresh the page if problems persist.', 'error');
-        });
-        
-        // Auto-save functionality
-        setInterval(() => {
-            try {
-                if (members.length > 0) {
-                    saveToBrowserStorage();
-                }
-            } catch (error) {
-                console.error('Auto-save error:', error);
-            }
-        }, 60000); // Auto-save every minute
-        
-        // Initialize the system when page loads
-        document.addEventListener('DOMContentLoaded', function() {
-            initializeSystem();
-        });
-        
-        // Call initialization immediately in case DOMContentLoaded already fired
-        if (document.readyState === 'loading') {
-            // Still loading, wait for DOMContentLoaded
-        } else {
-            // DOM already loaded
-            initializeSystem();
-        }
-        
-        console.log('Kabwe Central SDA Church Choir Management System with Data Persistence loaded successfully');
+    } catch (error) {
+        console.error('Login error:', error);
+        showMessage('Login failed. Please try again.', 'error');
+    }
+}
+
+// Keep your existing UI functions, but replace data persistence calls with database versions
