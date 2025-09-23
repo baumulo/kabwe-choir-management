@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kabwe Central SDA Church Choir - Management System</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * {
             margin: 0;
@@ -500,7 +499,7 @@
                 <div class="form-group">
                     <label for="attendanceType">Service Type:</label>
                     <select id="attendanceType">
-                        <option value="Sabbath Morning">Sabbath Morning Service</option>
+                        <option value="Sabbath Morning">Sabbath Service</option>
                         <option value="Choir Practice">Choir Practice</option>
                         <option value="Special Event">Special Event</option>
                         <option value="Wedding">Wedding</option>
@@ -789,147 +788,161 @@
         
         <div id="messageArea"></div>
     </div>
-    // Supabase configuration
-const SUPABASE_URL = 'https://your-project.supabase.co';
-const SUPABASE_ANON_KEY = 'your-anon-key';
+   // Airtable Configuration - PUT YOUR ACTUAL VALUES HERE
+const AIRTABLE_CONFIG = {
+    BASE_ID: 'appYourBaseIdHere', // Replace with your actual Base ID
+    API_KEY: 'patYourApiKeyHere', // Replace with your actual API Key
+    MEMBERS_TABLE: 'Members',
+    ATTENDANCE_TABLE: 'Attendance', 
+    LEAVE_TABLE: 'Leave Applications'
+};
 
-// Initialize Supabase client
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-// Enhanced data structure
+// Data arrays
 let members = [];
 let attendance = [];
 let leaveApplications = [];
 let currentUser = null;
 let isAdmin = false;
-let settings = {
-    adminPassword: "admin123",
-    lastSync: null
-};
 
-// Initialize the system with database
-async function initializeSystem() {
-    try {
-        showMessage('Connecting to database...', 'warning');
-        
-        // Load all data from Supabase
-        await loadAllDataFromSupabase();
-        
-        // Set today's date for attendance
-        const today = new Date().toISOString().split('T')[0];
-        const attendanceDateElement = document.getElementById('attendanceDate');
-        if (attendanceDateElement) {
-            attendanceDateElement.value = today;
+// Airtable API functions
+async function airtableFetch(table, method = 'GET', data = null) {
+    const url = `https://api.airtable.com/v0/${AIRTABLE_CONFIG.BASE_ID}/${table}`;
+    
+    const options = {
+        method: method,
+        headers: {
+            'Authorization': `Bearer ${AIRTABLE_CONFIG.API_KEY}`,
+            'Content-Type': 'application/json'
         }
+    };
+    
+    if (data) {
+        options.body = JSON.stringify(data);
+    }
+    
+    try {
+        const response = await fetch(url, options);
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        return await response.json();
+    } catch (error) {
+        console.error('Airtable API error:', error);
+        throw error;
+    }
+}
+
+// Load all data from Airtable
+async function loadAllDataFromAirtable() {
+    try {
+        showMessage('Loading data from Airtable...', 'warning');
         
-        // Update storage status
-        updateStorageStatus();
+        // Load members
+        const membersData = await airtableFetch(AIRTABLE_CONFIG.MEMBERS_TABLE);
+        members = membersData.records.map(record => ({
+            id: record.id,
+            name: record.fields.Name || '',
+            phone: record.fields.Phone || '',
+            voicePart: record.fields['Voice Part'] || '',
+            email: record.fields.Email || '',
+            registeredDate: record.fields['Registered Date'] || new Date().toISOString().split('T')[0],
+            status: record.fields.Status || 'Active'
+        }));
         
-        console.log('System initialized with database');
-        showMessage('Database connected successfully!', 'success');
+        // Load attendance
+        const attendanceData = await airtableFetch(AIRTABLE_CONFIG.ATTENDANCE_TABLE);
+        attendance = attendanceData.records.map(record => ({
+            id: record.id,
+            memberId: record.fields.Member ? record.fields.Member[0] : null,
+            memberName: record.fields['Member Name'] || '',
+            date: record.fields.Date || '',
+            serviceType: record.fields['Service Type'] || '',
+            status: record.fields.Status || 'Present'
+        }));
+        
+        // Load leave applications
+        const leaveData = await airtableFetch(AIRTABLE_CONFIG.LEAVE_TABLE);
+        leaveApplications = leaveData.records.map(record => ({
+            id: record.id,
+            memberId: record.fields.Member ? record.fields.Member[0] : null,
+            memberName: record.fields['Member Name'] || '',
+            startDate: record.fields['Start Date'] || '',
+            endDate: record.fields['End Date'] || '',
+            leaveType: record.fields['Leave Type'] || '',
+            reason: record.fields.Reason || '',
+            status: record.fields.Status || 'Pending',
+            applicationDate: record.fields['Application Date'] || new Date().toISOString().split('T')[0]
+        }));
+        
+        console.log(`Loaded from Airtable: ${members.length} members, ${attendance.length} attendance records`);
+        showMessage('Data loaded successfully from Airtable!', 'success');
         
     } catch (error) {
-        console.error('Error initializing system:', error);
-        showMessage('Failed to connect to database. Using local storage as backup.', 'warning');
+        console.error('Error loading from Airtable:', error);
+        showMessage('Using local storage as backup', 'warning');
         loadFromBrowserStorage();
     }
 }
 
-// Supabase Data Functions
-async function loadAllDataFromSupabase() {
-    try {
-        // Load members
-        const { data: membersData, error: membersError } = await supabase
-            .from('members')
-            .select('*')
-            .order('name');
-        
-        if (membersError) throw membersError;
-        members = membersData || [];
-        
-        // Load attendance
-        const { data: attendanceData, error: attendanceError } = await supabase
-            .from('attendance')
-            .select('*')
-            .order('date', { ascending: false });
-        
-        if (attendanceError) throw attendanceError;
-        attendance = attendanceData || [];
-        
-        // Load leave applications
-        const { data: leaveData, error: leaveError } = await supabase
-            .from('leave_applications')
-            .select('*')
-            .order('application_date', { ascending: false });
-        
-        if (leaveError) throw leaveError;
-        leaveApplications = leaveData || [];
-        
-        // Load settings
-        const { data: settingsData, error: settingsError } = await supabase
-            .from('settings')
-            .select('*');
-        
-        if (!settingsError && settingsData) {
-            settingsData.forEach(setting => {
-                settings[setting.setting_key] = setting.setting_value;
-            });
-        }
-        
-        console.log(`Loaded from database: ${members.length} members, ${attendance.length} attendance records`);
-        
-    } catch (error) {
-        console.error('Error loading from Supabase:', error);
-        throw error;
+// Save member to Airtable
+async function saveMemberToAirtable(member) {
+    const fields = {
+        'Name': member.name,
+        'Phone': member.phone,
+        'Voice Part': member.voicePart,
+        'Email': member.email || '',
+        'Status': member.status || 'Active',
+        'Registered Date': member.registeredDate || new Date().toISOString().split('T')[0]
+    };
+    
+    const data = { fields: fields };
+    
+    if (member.id) {
+        // Update existing record
+        return await airtableFetch(`${AIRTABLE_CONFIG.MEMBERS_TABLE}/${member.id}`, 'PATCH', data);
+    } else {
+        // Create new record
+        return await airtableFetch(AIRTABLE_CONFIG.MEMBERS_TABLE, 'POST', data);
     }
 }
 
-async function saveMemberToSupabase(member) {
-    try {
-        const { data, error } = await supabase
-            .from('members')
-            .upsert(member)
-            .select();
-            
-        if (error) throw error;
-        return data[0];
-    } catch (error) {
-        console.error('Error saving member:', error);
-        throw error;
-    }
+// Save attendance to Airtable
+async function saveAttendanceToAirtable(record) {
+    // First, get member name for display
+    const member = members.find(m => m.id === record.memberId);
+    const memberName = member ? member.name : '';
+    
+    const fields = {
+        'Member': [record.memberId],
+        'Member Name': memberName,
+        'Date': record.date,
+        'Service Type': record.serviceType,
+        'Status': record.status || 'Present'
+    };
+    
+    const data = { fields: fields };
+    return await airtableFetch(AIRTABLE_CONFIG.ATTENDANCE_TABLE, 'POST', data);
 }
 
-async function saveAttendanceToSupabase(record) {
-    try {
-        const { data, error } = await supabase
-            .from('attendance')
-            .insert(record)
-            .select();
-            
-        if (error) throw error;
-        return data[0];
-    } catch (error) {
-        console.error('Error saving attendance:', error);
-        throw error;
-    }
+// Save leave application to Airtable
+async function saveLeaveApplicationToAirtable(application) {
+    const member = members.find(m => m.id === application.memberId);
+    const memberName = member ? member.name : '';
+    
+    const fields = {
+        'Member': [application.memberId],
+        'Member Name': memberName,
+        'Start Date': application.startDate,
+        'End Date': application.endDate,
+        'Leave Type': application.leaveType,
+        'Reason': application.reason,
+        'Status': application.status || 'Pending',
+        'Application Date': application.applicationDate || new Date().toISOString().split('T')[0]
+    };
+    
+    const data = { fields: fields };
+    return await airtableFetch(AIRTABLE_CONFIG.LEAVE_TABLE, 'POST', data);
 }
 
-async function saveLeaveApplicationToSupabase(application) {
-    try {
-        const { data, error } = await supabase
-            .from('leave_applications')
-            .insert(application)
-            .select();
-            
-        if (error) throw error;
-        return data[0];
-    } catch (error) {
-        console.error('Error saving leave application:', error);
-        throw error;
-    }
-}
-
-// Enhanced registerMember function with database
+// Enhanced registerMember function for Airtable
 async function registerMember() {
     try {
         const name = document.getElementById('memberName').value.trim();
@@ -937,41 +950,39 @@ async function registerMember() {
         const voicePart = document.getElementById('voicePart').value;
         const email = document.getElementById('memberEmail').value.trim();
         
-        // Validation (same as before)
         if (!name || !phone || !voicePart) {
             showMessage('Please fill in all required fields.', 'error');
             return;
         }
         
-        // Check for existing members in database
-        const { data: existingMembers } = await supabase
-            .from('members')
-            .select('*')
-            .or(`name.eq.${name},phone.eq.${phone}`);
+        // Check if member already exists
+        const existingMember = members.find(m => 
+            m.name.toLowerCase() === name.toLowerCase() || m.phone === phone
+        );
         
-        if (existingMembers && existingMembers.length > 0) {
+        if (existingMember) {
             showMessage('A member with this name or phone number already exists.', 'error');
             return;
         }
         
-        // Create new member object for database
         const newMember = {
             name: name,
             phone: phone,
-            voice_part: voicePart,
+            voicePart: voicePart,
             email: email,
             status: 'Active'
         };
         
-        // Save to database
-        const savedMember = await saveMemberToSupabase(newMember);
+        // Save to Airtable
+        const response = await saveMemberToAirtable(newMember);
+        newMember.id = response.id;
         
         // Add to local array
-        members.push(savedMember);
+        members.push(newMember);
         
         showMessage(`Registration successful! Welcome to the choir, ${name}!`);
         
-        // Clear form and switch to login
+        // Clear form
         document.getElementById('memberName').value = '';
         document.getElementById('memberPhone').value = '';
         document.getElementById('voicePart').value = '';
@@ -983,11 +994,11 @@ async function registerMember() {
         
     } catch (error) {
         console.error('Registration error:', error);
-        showMessage(`Registration failed: ${error.message}`, 'error');
+        showMessage('Registration failed. Please try again.', 'error');
     }
 }
 
-// Enhanced markMemberAttendance function
+// Enhanced markMemberAttendance for Airtable
 async function markMemberAttendance() {
     try {
         if (!currentUser) return;
@@ -1000,31 +1011,31 @@ async function markMemberAttendance() {
             return;
         }
         
-        // Check if already marked (database check)
-        const { data: existingRecords } = await supabase
-            .from('attendance')
-            .select('*')
-            .eq('member_id', currentUser.id)
-            .eq('date', date)
-            .eq('service_type', serviceType);
+        // Check if already marked
+        const existingRecord = attendance.find(a => 
+            a.memberId === currentUser.id && 
+            a.date === date && 
+            a.serviceType === serviceType
+        );
         
-        if (existingRecords && existingRecords.length > 0) {
+        if (existingRecord) {
             showMessage('You have already marked attendance for this date and service type.', 'error');
             return;
         }
         
         const attendanceRecord = {
-            member_id: currentUser.id,
+            memberId: currentUser.id,
             date: date,
-            service_type: serviceType,
+            serviceType: serviceType,
             status: 'Present'
         };
         
-        // Save to database
-        const savedRecord = await saveAttendanceToSupabase(attendanceRecord);
+        // Save to Airtable
+        const response = await saveAttendanceToAirtable(attendanceRecord);
+        attendanceRecord.id = response.id;
         
         // Add to local array
-        attendance.push(savedRecord);
+        attendance.push(attendanceRecord);
         
         updateMemberDashboard();
         showMessage(`Attendance marked successfully for ${serviceType} on ${date}!`);
@@ -1035,54 +1046,80 @@ async function markMemberAttendance() {
     }
 }
 
-// Enhanced login function
-async function loginUser() {
+// Enhanced submitLeaveApplication for Airtable
+async function submitLeaveApplication() {
     try {
-        const name = document.getElementById('loginName').value.trim();
-        const phone = document.getElementById('loginPhone').value.trim();
-        const password = document.getElementById('loginPassword').value;
+        if (!currentUser) return;
         
-        if (!name || !phone) {
-            showMessage('Please enter both name and phone number.', 'error');
+        const startDate = document.getElementById('leaveStartDate').value;
+        const endDate = document.getElementById('leaveEndDate').value;
+        const leaveType = document.getElementById('leaveType').value;
+        const reason = document.getElementById('leaveReason').value.trim();
+        
+        if (!startDate || !endDate || !reason) {
+            showMessage('Please fill in all required fields.', 'error');
             return;
         }
         
-        // Check for admin login
-        if (password === settings.adminPassword) {
-            isAdmin = true;
-            currentUser = { name: name, role: 'admin' };
-            document.getElementById('loginSection').classList.add('hidden');
-            document.getElementById('adminDashboard').classList.remove('hidden');
-            updateAdminDashboard();
-            showMessage(`Welcome Admin! Database connected.`);
+        if (new Date(endDate) < new Date(startDate)) {
+            showMessage('End date cannot be before start date.', 'error');
             return;
         }
         
-        // Regular member login - query database
-        const { data: memberData, error } = await supabase
-            .from('members')
-            .select('*')
-            .eq('name', name)
-            .eq('phone', phone)
-            .eq('status', 'Active')
-            .single();
+        const leaveApplication = {
+            memberId: currentUser.id,
+            startDate: startDate,
+            endDate: endDate,
+            leaveType: leaveType,
+            reason: reason,
+            status: 'Pending'
+        };
         
-        if (error || !memberData) {
-            showMessage('Member not found or inactive. Please check your details.', 'error');
-            return;
-        }
+        // Save to Airtable
+        const response = await saveLeaveApplicationToAirtable(leaveApplication);
+        leaveApplication.id = response.id;
+        leaveApplication.memberName = currentUser.name;
+        leaveApplication.applicationDate = new Date().toISOString().split('T')[0];
         
-        currentUser = memberData;
-        isAdmin = false;
-        document.getElementById('loginSection').classList.add('hidden');
-        document.getElementById('memberDashboard').classList.remove('hidden');
-        updateMemberDashboard();
-        showMessage(`Welcome back, ${memberData.name}!`);
+        // Add to local array
+        leaveApplications.push(leaveApplication);
+        
+        hideLeaveApplicationForm();
+        updateMemberLeaveApplications();
+        showMessage('Leave application submitted successfully!');
         
     } catch (error) {
-        console.error('Login error:', error);
-        showMessage('Login failed. Please try again.', 'error');
+        console.error('Leave application error:', error);
+        showMessage('Failed to submit leave application. Please try again.', 'error');
     }
 }
 
-// Keep your existing UI functions, but replace data persistence calls with database versions
+// Update initialization function
+async function initializeSystem() {
+    try {
+        // Set today's date for attendance
+        const today = new Date().toISOString().split('T')[0];
+        const attendanceDateElement = document.getElementById('attendanceDate');
+        if (attendanceDateElement) {
+            attendanceDateElement.value = today;
+        }
+        
+        // Load from Airtable
+        await loadAllDataFromAirtable();
+        
+        console.log('System initialized with Airtable');
+        
+    } catch (error) {
+        console.error('Error initializing system:', error);
+        showMessage('Using local storage only', 'warning');
+        loadFromBrowserStorage();
+    }
+}
+
+// Keep all your existing UI functions (showMessage, showRegisterForm, etc.)
+// They will work exactly the same way!
+
+// Initialize when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    initializeSystem();
+});
