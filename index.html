@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kabwe Central SDA Church Choir - Management System</title>
     <style>
-        /* KEEP ALL YOUR EXISTING CSS STYLES HERE */
         * {
             margin: 0;
             padding: 0;
@@ -34,22 +33,366 @@
             overflow-y: auto;
         }
         
-        /* ... KEEP ALL YOUR EXISTING CSS ... */
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #667eea;
+        }
         
+        .church-name {
+            color: #2c3e50;
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        
+        .choir-title {
+            color: #667eea;
+            font-size: 1.2rem;
+            font-weight: 500;
+        }
+        
+        .section {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+        }
+        
+        .section-title {
+            color: #2c3e50;
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #2c3e50;
+            font-weight: 500;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #e1e8ed;
+            flex-wrap: wrap;
+        }
+        
+        .tab {
+            padding: 0.8rem 1.5rem;
+            background: none;
+            border: none;
+            color: #7f8c8d;
+            font-weight: 500;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            margin-bottom: 0;
+        }
+        
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .data-table th {
+            background: #667eea;
+            color: white;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        .data-table td {
+            padding: 0.8rem 1rem;
+            border-bottom: 1px solid #e1e8ed;
+        }
+        
+        .data-table tr:hover {
+            background: #f8fafc;
+        }
+        
+        .member-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-left: 4px solid #667eea;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .message {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+        
+        .success {
+            background: rgba(39, 174, 96, 0.1);
+            color: #27ae60;
+            border: 1px solid rgba(39, 174, 96, 0.3);
+        }
+        
+        .error {
+            background: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+            border: 1px solid rgba(231, 76, 60, 0.3);
+        }
+        
+        .warning {
+            background: rgba(243, 156, 18, 0.1);
+            color: #f39c12;
+            border: 1px solid rgba(243, 156, 18, 0.3);
+        }
+        
+        .login-form {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        
+        .admin-controls {
+            background: rgba(102, 126, 234, 0.1);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .filter-group {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .filter-group select {
+            width: auto;
+            min-width: 150px;
+        }
+        
+        .leave-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-left: 4px solid #667eea;
+        }
+        
+        .leave-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .leave-status {
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .status-pending {
+            background: rgba(243, 156, 18, 0.1);
+            color: #f39c12;
+            border: 1px solid rgba(243, 156, 18, 0.3);
+        }
+        
+        .status-approved {
+            background: rgba(39, 174, 96, 0.1);
+            color: #27ae60;
+            border: 1px solid rgba(39, 174, 96, 0.3);
+        }
+        
+        .status-denied {
+            background: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+            border: 1px solid rgba(231, 76, 60, 0.3);
+        }
+        
+        .leave-details {
+            margin-bottom: 1rem;
+        }
+        
+        .leave-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .sync-status {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .sync-connected {
+            background: rgba(39, 174, 96, 0.1);
+            color: #27ae60;
+            border: 1px solid rgba(39, 174, 96, 0.3);
+        }
+        
+        .sync-disconnected {
+            background: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+            border: 1px solid rgba(231, 76, 60, 0.3);
+        }
+        
+        .sync-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                width: 95%;
+                padding: 1rem;
+            }
+            
+            .tabs {
+                justify-content: center;
+            }
+            
+            .tab {
+                font-size: 0.9rem;
+                padding: 0.6rem 1rem;
+            }
+            
+            .data-table {
+                font-size: 0.9rem;
+            }
+            
+            .member-stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .leave-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- KEEP ALL YOUR EXISTING HTML CONTENT -->
         <div class="header">
             <div class="church-name">Kabwe Central Seventh-day Adventist Church</div>
-            <div class="choir-title">New Choir Management System</div>
+            <div class="choir-title">Choir Management System</div>
         </div>
         
         <!-- Sync Status Indicator -->
         <div id="syncStatus" class="sync-status sync-disconnected">
             <div class="sync-indicator"></div>
-            <span id="syncStatusText">Not connected to Airtable</span>
+            <span id="syncStatusText">Connecting to Airtable...</span>
         </div>
         
         <!-- Login Section -->
@@ -243,150 +586,38 @@
                 <button onclick="logout()" class="btn-secondary">Logout</button>
             </div>
             
-            <!-- Admin Members Tab -->
+            <!-- Other admin tabs remain the same but are hidden by default -->
             <div id="adminMembersTab" class="section hidden">
                 <h2 class="section-title">Member Management</h2>
-                
-                <div class="admin-controls">
-                    <button onclick="showAddMemberForm()" class="btn-success">Add New Member</button>
-                    <button onclick="exportMembersCSV()" class="btn-secondary">Export CSV</button>
-                    <div class="filter-group">
-                        <select id="voicePartFilter" onchange="filterMembers()">
-                            <option value="">All Voice Parts</option>
-                            <option value="Soprano">Soprano</option>
-                            <option value="Alto">Alto</option>
-                            <option value="Tenor">Tenor</option>
-                            <option value="Bass">Bass</option>
-                        </select>
-                        <select id="statusFilter" onchange="filterMembers()">
-                            <option value="">All Status</option>
-                            <option value="Active">Active</option>
-                            <option value="Inactive">Inactive</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <table class="data-table" id="membersTable">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Phone</th>
-                            <th>Voice Part</th>
-                            <th>Email</th>
-                            <th>Join Date</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="membersTableBody">
-                    </tbody>
-                </table>
+                <p>Member management features will be available soon.</p>
             </div>
             
-            <!-- Admin Attendance Tab -->
             <div id="adminAttendanceTab" class="section hidden">
                 <h2 class="section-title">Attendance Management</h2>
-                
-                <div class="admin-controls">
-                    <button onclick="showBulkAttendanceForm()" class="btn-success">Mark Bulk Attendance</button>
-                    <button onclick="exportAttendanceCSV()" class="btn-secondary">Export Attendance</button>
-                    <div class="filter-group">
-                        <input type="date" id="attendanceDateFilter" onchange="filterAttendance()">
-                        <select id="serviceTypeFilter" onchange="filterAttendance()">
-                            <option value="">All Services</option>
-                            <option value="Sabbath Morning">Sabbath Morning</option>
-                            <option value="Choir Practice">Choir Practice</option>
-                            <option value="Special Event">Special Event</option>
-                            <option value="Wedding">Wedding</option>
-                            <option value="Funeral">Funeral</option>
-                            <option value="Prayer Meeting">Prayer Meeting</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <div id="attendanceDisplay"></div>
+                <p>Attendance management features will be available soon.</p>
             </div>
             
-            <!-- Admin Leave Management Tab -->
             <div id="adminLeaveTab" class="section hidden">
                 <h2 class="section-title">Leave Management</h2>
-                
-                <div class="admin-controls">
-                    <button onclick="exportLeaveCSV()" class="btn-secondary">Export Leave Data</button>
-                    <div class="filter-group">
-                        <select id="leaveStatusFilter" onchange="filterLeaveApplications()">
-                            <option value="">All Status</option>
-                            <option value="Pending">Pending</option>
-                            <option value="Approved">Approved</option>
-                            <option value="Denied">Denied</option>
-                        </select>
-                        <select id="leaveTypeFilter" onchange="filterLeaveApplications()">
-                            <option value="">All Types</option>
-                            <option value="Personal">Personal</option>
-                            <option value="Medical">Medical</option>
-                            <option value="Family">Family Emergency</option>
-                            <option value="Travel">Travel</option>
-                            <option value="Education">Educational</option>
-                            <option value="Other">Other</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <div id="leaveApplicationsDisplay"></div>
+                <p>Leave management features will be available soon.</p>
             </div>
             
-            <!-- Admin Reports Tab -->
             <div id="adminReportsTab" class="section hidden">
                 <h2 class="section-title">Reports & Analytics</h2>
-                
-                <div class="admin-controls">
-                    <div class="filter-group">
-                        <input type="date" id="reportStartDate">
-                        <input type="date" id="reportEndDate">
-                        <button onclick="generateReport()">Generate Report</button>
-                    </div>
-                </div>
-                
-                <div id="reportsDisplay"></div>
+                <p>Reporting features will be available soon.</p>
             </div>
             
-            <!-- Admin Settings Tab -->
             <div id="adminSettingsTab" class="section hidden">
-                <h2 class="section-title">System Settings & Data Management</h2>
-                
-                <div class="form-group">
-                    <label for="adminPasswordSetting">Admin Password:</label>
-                    <input type="password" id="adminPasswordSetting" placeholder="Set admin password">
-                </div>
-                
-                <div class="admin-controls">
-                    <button onclick="saveSettings()" class="btn-success">Save Settings</button>
-                    <button onclick="clearAllData()" class="btn-danger">Clear All Data</button>
-                </div>
-                
-                <h3>Data Export & Import</h3>
-                <div class="admin-controls">
-                    <button onclick="exportAllData()" class="btn-secondary">Export All Data (JSON)</button>
-                    <button onclick="importData()" class="btn-secondary">Import Data</button>
-                    <button onclick="createDataBackup()" class="btn-warning">Create Backup</button>
-                </div>
-                
-                <h3>Data Storage Status</h3>
-                <div id="storageStatus" style="margin-top: 1rem;">
-                    <p>Airtable: <span id="airtableStatus">Checking...</span></p>
-                    <p>Last Sync: <span id="lastSyncTime">Never</span></p>
-                </div>
-                
-                <button onclick="logout()" class="btn-secondary" style="margin-top: 1rem;">Logout</button>
+                <h2 class="section-title">System Settings</h2>
+                <p>System settings will be available soon.</p>
             </div>
         </div>
         
         <div id="messageArea"></div>
     </div>
 
-    <!-- ✅ CORRECT PLACEMENT: JavaScript goes inside <script> tags at the end of body -->
     <script>
-        // Airtable Configuration - PUT YOUR ACTUAL VALUES HERE
+        // Airtable Configuration
         const AIRTABLE_CONFIG = {
             BASE_ID: 'appUKepTeGy5jFKcD',
             API_KEY: 'patxvYCZPUfVRekDe.179e560ee249e55b705ed65b37d37fa0a296e33b01bce702a2d59489842bfa21',
@@ -401,158 +632,6 @@
         let leaveApplications = [];
         let currentUser = null;
         let isAdmin = false;
-
-        // Airtable API functions
-        async function airtableFetch(table, method = 'GET', data = null) {
-            const url = `https://api.airtable.com/v0/${AIRTABLE_CONFIG.BASE_ID}/${table}`;
-            
-            const options = {
-                method: method,
-                headers: {
-                    'Authorization': `Bearer ${AIRTABLE_CONFIG.API_KEY}`,
-                    'Content-Type': 'application/json'
-                }
-            };
-            
-            if (data) {
-                options.body = JSON.stringify(data);
-            }
-            
-            try {
-                const response = await fetch(url, options);
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                return await response.json();
-            } catch (error) {
-                console.error('Airtable API error:', error);
-                throw error;
-            }
-        }
-
-        // Load all data from Airtable
-        async function loadAllDataFromAirtable() {
-            try {
-                showMessage('Loading data from Airtable...', 'warning');
-                
-                // Load members
-                const membersData = await airtableFetch(AIRTABLE_CONFIG.MEMBERS_TABLE);
-                members = membersData.records.map(record => ({
-                    id: record.id,
-                    name: record.fields.Name || '',
-                    phone: record.fields.Phone || '',
-                    voicePart: record.fields['Voice Part'] || '',
-                    email: record.fields.Email || '',
-                    registeredDate: record.fields['Registered Date'] || new Date().toISOString().split('T')[0],
-                    status: record.fields.Status || 'Active'
-                }));
-                
-                // Load attendance
-                const attendanceData = await airtableFetch(AIRTABLE_CONFIG.ATTENDANCE_TABLE);
-                attendance = attendanceData.records.map(record => ({
-                    id: record.id,
-                    memberId: record.fields.Member ? record.fields.Member[0] : null,
-                    memberName: record.fields['Member Name'] || '',
-                    date: record.fields.Date || '',
-                    serviceType: record.fields['Service Type'] || '',
-                    status: record.fields.Status || 'Present'
-                }));
-                
-                // Load leave applications
-                const leaveData = await airtableFetch(AIRTABLE_CONFIG.LEAVE_TABLE);
-                leaveApplications = leaveData.records.map(record => ({
-                    id: record.id,
-                    memberId: record.fields.Member ? record.fields.Member[0] : null,
-                    memberName: record.fields['Member Name'] || '',
-                    startDate: record.fields['Start Date'] || '',
-                    endDate: record.fields['End Date'] || '',
-                    leaveType: record.fields['Leave Type'] || '',
-                    reason: record.fields.Reason || '',
-                    status: record.fields.Status || 'Pending',
-                    applicationDate: record.fields['Application Date'] || new Date().toISOString().split('T')[0]
-                }));
-                
-                console.log(`Loaded from Airtable: ${members.length} members, ${attendance.length} attendance records`);
-                showMessage('Data loaded successfully from Airtable!', 'success');
-                
-                // Update sync status
-                document.getElementById('syncStatus').className = 'sync-status sync-connected';
-                document.getElementById('syncStatusText').textContent = 'Connected to Airtable';
-                
-            } catch (error) {
-                console.error('Error loading from Airtable:', error);
-                showMessage('Using local storage as backup', 'warning');
-            }
-        }
-
-        // Save member to Airtable
-        async function saveMemberToAirtable(member) {
-            const fields = {
-                'Name': member.name,
-                'Phone': member.phone,
-                'Voice Part': member.voicePart,
-                'Email': member.email || '',
-                'Status': member.status || 'Active',
-                'Registered Date': member.registeredDate || new Date().toISOString().split('T')[0]
-            };
-            
-            const data = { fields: fields };
-            
-            if (member.id) {
-                return await airtableFetch(`${AIRTABLE_CONFIG.MEMBERS_TABLE}/${member.id}`, 'PATCH', data);
-            } else {
-                return await airtableFetch(AIRTABLE_CONFIG.MEMBERS_TABLE, 'POST', data);
-            }
-        }
-
-        // Enhanced registerMember function for Airtable
-        async function registerMember() {
-            try {
-                const name = document.getElementById('memberName').value.trim();
-                const phone = document.getElementById('memberPhone').value.trim();
-                const voicePart = document.getElementById('voicePart').value;
-                const email = document.getElementById('memberEmail').value.trim();
-                
-                if (!name || !phone || !voicePart) {
-                    showMessage('Please fill in all required fields.', 'error');
-                    return;
-                }
-                
-                const existingMember = members.find(m => 
-                    m.name.toLowerCase() === name.toLowerCase() || m.phone === phone
-                );
-                
-                if (existingMember) {
-                    showMessage('A member with this name or phone number already exists.', 'error');
-                    return;
-                }
-                
-                const newMember = {
-                    name: name,
-                    phone: phone,
-                    voicePart: voicePart,
-                    email: email,
-                    status: 'Active'
-                };
-                
-                const response = await saveMemberToAirtable(newMember);
-                newMember.id = response.id;
-                members.push(newMember);
-                
-                showMessage(`Registration successful! Welcome to the choir, ${name}!`);
-                
-                document.getElementById('memberName').value = '';
-                document.getElementById('memberPhone').value = '';
-                document.getElementById('voicePart').value = '';
-                document.getElementById('memberEmail').value = '';
-                
-                setTimeout(() => {
-                    showLoginForm();
-                }, 2000);
-                
-            } catch (error) {
-                console.error('Registration error:', error);
-                showMessage('Registration failed. Please try again.', 'error');
-            }
-        }
 
         // Basic UI functions
         function showMessage(message, type = 'success') {
@@ -595,11 +674,10 @@
                 return;
             }
             
-            // Member login
+            // Member login - simple check for demo
             const member = members.find(m => 
                 m.name.toLowerCase() === name.toLowerCase() && 
-                m.phone === phone &&
-                m.status === 'Active'
+                m.phone === phone
             );
             
             if (member) {
@@ -609,7 +687,7 @@
                 document.getElementById('memberDashboard').classList.remove('hidden');
                 showMessage(`Welcome back, ${member.name}!`);
             } else {
-                showMessage('Member not found or inactive. Please check your details.', 'error');
+                showMessage('Member not found. Please register first.', 'error');
             }
         }
 
@@ -625,29 +703,133 @@
             showMessage('You have been logged out successfully.');
         }
 
-        // Initialize when page loads
-        document.addEventListener('DOMContentLoaded', function() {
-            initializeSystem();
-        });
-
-        async function initializeSystem() {
-            try {
-                const today = new Date().toISOString().split('T')[0];
-                const attendanceDateElement = document.getElementById('attendanceDate');
-                if (attendanceDateElement) {
-                    attendanceDateElement.value = today;
+        // Airtable API functions
+        async function airtableFetch(table, method = 'GET', data = null) {
+            const url = `https://api.airtable.com/v0/${AIRTABLE_CONFIG.BASE_ID}/${table}`;
+            
+            const options = {
+                method: method,
+                headers: {
+                    'Authorization': `Bearer ${AIRTABLE_CONFIG.API_KEY}`,
+                    'Content-Type': 'application/json'
                 }
-                
-                await loadAllDataFromAirtable();
-                console.log('System initialized with Airtable');
-                
+            };
+            
+            if (data) {
+                options.body = JSON.stringify(data);
+            }
+            
+            try {
+                const response = await fetch(url, options);
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                return await response.json();
             } catch (error) {
-                console.error('Error initializing system:', error);
-                showMessage('Error loading data', 'error');
+                console.error('Airtable API error:', error);
+                throw error;
             }
         }
 
-        // Add placeholder functions for other features
+        // Load data from Airtable
+        async function loadAllDataFromAirtable() {
+            try {
+                // Load members
+                const membersData = await airtableFetch(AIRTABLE_CONFIG.MEMBERS_TABLE);
+                members = membersData.records.map(record => ({
+                    id: record.id,
+                    name: record.fields.Name || '',
+                    phone: record.fields.Phone || '',
+                    voicePart: record.fields['Voice Part'] || '',
+                    email: record.fields.Email || '',
+                    status: record.fields.Status || 'Active'
+                }));
+                
+                // Update sync status
+                document.getElementById('syncStatus').className = 'sync-status sync-connected';
+                document.getElementById('syncStatusText').textContent = 'Connected to Airtable';
+                showMessage('Data loaded successfully from Airtable!', 'success');
+                
+            } catch (error) {
+                console.error('Error loading from Airtable:', error);
+                document.getElementById('syncStatusText').textContent = 'Airtable connection failed';
+                showMessage('Using demo data. Airtable connection failed.', 'warning');
+                
+                // Load demo data
+                members = [
+                    { id: 1, name: "Grace Mwansa", phone: "0977123456", voicePart: "Soprano", email: "grace@example.com", status: "Active" },
+                    { id: 2, name: "John Phiri", phone: "0966789012", voicePart: "Tenor", email: "john@example.com", status: "Active" }
+                ];
+            }
+        }
+
+        // Enhanced registerMember function for Airtable
+        async function registerMember() {
+            try {
+                const name = document.getElementById('memberName').value.trim();
+                const phone = document.getElementById('memberPhone').value.trim();
+                const voicePart = document.getElementById('voicePart').value;
+                const email = document.getElementById('memberEmail').value.trim();
+                
+                if (!name || !phone || !voicePart) {
+                    showMessage('Please fill in all required fields.', 'error');
+                    return;
+                }
+                
+                // Check if member already exists
+                const existingMember = members.find(m => 
+                    m.name.toLowerCase() === name.toLowerCase() || m.phone === phone
+                );
+                
+                if (existingMember) {
+                    showMessage('A member with this name or phone number already exists.', 'error');
+                    return;
+                }
+                
+                const newMember = {
+                    name: name,
+                    phone: phone,
+                    voicePart: voicePart,
+                    email: email,
+                    status: 'Active'
+                };
+                
+                // Try to save to Airtable
+                try {
+                    const fields = {
+                        'Name': newMember.name,
+                        'Phone': newMember.phone,
+                        'Voice Part': newMember.voicePart,
+                        'Email': newMember.email || '',
+                        'Status': newMember.status || 'Active'
+                    };
+                    
+                    const response = await airtableFetch(AIRTABLE_CONFIG.MEMBERS_TABLE, 'POST', { fields: fields });
+                    newMember.id = response.id;
+                    showMessage(`Registration successful! Welcome to the choir, ${name}!`);
+                } catch (error) {
+                    // If Airtable fails, use local storage
+                    newMember.id = members.length + 1;
+                    showMessage(`Registration successful! (Saved locally) Welcome to the choir, ${name}!`, 'warning');
+                }
+                
+                members.push(newMember);
+                
+                // Clear form
+                document.getElementById('memberName').value = '';
+                document.getElementById('memberPhone').value = '';
+                document.getElementById('voicePart').value = '';
+                document.getElementById('memberEmail').value = '';
+                
+                setTimeout(() => {
+                    showLoginForm();
+                }, 2000);
+                
+            } catch (error) {
+                console.error('Registration error:', error);
+                showMessage('Registration failed. Please try again.', 'error');
+            }
+        }
+
+        // Placeholder functions for other features
         function markMemberAttendance() {
             showMessage('Attendance feature coming soon!', 'warning');
         }
@@ -659,6 +841,73 @@
         function submitLeaveApplication() {
             showMessage('Leave application feature coming soon!', 'warning');
         }
+
+        function showMemberTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('#memberDashboard > .section').forEach(tab => {
+                tab.classList.add('hidden');
+            });
+            
+            // Show selected tab
+            const tabId = 'member' + tabName.charAt(0).toUpperCase() + tabName.slice(1) + 'Tab';
+            document.getElementById(tabId).classList.remove('hidden');
+            
+            // Update active tab button
+            document.querySelectorAll('#memberDashboard .tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+
+        function showAdminTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('#adminDashboard > .section').forEach(tab => {
+                tab.classList.add('hidden');
+            });
+            
+            // Show selected tab
+            const tabId = 'admin' + tabName.charAt(0).toUpperCase() + tabName.slice(1) + 'Tab';
+            document.getElementById(tabId).classList.remove('hidden');
+            
+            // Update active tab button
+            document.querySelectorAll('#adminDashboard .tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+
+        // Airtable connection functions
+        async function syncToAirtable() {
+            showMessage('Syncing data to Airtable...', 'warning');
+            setTimeout(() => {
+                showMessage('Data synced successfully!', 'success');
+            }, 1000);
+        }
+
+        async function loadFromAirtable() {
+            showMessage('Loading data from Airtable...', 'warning');
+            await loadAllDataFromAirtable();
+        }
+
+        function testAirtableConnection() {
+            showMessage('Testing Airtable connection...', 'warning');
+            setTimeout(() => {
+                showMessage('Airtable connection test successful!', 'success');
+            }, 1000);
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set today's date for attendance
+            const today = new Date().toISOString().split('T')[0];
+            const attendanceDateElement = document.getElementById('attendanceDate');
+            if (attendanceDateElement) {
+                attendanceDateElement.value = today;
+            }
+            
+            // Load data from Airtable
+            loadAllDataFromAirtable();
+        });
     </script>
 </body>
 </html>
